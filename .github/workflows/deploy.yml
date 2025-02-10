@@ -73,6 +73,29 @@ jobs:
           name: ColorMapChecker
           path: ColorMapChecker/dist
 
+  build-animated-classifier:
+    name: Build animated classifier
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@main
+      - name: Setup node
+        uses: actions/setup-node@main
+      - name: Install dependencies and build
+        run: |
+          cd AnimatedClassifier
+          npm install
+          npx \
+            vite build \
+            --outDir=dist \
+            --base=https://naokihori.github.io/Trash/AnimatedClassifier/
+          cd ..
+      - name: Upload
+        uses: actions/upload-artifact@main
+        with:
+          name: AnimatedClassifier
+          path: AnimatedClassifier/dist
+
   merge-and-deploy:
     name: Merge artifacts and deploy
     permissions:
@@ -86,7 +109,13 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs: [build-maze, build-sudoku, build-color-map-checker]
+    needs:
+      [
+        build-maze,
+        build-sudoku,
+        build-color-map-checker,
+        build-animated-classifier,
+      ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
@@ -111,6 +140,11 @@ jobs:
         with:
           name: ColorMapChecker
           path: package/ColorMapChecker
+      - name: Download animated classifier
+        uses: actions/download-artifact@main
+        with:
+          name: AnimatedClassifier
+          path: package/AnimatedClassifier
       - name: Setup GitHub Pages
         uses: actions/configure-pages@main
       - name: Upload HTML
