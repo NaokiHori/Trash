@@ -1,0 +1,15 @@
+{
+  "name": "julia-set-viewer",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "check": "tsc",
+    "dev": "vite"
+  },
+  "dependencies": {
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0"
+  }
+}

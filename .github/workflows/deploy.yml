@@ -4,100 +4,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-maze:
-    name: Build maze
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
-      - name: Setup node
-        uses: actions/setup-node@main
-      - name: Install dependencies and build
-        run: |
-          cd MiniMaze
-          npm install
-          npx \
-            vite build \
-            --outDir=dist \
-            --base=https://naokihori.github.io/Trash/MiniMaze/
-          cd ..
-      - name: Upload
-        uses: actions/upload-artifact@main
-        with:
-          name: MiniMaze
-          path: MiniMaze/dist
-
-  build-sudoku:
-    name: Build sudoku
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
-      - name: Setup node
-        uses: actions/setup-node@main
-      - name: Install dependencies and build
-        run: |
-          cd SudokuAssistant
-          npm install
-          npx \
-            vite build \
-            --outDir=dist \
-            --base=https://naokihori.github.io/Trash/SudokuAssistant/
-          cd ..
-      - name: Upload
-        uses: actions/upload-artifact@main
-        with:
-          name: SudokuAssistant
-          path: SudokuAssistant/dist
-
-  build-color-map-checker:
-    name: Build color-map checker
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
-      - name: Setup node
-        uses: actions/setup-node@main
-      - name: Install dependencies and build
-        run: |
-          cd ColorMapChecker
-          npm install
-          npx \
-            vite build \
-            --outDir=dist \
-            --base=https://naokihori.github.io/Trash/ColorMapChecker/
-          cd ..
-      - name: Upload
-        uses: actions/upload-artifact@main
-        with:
-          name: ColorMapChecker
-          path: ColorMapChecker/dist
-
-  build-animated-classifier:
-    name: Build animated classifier
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@main
-      - name: Setup node
-        uses: actions/setup-node@main
-      - name: Install dependencies and build
-        run: |
-          cd AnimatedClassifier
-          npm install
-          npx \
-            vite build \
-            --outDir=dist \
-            --base=https://naokihori.github.io/Trash/AnimatedClassifier/
-          cd ..
-      - name: Upload
-        uses: actions/upload-artifact@main
-        with:
-          name: AnimatedClassifier
-          path: AnimatedClassifier/dist
-
-  merge-and-deploy:
-    name: Merge artifacts and deploy
+  build-and-deploy:
+    name: Build and deploy
     permissions:
       contents: read
       pages: write
@@ -109,48 +17,26 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
-    needs:
-      [
-        build-maze,
-        build-sudoku,
-        build-color-map-checker,
-        build-animated-classifier,
-      ]
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
-      - name: Prepare directory to deploy
-        run: |
-          mkdir package
-          cp \
-            index.html style.css \
-            package/
-      - name: Download maze
-        uses: actions/download-artifact@main
-        with:
-          name: MiniMaze
-          path: package/MiniMaze
-      - name: Download sudoku
-        uses: actions/download-artifact@main
-        with:
-          name: SudokuAssistant
-          path: package/SudokuAssistant
-      - name: Download color map checker
-        uses: actions/download-artifact@main
-        with:
-          name: ColorMapChecker
-          path: package/ColorMapChecker
-      - name: Download animated classifier
-        uses: actions/download-artifact@main
-        with:
-          name: AnimatedClassifier
-          path: package/AnimatedClassifier
+      - name: Setup node
+        uses: actions/setup-node@main
       - name: Setup GitHub Pages
         uses: actions/configure-pages@main
-      - name: Upload HTML
+      - name: Install dependencies
+        run: |
+          npm install
+      - name: Build
+        run: |
+          npx \
+            vite build \
+            --outDir=dist \
+            --base=https://naokihori.github.io/Trash/
+      - name: Upload artifacts
         uses: actions/upload-pages-artifact@main
         with:
-          path: package
+          path: dist
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@main
