@@ -62,28 +62,3 @@ export function rgbToHsv(
   const v = max;
   return [h, s, v];
 }
-
-// convert HSL value [0:1] to RGB value [0:1]
-// https://www.peko-step.com/tool/hslrgb.html#google_vignette
-export function hslToRgb(
-  hsl: [number, number, number],
-): [number, number, number] {
-  const h = hsl[0];
-  const s = hsl[1];
-  const l = hsl[2];
-  const min = l < 0.5 ? l - l * s : l - (1 - l) * s;
-  const max = l < 0.5 ? l + l * s : l + (1 - l) * s;
-  if (h < 1 / 6) {
-    return [max, h * (max - min) + min, min];
-  } else if (h < 2 / 6) {
-    return [(2 / 6 - h) * (max - min) + min, max, min];
-  } else if (h < 3 / 6) {
-    return [min, max, (h - 2 / 6) * (max - min) + min];
-  } else if (h < 4 / 6) {
-    return [min, (4 / 6 - h) * (max - min) + min, max];
-  } else if (h < 5 / 6) {
-    return [(h - 4 / 6) * (max - min) + min, min, max];
-  } else {
-    return [max, min, (1 - h) * (max - min) + min];
-  }
-}
