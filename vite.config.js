@@ -11,8 +11,9 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(root, ".", "index.html"),
-        AnimatedClassifier: resolve(root, "AnimatedClassifier", "index.html"),
+        Classifier: resolve(root, "Classifier", "index.html"),
         ColorMapChecker: resolve(root, "ColorMapChecker", "index.html"),
+        Delaunay: resolve(root, "Delaunay", "index.html"),
         JuliaSetViewer: resolve(root, "JuliaSetViewer", "index.html"),
         MiniMaze: resolve(root, "MiniMaze", "index.html"),
         SudokuAssistant: resolve(root, "SudokuAssistant", "index.html"),

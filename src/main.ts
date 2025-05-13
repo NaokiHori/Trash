@@ -2,7 +2,8 @@ import sudokuAssistantIcon from "../SudokuAssistant/icon.jpg";
 import miniMazeIcon from "../MiniMaze/icon.jpg";
 import juliaSetViewerIcon from "../JuliaSetViewer/icon.jpg";
 import colorMapCheckerIcon from "../ColorMapChecker/icon.jpg";
-import animatedClassifierIcon from "../AnimatedClassifier/icon.jpg";
+import animatedClassifierIcon from "../Classifier/icon.jpg";
+import delaynayIcon from "../Delaunay/icon.jpg";
 
 function getElementById(elementId: string): HTMLElement {
   const element: HTMLElement | null = document.getElementById(elementId);
@@ -126,9 +127,15 @@ function main() {
     }),
     new Page({
       isActive: false,
-      title: "Animated Classifier",
-      href: `${ROOT}/AnimatedClassifier/index.html`,
+      title: "Classifier",
+      href: `${ROOT}/Classifier/index.html`,
       imageSource: animatedClassifierIcon,
+    }),
+    new Page({
+      isActive: false,
+      title: "Delaunay triangulator",
+      href: `${ROOT}/Delaunay/index.html`,
+      imageSource: delaynayIcon,
     }),
   ];
   updateCarouselPagination(getCurrentPageIndex(pages), pages.length);
