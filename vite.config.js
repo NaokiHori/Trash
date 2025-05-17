@@ -11,7 +11,7 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: resolve(root, ".", "index.html"),
-        Classifier: resolve(root, "Classifier", "index.html"),
+        // Classifier: resolve(root, "Classifier", "index.html"),
         ColorMapChecker: resolve(root, "ColorMapChecker", "index.html"),
         Delaunay: resolve(root, "Delaunay", "index.html"),
         JuliaSetViewer: resolve(root, "JuliaSetViewer", "index.html"),
