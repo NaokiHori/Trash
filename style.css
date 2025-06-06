@@ -41,7 +41,7 @@ div.carousel-item-inactive {
   display: none;
 }
 
-div.carousel-title > a {
+div.carousel-item > a {
   font-size: 3.5dvh;
 }
 

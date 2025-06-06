@@ -29,7 +29,7 @@ class Page {
     imageSource: string;
   }) {
     const element = document.createElement("div");
-    element.classList.add("carousel-title");
+    element.classList.add("carousel-item");
     const anchor = document.createElement("a");
     anchor.textContent = title;
     anchor.setAttribute("href", href);
