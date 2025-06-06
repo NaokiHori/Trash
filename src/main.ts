@@ -4,6 +4,7 @@ import juliaSetViewerIcon from "../JuliaSetViewer/icon.jpg";
 import colorMapCheckerIcon from "../ColorMapChecker/icon.jpg";
 // import animatedClassifierIcon from "../Classifier/icon.jpg";
 import delaynayIcon from "../Delaunay/icon.jpg";
+import advectionIcon from "../Advection/icon.jpg";
 
 function getElementById(elementId: string): HTMLElement {
   const element: HTMLElement | null = document.getElementById(elementId);
@@ -139,6 +140,12 @@ function main() {
       title: "Delaunay triangulator",
       href: `${ROOT}/Delaunay/index.html`,
       imageSource: delaynayIcon,
+    }),
+    new Page({
+      isActive: false,
+      title: "Advection",
+      href: `${ROOT}/Advection/index.html`,
+      imageSource: advectionIcon,
     }),
   ];
   updateCarouselPagination(getCurrentPageIndex(pages), pages.length);
