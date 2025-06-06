@@ -42,6 +42,7 @@ div.carousel-item-inactive {
 }
 
 div.carousel-item > a {
+  text-align: center;
   font-size: 3.5dvh;
 }
 

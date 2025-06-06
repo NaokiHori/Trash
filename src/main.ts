@@ -30,14 +30,17 @@ class Page {
   }) {
     const element = document.createElement("div");
     element.classList.add("carousel-item");
-    const anchor = document.createElement("a");
-    anchor.textContent = title;
-    anchor.setAttribute("href", href);
+    const titleAnchor = document.createElement("a");
+    titleAnchor.textContent = title;
+    titleAnchor.setAttribute("href", href);
+    const imageAnchor = document.createElement("a");
+    imageAnchor.setAttribute("href", href);
     const image = document.createElement("img");
     image.classList.add("carousel-image");
     image.setAttribute("src", imageSource);
-    element.appendChild(anchor);
-    element.appendChild(image);
+    imageAnchor.appendChild(image);
+    element.appendChild(titleAnchor);
+    element.appendChild(imageAnchor);
     this._element = element;
     this._isActive = isActive;
     this.setDisplayStatus();
