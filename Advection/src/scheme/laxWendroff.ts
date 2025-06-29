@@ -3,7 +3,7 @@ import { BaseScheme } from "./base";
 const N_HALO = 1;
 
 export class LaxWendroffScheme extends BaseScheme {
-  public label = "Lax Wendroff";
+  public label = "Lax-Wendroff";
   private _values: Array<number>;
   private _dValues: Array<number>;
 

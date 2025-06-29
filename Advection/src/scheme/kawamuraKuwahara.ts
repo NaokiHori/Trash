@@ -3,7 +3,7 @@ import { BaseScheme } from "./base";
 const N_HALO = 2;
 
 export class KawamuraKuwaharaScheme extends BaseScheme {
-  public label = "Kawamura Kuwahara";
+  public label = "Kawamura-Kuwahara";
   private _values: Array<number>;
   private _dValues: Array<number>;
 

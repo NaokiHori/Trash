@@ -1,6 +1,11 @@
 import { Graph } from "./graph";
 import { Scheme } from "./scheme";
 
+function getSpecifiedScheme(): string | null {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get("scheme");
+}
+
 function integrate(graph: Graph, scheme: Scheme) {
   requestAnimationFrame(() => {
     const nIterations = 6;
@@ -15,7 +20,7 @@ function integrate(graph: Graph, scheme: Scheme) {
 function main() {
   const length = 1;
   const nitems = 128;
-  const scheme = new Scheme(length, nitems);
+  const scheme = new Scheme(getSpecifiedScheme(), length, nitems);
   const labelElement = document.getElementById("scheme-label");
   if (labelElement === null) {
     throw new Error("label div element not found");

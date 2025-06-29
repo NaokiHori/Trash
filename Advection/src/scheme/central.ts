@@ -3,7 +3,7 @@ import { BaseScheme } from "./base";
 const N_HALO = 1;
 
 export class CentralScheme extends BaseScheme {
-  public label = "2nd Central FD";
+  public label = "Central-FD";
   private _values: Array<number>;
   private _dValues: Array<number>;
   private _fluxes: Array<number>;

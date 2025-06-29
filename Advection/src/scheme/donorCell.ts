@@ -3,7 +3,7 @@ import { BaseScheme } from "./base";
 const N_HALO = 1;
 
 export class DonorCellScheme extends BaseScheme {
-  public label = "Donor Cell";
+  public label = "Donor-Cell";
   private _values: Array<number>;
   private _dValues: Array<number>;
   private _fluxes: Array<number>;
