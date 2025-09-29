@@ -1,0 +1,56 @@
+html,
+body {
+  overflow: hidden;
+  margin: 0;
+  padding-block: 1rem;
+  width: 100dvw;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 1rem;
+  background-color: #070605;
+  font-family: Arial, sans-serif;
+}
+
+#roulette {
+  aspect-ratio: 1 / 1;
+  height: min(95%, 95vw);
+  max-width: 95%;
+  max-height: 95%;
+  margin: auto;
+  border-radius: 50%;
+  border-color: #aaaaaa;
+  border-style: solid;
+  border-width: 0.1rem;
+}
+
+#labels {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 1rem;
+  max-width: 90%;
+  text-align: center;
+}
+
+div.label {
+  color: #ffffff;
+  font-size: 1rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.4rem;
+  background-color: #272625;
+}
+
+footer {
+  width: 100%;
+  padding: 0.5rem 0;
+  text-align: center;
+  background-color: #272625;
+}
+
+footer > a {
+  color: #ffffff;
+  font-size: 0.9rem;
+}

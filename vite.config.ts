@@ -17,6 +17,7 @@ export default defineConfig({
         JuliaSetViewer: resolve(root, "JuliaSetViewer", "index.html"),
         MiniMaze: resolve(root, "MiniMaze", "index.html"),
         SudokuAssistant: resolve(root, "SudokuAssistant", "index.html"),
+        Roulette: resolve(root, "Roulette", "index.html"),
       },
     },
   },

@@ -5,6 +5,7 @@ import colorMapCheckerIcon from "../ColorMapChecker/icon.jpg";
 // import animatedClassifierIcon from "../Classifier/icon.jpg";
 import delaynayIcon from "../Delaunay/icon.jpg";
 import advectionIcon from "../Advection/icon.jpg";
+import rouletteIcon from "../Roulette/icon.jpg";
 
 function getElementById(elementId: string): HTMLElement {
   const element: HTMLElement | null = document.getElementById(elementId);
@@ -146,6 +147,12 @@ function main() {
       title: "Advection",
       href: `${ROOT}/Advection/index.html`,
       imageSource: advectionIcon,
+    }),
+    new Page({
+      isActive: false,
+      title: "Roulette",
+      href: `${ROOT}/Roulette/index.html?members=Alice,Bob,Charlie,David,Eve,Frank,George`,
+      imageSource: rouletteIcon,
     }),
   ];
   updateCarouselPagination(getCurrentPageIndex(pages), pages.length);
