@@ -9,11 +9,7 @@ function getMembers(): Readonly<Array<string>> {
   return members.split(",");
 }
 
-function update(
-  step: number,
-  rouletteState: RouletteState,
-  rouletteView: RouletteView,
-) {
+function update(rouletteState: RouletteState, rouletteView: RouletteView) {
   rouletteState.update();
   const isFinalized = rouletteState.isFinalized();
   rouletteView.draw(rouletteState.getSelectedIndex(), isFinalized);
@@ -21,7 +17,7 @@ function update(
     return;
   }
   requestAnimationFrame(() => {
-    update(step + 1, rouletteState, rouletteView);
+    update(rouletteState, rouletteView);
   });
 }
 
@@ -34,7 +30,7 @@ function main() {
   }
   const rouletteState = new RouletteState(members);
   const rouletteView = new RouletteView(members);
-  update(0, rouletteState, rouletteView);
+  update(rouletteState, rouletteView);
 }
 
 window.addEventListener("load", () => {
