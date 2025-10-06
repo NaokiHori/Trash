@@ -1,3 +1,4 @@
+// generate roulette-like conic-gradient background
 export function getBackground(
   nColors: number,
   isFinalized: boolean,

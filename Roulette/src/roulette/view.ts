@@ -1,6 +1,7 @@
 import * as Utils from "./util";
 
-const DEFAULT_LABEL_COLOR = "#272727";
+const DARK_GRAY = "#272625";
+const WHITE = "#ffffff";
 
 export class RouletteView {
   private readonly rouletteElement: HTMLElement;
@@ -31,16 +32,24 @@ export class RouletteView {
 
   public draw(selectedIndex: number, isFinalized: boolean) {
     for (const [index, labelElement] of this.labelElements.entries()) {
-      labelElement.style.backgroundColor =
+      // border color is colored in the same way as the roulette
+      // once finalized, make it darker to be less visible
+      labelElement.style.borderColor =
         index === selectedIndex
           ? Utils.getColor(this.nColors, isFinalized, true, index)
-          : DEFAULT_LABEL_COLOR;
+          : DARK_GRAY;
+      // font color is normally white
+      // once finalized, make it darker to be less visible
+      labelElement.style.color = isFinalized
+        ? index === selectedIndex
+          ? WHITE
+          : DARK_GRAY
+        : WHITE;
     }
-    const background = Utils.getBackground(
+    this.rouletteElement.style.background = Utils.getBackground(
       this.nColors,
       isFinalized,
       selectedIndex,
     );
-    this.rouletteElement.style.background = background;
   }
 }
