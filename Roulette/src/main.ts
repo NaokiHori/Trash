@@ -1,12 +1,16 @@
 import { RouletteState, RouletteView } from "./roulette";
 
+function shuffleArray<T>(array: Array<T>): Array<T> {
+  return array.sort(() => Math.random() - 0.5);
+}
+
 function getMembers(): Readonly<Array<string>> {
   const urlParams = new URLSearchParams(window.location.search);
   const members = urlParams.get("members");
   if (members === null) {
     return [];
   }
-  return members.split(",");
+  return shuffleArray<string>(members.split(","));
 }
 
 function update(rouletteState: RouletteState, rouletteView: RouletteView) {
