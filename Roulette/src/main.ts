@@ -1,7 +1,14 @@
 import { RouletteState, RouletteView } from "./roulette";
 
 function shuffleArray<T>(array: Array<T>): Array<T> {
-  return array.sort(() => Math.random() - 0.5);
+  // Fisher–Yates shuffle
+  // https://en.wikipedia.org/wiki/Fisher–Yates_shuffle
+  const nItems = array.length;
+  for (let i = nItems - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
 }
 
 function getMembers(): Readonly<Array<string>> {
