@@ -35,8 +35,8 @@ export class KawamuraKuwaharaScheme extends BaseScheme {
     if (velocity < 0) {
       for (let i = N_HALO; i < nitems + N_HALO; i++) {
         dValues[i] =
-          (+coef / 6) *
-          (+values[i - 2] -
+          (coef / 6) *
+          (values[i - 2] -
             2 * values[i - 1] +
             9 * values[i] -
             10 * values[i + 1] +

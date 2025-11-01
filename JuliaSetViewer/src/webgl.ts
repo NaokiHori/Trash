@@ -33,9 +33,9 @@ export class WebGL {
         // set-up rectangle domain
         const positions = [
           [-1, -1],
-          [+1, -1],
-          [-1, +1],
-          [+1, +1],
+          [1, -1],
+          [-1, 1],
+          [1, 1],
         ];
         const indices = [0, 1, 2, 1, 3, 2];
         // create a vertex buffer object
