@@ -36,7 +36,7 @@ export class QuickestScheme extends BaseScheme {
       for (let i = N_HALO; i < nitems + N_HALO; i++) {
         dValues[i] = 0;
         dValues[i] +=
-          (+coef / 6) *
+          (coef / 6) *
           (1 * values[i + 2] -
             6 * values[i + 1] +
             3 * values[i] +
@@ -44,7 +44,7 @@ export class QuickestScheme extends BaseScheme {
         dValues[i] +=
           (coef ** 2 / 2) * (values[i - 1] - 2 * values[i] + values[i + 1]);
         dValues[i] +=
-          (+(coef ** 3) / 6) *
+          (coef ** 3 / 6) *
           (-values[i + 2] + 3 * values[i + 1] - 3 * values[i] + values[i - 1]);
       }
     } else {

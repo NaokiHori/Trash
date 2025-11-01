@@ -6,6 +6,7 @@ import colorMapCheckerIcon from "../ColorMapChecker/icon.jpg";
 import delaynayIcon from "../Delaunay/icon.jpg";
 import advectionIcon from "../Advection/icon.jpg";
 import rouletteIcon from "../Roulette/icon.jpg";
+import cellularAutomatonIcon from "../CellularAutomaton/icon.jpg";
 
 function getElementById(elementId: string): HTMLElement {
   const element: HTMLElement | null = document.getElementById(elementId);
@@ -153,6 +154,12 @@ function main() {
       title: "Roulette",
       href: `${ROOT}/Roulette/index.html?members=Alice,Bob,Charlie,David,Eve,Frank,George`,
       imageSource: rouletteIcon,
+    }),
+    new Page({
+      isActive: false,
+      title: "Cellular Automaton",
+      href: `${ROOT}/CellularAutomaton/index.html`,
+      imageSource: cellularAutomatonIcon,
     }),
   ];
   updateCarouselPagination(getCurrentPageIndex(pages), pages.length);

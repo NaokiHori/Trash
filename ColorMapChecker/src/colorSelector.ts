@@ -56,7 +56,7 @@ export class ColorSelector {
 }
 
 function capitalizeFirstLetter(sequence: string): string {
-  const firstLetter = String(sequence).charAt(0);
-  const otherLetters = String(sequence).slice(1);
+  const firstLetter = sequence.charAt(0);
+  const otherLetters = sequence.slice(1);
   return firstLetter.toUpperCase() + otherLetters;
 }

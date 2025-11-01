@@ -35,9 +35,9 @@ export class QuickScheme extends BaseScheme {
     if (velocity < 0) {
       for (let i = N_HALO; i < nitems + N_HALO; i++) {
         dValues[i] =
-          +coef *
+          coef *
           0.125 *
-          (+3 * values[i - 1] +
+          (3 * values[i - 1] +
             3 * values[i] -
             7 * values[i + 1] +
             1 * values[i + 2]);
