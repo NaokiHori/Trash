@@ -20,22 +20,22 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@main
-      - name: Setup node
-        uses: actions/setup-node@main
       - name: Setup GitHub Pages
         uses: actions/configure-pages@main
-      - name: Install dependencies
+      - name: Build Docker image
+        run: docker compose build
+      - name: Perform type-check
         run: |
-          npm install
+          docker compose run --rm app npx tsc
       - name: Check code format
         run: |
-          npx prettier . --check
+          docker compose run --rm app npx prettier . --check
       - name: Run linter
         run: |
-          npx eslint .
+          docker compose run --rm app npx eslint .
       - name: Build
         run: |
-          npx \
+          docker compose run --rm app npx \
             vite build \
             --outDir=dist \
             --base=https://naokihori.github.io/Trash/

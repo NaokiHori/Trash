@@ -5,7 +5,23 @@
 
 Series of shitty web applications I developed for fun.
 
-## (Dev) Dependencies
+## Set up
+
+```bash
+docker compose build
+```
+
+## Launch development server
+
+```bash
+docker compose up
+```
+
+```bash
+make help
+```
+
+## (Dev) Dependencies included in the container
 
 - @types/node
 - prettier
