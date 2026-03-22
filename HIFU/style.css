@@ -1,0 +1,34 @@
+html,
+body {
+  overflow: hidden;
+  margin: 0;
+  padding-block: 1rem;
+  width: 100dvw;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  row-gap: 1rem;
+  background-color: #070605;
+  font-family: Arial, sans-serif;
+}
+
+#field {
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-basis: 0;
+  width: 100%;
+}
+
+footer {
+  width: 100%;
+  padding: 0.5rem 0;
+  text-align: center;
+  background-color: #272625;
+}
+
+footer > a {
+  color: #ffffff;
+  font-size: 0.9rem;
+}

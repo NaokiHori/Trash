@@ -1,8 +1,6 @@
-import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   ...tseslint.configs.stylisticTypeChecked,
   {
@@ -25,6 +23,6 @@ export default tseslint.config(
     },
   },
   {
-    ignores: ["node_modules/*", "dist/*", "eslint.config.js"],
+    ignores: ["node_modules/*", "dist/*", "eslint.config.js", "vite.config.ts"],
   },
 );

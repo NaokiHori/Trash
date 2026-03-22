@@ -7,6 +7,7 @@ import delaynayIcon from "../Delaunay/icon.jpg";
 import advectionIcon from "../Advection/icon.jpg";
 import rouletteIcon from "../Roulette/icon.jpg";
 import cellularAutomatonIcon from "../CellularAutomaton/icon.jpg";
+import hifuIcon from "../HIFU/icon.jpg";
 
 function getElementById(elementId: string): HTMLElement {
   const element: HTMLElement | null = document.getElementById(elementId);
@@ -160,6 +161,12 @@ function main() {
       title: "Cellular Automaton",
       href: `${ROOT}/CellularAutomaton/index.html`,
       imageSource: cellularAutomatonIcon,
+    }),
+    new Page({
+      isActive: false,
+      title: "HIFU",
+      href: `${ROOT}/HIFU/index.html`,
+      imageSource: hifuIcon,
     }),
   ];
   updateCarouselPagination(getCurrentPageIndex(pages), pages.length);
