@@ -1,20 +1,10 @@
+import { Animation } from "./animation";
 import { Graph } from "./graph";
 import { Scheme } from "./scheme";
 
 function getSpecifiedScheme(): string | null {
   const urlParams = new URLSearchParams(window.location.search);
   return urlParams.get("scheme");
-}
-
-function integrate(graph: Graph, scheme: Scheme) {
-  requestAnimationFrame(() => {
-    const nIterations = 6;
-    for (let i = 0; i < nIterations; i++) {
-      scheme.integrate();
-    }
-    graph.updateCircles(scheme.getArray());
-    integrate(graph, scheme);
-  });
 }
 
 function main() {
@@ -50,7 +40,14 @@ function main() {
   const graph = new Graph("graph", nitems);
   graph.updateGraphSize();
   graph.updateCircles(scheme.getArray());
-  integrate(graph, scheme);
+  const animation = new Animation(60, () => {
+    const nIterations = 6;
+    for (let i = 0; i < nIterations; i++) {
+      scheme.integrate();
+    }
+    graph.updateCircles(scheme.getArray());
+  });
+  animation.start();
   window.addEventListener("resize", () => {
     graph.updateGraphSize();
     graph.updateCircles(scheme.getArray());
