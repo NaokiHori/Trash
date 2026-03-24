@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: container_trash
-    image: trash
+    image: naokihori/trash
     ports:
       - "5173:5173"
     volumes:

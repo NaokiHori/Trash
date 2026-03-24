@@ -11,7 +11,10 @@ const vec2 domain_center = vec2(0., 0.375 * radius);
 // wavelength
 float wavelength = 1e-3;
 
+uniform int u_is_animated;
+uniform float u_source_argument;
 uniform vec2 u_resolution;
+uniform vec3 u_color_exponents;
 
 vec2 transform_to_screen_coordinate(
     vec2 domain_length,
@@ -49,6 +52,14 @@ float compute_distance(
   }
 }
 
+vec3 get_color_map(
+    float scalar
+) {
+  // scalar is in [-1, 1]
+  float factor = 0.5;
+  return vec3(clamp(0.5 + factor * scalar, 0., 1.));
+}
+
 vec3 blur(
     float x
 ) {
@@ -77,15 +88,20 @@ void main(
     vec2 source = vec2(radius * cos(theta), radius * sin(theta));
     float dist = distance(point, source);
     float amp = inversesqrt(max(1., dist / dist_min));
-    float phase = 2. * PI * mod(dist, wavelength) / wavelength;
+    float phase = - u_source_argument + 2. * PI * mod(dist, wavelength) / wavelength;
     pressure.x += amp * cos(phase);
     pressure.y -= amp * sin(phase);
   }
-  float scalar = length(pressure) / theoretical_max;
-  float r = pow(scalar, 4.);
-  float g = pow(scalar, 2.);
-  float b = pow(scalar, 1.);
-  gl_FragColor = vec4(r, g, b, 1.);
+  if (1 == u_is_animated) {
+    float scalar = pressure.x / theoretical_max;
+    gl_FragColor = vec4(get_color_map(scalar), 1.);
+  } else {
+    float scalar = length(pressure) / theoretical_max;
+    float r = pow(scalar, u_color_exponents.x);
+    float g = pow(scalar, u_color_exponents.y);
+    float b = pow(scalar, u_color_exponents.z);
+    gl_FragColor = vec4(r, g, b, 1.);
+  }
   // superposing arcs
   vec2 distances = vec2(
       compute_distance(

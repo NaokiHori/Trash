@@ -1,10 +1,5 @@
+import { Animation } from "./animation";
 import { Simulator } from "./simulator";
-
-function handleResizeEvent(canvas: HTMLCanvasElement) {
-  const rect: DOMRect = canvas.getBoundingClientRect();
-  canvas.width = rect.width;
-  canvas.height = rect.height;
-}
 
 function getCanvas(): HTMLCanvasElement {
   const id = "field";
@@ -20,16 +15,26 @@ function getCanvas(): HTMLCanvasElement {
 
 function main() {
   const canvas = getCanvas();
-  handleResizeEvent(canvas);
-  const simulator = new Simulator(canvas);
-  window.addEventListener("resize", () => {
-    handleResizeEvent(canvas);
-    simulator.handleResizeEvent(canvas);
-    simulator.draw(canvas);
+  const simulator = new Simulator(canvas, false);
+  const animation = new Animation(60, () => {
+    simulator.update();
+    simulator.draw();
   });
-  handleResizeEvent(canvas);
+  canvas.addEventListener("click", () => {
+    if (animation.getIsRunning()) {
+      animation.stop();
+    } else {
+      animation.start();
+    }
+    simulator.flipIsAnimated();
+    simulator.draw();
+  });
+  window.addEventListener("resize", () => {
+    simulator.handleResizeEvent(canvas);
+    simulator.draw();
+  });
   simulator.handleResizeEvent(canvas);
-  simulator.draw(canvas);
+  simulator.draw();
 }
 
 window.addEventListener("load", (): void => {

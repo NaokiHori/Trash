@@ -76,7 +76,7 @@ export class Program {
   }: {
     dataType: "FLOAT32" | "INT32" | "UNSUPPORTED";
     uniformName: string;
-    data: Array<number>;
+    data: Readonly<Array<number>>;
   }) {
     this.use((webGLProgram: WebGLProgram) => {
       const location: WebGLUniformLocation | null = this._gl.getUniformLocation(
