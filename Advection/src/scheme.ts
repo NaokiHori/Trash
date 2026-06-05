@@ -2,6 +2,7 @@ import { AcdiScheme } from "./scheme/acdi";
 import { CentralScheme } from "./scheme/central";
 import { CipScheme } from "./scheme/cip";
 import { DonorCellScheme } from "./scheme/donorCell";
+import { EnoScheme } from "./scheme/eno";
 import { KawamuraKuwaharaScheme } from "./scheme/kawamuraKuwahara";
 import { LaxWendroffScheme } from "./scheme/laxWendroff";
 import { MusclScheme } from "./scheme/muscl";
@@ -14,6 +15,7 @@ const schemeList = [
   CentralScheme,
   CipScheme,
   DonorCellScheme,
+  EnoScheme,
   KawamuraKuwaharaScheme,
   LaxWendroffScheme,
   MusclScheme,

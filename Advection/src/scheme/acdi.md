@@ -69,4 +69,4 @@ $\Gamma$ and $\epsilon$ are free parameter to be prescribed, which are fixed to 
 
 ## Reference
 
-- Jain, _J. Comput. Phys_ (**469**), 2022
+- Jain, _J. Comput. Phys._ (**469**), 2022

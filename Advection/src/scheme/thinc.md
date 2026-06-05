@@ -78,4 +78,4 @@ with $n_i$ being the normal vector while $\psi_i$ being the signed distance func
 
 ## Reference
 
-- Xie and Xiao, _J. Comput. Phys_ (**349**), 2017
+- Xie and Xiao, _J. Comput. Phys._ (**349**), 2017
