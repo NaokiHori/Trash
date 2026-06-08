@@ -9,6 +9,7 @@ import { MusclScheme } from "./scheme/muscl";
 import { QuickScheme } from "./scheme/quick";
 import { QuickestScheme } from "./scheme/quickest";
 import { ThincScheme } from "./scheme/thinc";
+import { WenoScheme } from "./scheme/weno";
 
 const schemeList = [
   AcdiScheme,
@@ -22,6 +23,7 @@ const schemeList = [
   QuickScheme,
   QuickestScheme,
   ThincScheme,
+  WenoScheme,
 ] as const;
 
 type OneOfSchemes = InstanceType<(typeof schemeList)[number]>;
