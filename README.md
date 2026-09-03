@@ -26,5 +26,5 @@ make help
 - @types/node
 - prettier
 - typescript
-- typescript-eslint
+- oxlint
 - vite

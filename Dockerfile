@@ -6,7 +6,7 @@ RUN npm install --save-dev \
   @types/node \
   prettier \
   typescript \
-  typescript-eslint \
+  oxlint \
   vite
 
 WORKDIR /project/src

@@ -27,7 +27,9 @@ jobs:
         run: |
           docker compose run --rm app npx tsc
           docker compose run --rm app npx prettier . --check
-          docker compose run --rm app npx eslint .
+          docker compose up -d app
+          make lint
+          docker compose down
       - name: Build
         run: |
           docker compose run --rm app npx \
