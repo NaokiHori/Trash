@@ -83,15 +83,15 @@ export class Cell {
     this._cellTextElement = cellTextElement;
     this._subCellElements = subCellElements;
     // initially assume all candidates are valid
-    this._subCellValuesValid = new Array<boolean>(SUDOKU_VALUES.length).fill(
-      true,
-    );
-    this._subCellValuesUnique = new Array<boolean>(SUDOKU_VALUES.length).fill(
-      false,
-    );
-    this._subCellValuesDisabled = new Array<boolean>(SUDOKU_VALUES.length).fill(
-      false,
-    );
+    this._subCellValuesValid = Array.from<boolean>({
+      length: SUDOKU_VALUES.length,
+    }).fill(true);
+    this._subCellValuesUnique = Array.from<boolean>({
+      length: SUDOKU_VALUES.length,
+    }).fill(false);
+    this._subCellValuesDisabled = Array.from<boolean>({
+      length: SUDOKU_VALUES.length,
+    }).fill(false);
     this._value = EMPTY_VALUE;
     this._isDefault = false;
     this._isSelected = false;

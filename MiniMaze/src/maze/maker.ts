@@ -14,7 +14,7 @@ export class Maker {
   public constructor(boardSize: BoardSize) {
     const board: Array<Array<Cell>> = Array.from(
       { length: boardSize.height },
-      () => new Array<Cell>(boardSize.width).fill("WALL"),
+      () => Array.from<Cell>({ length: boardSize.width }).fill("WALL"),
     );
     const rows = shuffle(getEvenNumbers(boardSize.height));
     const columns = shuffle(getEvenNumbers(boardSize.width));

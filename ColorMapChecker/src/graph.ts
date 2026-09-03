@@ -48,9 +48,9 @@ export class Graph {
     const resolution = 1024;
     const lineWidth = 5;
     const points = [
-      new Array<Coordinate>(resolution),
-      new Array<Coordinate>(resolution),
-      new Array<Coordinate>(resolution),
+      Array.from<Coordinate>({ length: resolution }),
+      Array.from<Coordinate>({ length: resolution }),
+      Array.from<Coordinate>({ length: resolution }),
     ];
     for (let i = 0; i < resolution; i++) {
       const x = (i + 1) / (resolution + 1);
