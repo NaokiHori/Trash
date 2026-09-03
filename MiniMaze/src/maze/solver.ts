@@ -19,18 +19,17 @@ export class Solver {
     goal: Readonly<Position>,
   ): { isCompleted: boolean } {
     this._isInvoked = true;
-    const position: Position | null = findStartingPoint(
+    const position: Position | null = findStartingPoint(boardSize, board, start, goal);
+    if (null === position) {
+      return { isCompleted: true };
+    }
+    board[position.y][position.x] = "DEADEND";
+    const walkPatterns: ReadonlyArray<Readonly<WalkPattern>> = this.getWalkPatterns(
       boardSize,
       board,
       start,
       goal,
     );
-    if (null === position) {
-      return { isCompleted: true };
-    }
-    board[position.y][position.x] = "DEADEND";
-    const walkPatterns: ReadonlyArray<Readonly<WalkPattern>> =
-      this.getWalkPatterns(boardSize, board, start, goal);
     randomWalk: for (;;) {
       for (const walkPattern of walkPatterns) {
         if (walkPattern.canWalk(position)) {
@@ -61,10 +60,7 @@ export class Solver {
             x: position.x - 1,
             y: position.y,
           };
-          return (
-            !isAtLeftBound &&
-            isDeadEnd(boardSize, board, start, goal, newPosition)
-          );
+          return !isAtLeftBound && isDeadEnd(boardSize, board, start, goal, newPosition);
         },
         walk: (position: Position) => {
           board[position.y][--position.x] = "DEADEND";
@@ -77,10 +73,7 @@ export class Solver {
             x: position.x + 1,
             y: position.y,
           };
-          return (
-            !isAtRightBound &&
-            isDeadEnd(boardSize, board, start, goal, newPosition)
-          );
+          return !isAtRightBound && isDeadEnd(boardSize, board, start, goal, newPosition);
         },
         walk: (position: Position) => {
           board[position.y][++position.x] = "DEADEND";
@@ -93,10 +86,7 @@ export class Solver {
             x: position.x,
             y: position.y - 1,
           };
-          return (
-            !isAtBottomBound &&
-            isDeadEnd(boardSize, board, start, goal, newPosition)
-          );
+          return !isAtBottomBound && isDeadEnd(boardSize, board, start, goal, newPosition);
         },
         walk: (position: Position) => {
           board[--position.y][position.x] = "DEADEND";
@@ -109,10 +99,7 @@ export class Solver {
             x: position.x,
             y: position.y + 1,
           };
-          return (
-            !isAtTopBound &&
-            isDeadEnd(boardSize, board, start, goal, newPosition)
-          );
+          return !isAtTopBound && isDeadEnd(boardSize, board, start, goal, newPosition);
         },
         walk: (position: Position) => {
           board[++position.y][position.x] = "DEADEND";

@@ -108,14 +108,8 @@ export class Graph {
   public setClickHandler(onClick: () => void) {
     this._canvas.addEventListener("click", () => {
       this._displayHsv = !this._displayHsv;
-      this._titles.rgb.setAttribute(
-        "style",
-        `display: ${this._displayHsv ? "none" : "inline"};`,
-      );
-      this._titles.hsv.setAttribute(
-        "style",
-        `display: ${this._displayHsv ? "inline" : "none"};`,
-      );
+      this._titles.rgb.setAttribute("style", `display: ${this._displayHsv ? "none" : "inline"};`);
+      this._titles.hsv.setAttribute("style", `display: ${this._displayHsv ? "inline" : "none"};`);
       onClick();
     });
   }
@@ -149,18 +143,10 @@ function drawLine(
   ctx.stroke();
 }
 
-function convertX(
-  canvasWidth: number,
-  margin: [number, number],
-  x: number,
-): number {
+function convertX(canvasWidth: number, margin: [number, number], x: number): number {
   return margin[0] + (canvasWidth - margin[0] - margin[1]) * x;
 }
 
-function convertY(
-  canvasHeight: number,
-  margin: [number, number],
-  y: number,
-): number {
+function convertY(canvasHeight: number, margin: [number, number], y: number): number {
   return canvasHeight - margin[0] - (canvasHeight - margin[0] - margin[1]) * y;
 }

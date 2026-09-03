@@ -19,9 +19,7 @@ export class VertexBufferObject {
     this._buffer = buffer;
     // TODO: assuming Float32Array buffer
     const size: GLsizeiptr =
-      Float32Array.BYTES_PER_ELEMENT *
-      numberOfVertices *
-      numberOfItemsForEachVertex;
+      Float32Array.BYTES_PER_ELEMENT * numberOfVertices * numberOfItemsForEachVertex;
     this.bindAndExecute({
       gl,
       callback: () => {
@@ -45,8 +43,7 @@ export class VertexBufferObject {
     gl: WebGLRenderingContext;
     callback: (vertexBufferObject: VertexBufferObject) => void;
   }) {
-    const currentlyBoundBuffer: WebGLBuffer | null =
-      getCurrentlyBoundBuffer(gl);
+    const currentlyBoundBuffer: WebGLBuffer | null = getCurrentlyBoundBuffer(gl);
     if (currentlyBoundBuffer !== null) {
       throw new Error(`Trying to bind a buffer with another buffer bound`);
     }
@@ -56,22 +53,12 @@ export class VertexBufferObject {
     gl.bindBuffer(target, null);
   }
 
-  public updateData({
-    gl,
-    data,
-  }: {
-    gl: WebGLRenderingContext;
-    data: Float32Array;
-  }) {
-    const currentlyBoundBuffer: WebGLBuffer | null =
-      getCurrentlyBoundBuffer(gl);
+  public updateData({ gl, data }: { gl: WebGLRenderingContext; data: Float32Array }) {
+    const currentlyBoundBuffer: WebGLBuffer | null = getCurrentlyBoundBuffer(gl);
     if (currentlyBoundBuffer !== this._buffer) {
-      throw new Error(
-        `Trying to push data without a buffer bound or with another buffer bound`,
-      );
+      throw new Error(`Trying to push data without a buffer bound or with another buffer bound`);
     }
-    const expectedLength: number =
-      this._numberOfVertices * this._numberOfItemsForEachVertex;
+    const expectedLength: number = this._numberOfVertices * this._numberOfItemsForEachVertex;
     if (data.length !== expectedLength) {
       throw new Error(
         `data.length = ${data.length.toString()}, which does not agree with an expected value: ${expectedLength.toString()}`,
@@ -95,9 +82,7 @@ export class VertexBufferObject {
   }
 }
 
-function getCurrentlyBoundBuffer(
-  gl: WebGLRenderingContext,
-): WebGLBuffer | null {
+function getCurrentlyBoundBuffer(gl: WebGLRenderingContext): WebGLBuffer | null {
   // NOTE: gl.getParameter inherently returns any-typed variable
   return gl.getParameter(gl.ARRAY_BUFFER_BINDING) as WebGLBuffer | null;
 }

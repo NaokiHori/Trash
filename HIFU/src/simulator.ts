@@ -4,10 +4,7 @@ import { IndexBufferObject } from "./webgl/indexBufferObject";
 import vertexShaderSource from "../shader/vertexShader.glsl?raw";
 import fragmentShaderSource from "../shader/fragmentShader.glsl?raw";
 
-function setupRectangleDomain(
-  gl: WebGLRenderingContext,
-  program: Program,
-): IndexBufferObject {
+function setupRectangleDomain(gl: WebGLRenderingContext, program: Program): IndexBufferObject {
   const positions = [
     [-1, -1],
     [1, -1],

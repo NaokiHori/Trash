@@ -10,9 +10,7 @@ export class Button {
     this._element = element;
   }
 
-  public onClick(
-    handlers: [(button: Button) => void, (button: Button) => void],
-  ) {
+  public onClick(handlers: [(button: Button) => void, (button: Button) => void]) {
     this._element.addEventListener("click", () => {
       this._clickCounter += 1;
       if (1 === this._clickCounter) {

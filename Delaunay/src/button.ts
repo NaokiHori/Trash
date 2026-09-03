@@ -11,11 +11,7 @@ export class Button {
   }
 
   public onClick(
-    handlers: [
-      (button: Button) => void,
-      (button: Button) => void,
-      (button: Button) => void,
-    ],
+    handlers: [(button: Button) => void, (button: Button) => void, (button: Button) => void],
   ) {
     this._element.addEventListener("click", () => {
       const reminder = this._clickCounter % 3;

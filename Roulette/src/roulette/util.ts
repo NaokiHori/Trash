@@ -1,18 +1,9 @@
 // generate roulette-like conic-gradient background
-export function getBackground(
-  nColors: number,
-  isFinalized: boolean,
-  selectedIndex: number,
-) {
+export function getBackground(nColors: number, isFinalized: boolean, selectedIndex: number) {
   const slices = Array.from({ length: nColors }, (_, index) => {
     const start = index / nColors;
     const end = (index + 1) / nColors;
-    const color = getColor(
-      nColors,
-      isFinalized,
-      index === selectedIndex,
-      index,
-    );
+    const color = getColor(nColors, isFinalized, index === selectedIndex, index);
     return `${color} ${start.toString()}turn ${end.toString()}turn`;
   });
   return `conic-gradient(${slices.join(", ")})`;

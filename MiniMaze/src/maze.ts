@@ -33,12 +33,7 @@ export class Maze {
   }
 
   public solve(): { isCompleted: boolean } {
-    return this._solver.solve(
-      this._boardSize,
-      this._maker.board,
-      this._start,
-      this._goal,
-    );
+    return this._solver.solve(this._boardSize, this._maker.board, this._start, this._goal);
   }
 
   public moveCursor(direction: Direction) {

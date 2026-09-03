@@ -15,24 +15,13 @@ class PingPongBuffer {
   private _framebuffer: Framebuffer;
   private _texture: Texture;
 
-  constructor(
-    gl: WebGL2RenderingContext,
-    program: Program,
-    width: number,
-    height: number,
-  ) {
+  constructor(gl: WebGL2RenderingContext, program: Program, width: number, height: number) {
     const { framebuffer, texture } = program.use(() => {
       const framebuffer = new Framebuffer({ gl });
       const texture = new Texture({ gl });
       texture.bindAndExecute((boundTexture: Texture) => {
         const target = boundTexture.target;
-        gl.texStorage2D(
-          target,
-          1,
-          TEXTURE_CONFIG.internalFormat,
-          width,
-          height,
-        );
+        gl.texStorage2D(target, 1, TEXTURE_CONFIG.internalFormat, width, height);
         gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
         gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
       });
@@ -47,13 +36,9 @@ class PingPongBuffer {
           level,
         );
       });
-      const framebufferStatus: GLenum = gl.checkFramebufferStatus(
-        framebuffer.target,
-      );
+      const framebufferStatus: GLenum = gl.checkFramebufferStatus(framebuffer.target);
       if (gl.FRAMEBUFFER_COMPLETE !== framebufferStatus) {
-        throw new Error(
-          `Failed to create a framebuffer: ${framebufferStatus.toString()}`,
-        );
+        throw new Error(`Failed to create a framebuffer: ${framebufferStatus.toString()}`);
       }
       return { framebuffer, texture };
     });

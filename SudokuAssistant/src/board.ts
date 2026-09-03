@@ -1,12 +1,7 @@
 import { createChildElement } from "./dom";
 import { Body } from "./body";
 import { EditMode, EditModes } from "./editMode";
-import {
-  EMPTY_VALUE,
-  SUDOKU_VALUES,
-  SudokuValue,
-  isEmpty,
-} from "./sudokuValue";
+import { EMPTY_VALUE, SUDOKU_VALUES, SudokuValue, isEmpty } from "./sudokuValue";
 import { Cell } from "./board/cell";
 import { BOARD_SIZE } from "./board/param";
 import { Position } from "./board/position";
@@ -15,10 +10,7 @@ import { setNeighborCells } from "./board/setNeighborCells";
 export class Board {
   private _cells: Array<Cell>;
 
-  public constructor(
-    body: Body,
-    puzzle: ReadonlyArray<ReadonlyArray<SudokuValue>>,
-  ) {
+  public constructor(body: Body, puzzle: ReadonlyArray<ReadonlyArray<SudokuValue>>) {
     const element = createChildElement({
       tagName: "div",
       parentElement: body.element,

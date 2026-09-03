@@ -23,10 +23,7 @@ export class EnoScheme extends BaseScheme {
     return this._getArray(N_HALO, this.values);
   }
 
-  private static computeDividedDifference(
-    dx: number,
-    values: Readonly<Array<number>>,
-  ): number {
+  private static computeDividedDifference(dx: number, values: Readonly<Array<number>>): number {
     const nitems = values.length;
     if (nitems < 2) {
       return values[0];
@@ -62,14 +59,8 @@ export class EnoScheme extends BaseScheme {
         const iEnd = iStart + width;
         if (
           EnoScheme.compare(
-            EnoScheme.computeDividedDifference(
-              dx,
-              values.slice(iStart - 1, iEnd),
-            ),
-            EnoScheme.computeDividedDifference(
-              dx,
-              values.slice(iStart, iEnd + 1),
-            ),
+            EnoScheme.computeDividedDifference(dx, values.slice(iStart - 1, iEnd)),
+            EnoScheme.computeDividedDifference(dx, values.slice(iStart, iEnd + 1)),
           )
         ) {
           iStart -= 1;
@@ -90,10 +81,7 @@ export class EnoScheme extends BaseScheme {
   }
 }
 
-function computeInnerProduct(
-  a: Readonly<Array<number>>,
-  b: Readonly<Array<number>>,
-): number {
+function computeInnerProduct(a: Readonly<Array<number>>, b: Readonly<Array<number>>): number {
   let result = 0;
   for (let i = 0; i < MAX_STENCIL_SIZE; i++) {
     result += a[i] * b[i];

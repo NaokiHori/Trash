@@ -12,9 +12,8 @@ export class Maker {
   private _startingPointCandidates: Array<Position>;
 
   public constructor(boardSize: BoardSize) {
-    const board: Array<Array<Cell>> = Array.from(
-      { length: boardSize.height },
-      () => Array.from<Cell>({ length: boardSize.width }).fill("WALL"),
+    const board: Array<Array<Cell>> = Array.from({ length: boardSize.height }, () =>
+      Array.from<Cell>({ length: boardSize.width }).fill("WALL"),
     );
     const rows = shuffle(getEvenNumbers(boardSize.height));
     const columns = shuffle(getEvenNumbers(boardSize.width));
@@ -36,15 +35,10 @@ export class Maker {
   }
 
   public updateBoard(): { isCompleted: boolean } {
-    const startingPointCandidates: Array<Position> =
-      this._startingPointCandidates;
+    const startingPointCandidates: Array<Position> = this._startingPointCandidates;
     const boardSize: BoardSize = this._boardSize;
     const board: ReadonlyArray<Array<Cell>> = this._board;
-    const position: Position | null = findStartingPoint(
-      startingPointCandidates,
-      boardSize,
-      board,
-    );
+    const position: Position | null = findStartingPoint(startingPointCandidates, boardSize, board);
     if (null === position) {
       this._isCompleted = true;
       return { isCompleted: true };
@@ -88,8 +82,7 @@ export class Maker {
         },
       },
       {
-        canWalk: (position: Position) =>
-          canAdvanceRight(boardSize, board, position),
+        canWalk: (position: Position) => canAdvanceRight(boardSize, board, position),
         walk: (position: Position) => {
           board[position.y][++position.x] = "ROAD";
           board[position.y][++position.x] = "ROAD";
@@ -103,8 +96,7 @@ export class Maker {
         },
       },
       {
-        canWalk: (position: Position) =>
-          canAdvanceUp(boardSize, board, position),
+        canWalk: (position: Position) => canAdvanceUp(boardSize, board, position),
         walk: (position: Position) => {
           board[++position.y][position.x] = "ROAD";
           board[++position.y][position.x] = "ROAD";
@@ -153,10 +145,7 @@ function findStartingPoint(
   return null;
 }
 
-function canAdvanceDown(
-  board: ReadonlyArray<ReadonlyArray<Cell>>,
-  position: Position,
-): boolean {
+function canAdvanceDown(board: ReadonlyArray<ReadonlyArray<Cell>>, position: Position): boolean {
   if (0 === position.y) return false;
   if ("ROAD" === board[position.y - 2][position.x]) return false;
   return true;
@@ -172,10 +161,7 @@ function canAdvanceUp(
   return true;
 }
 
-function canAdvanceLeft(
-  board: ReadonlyArray<ReadonlyArray<Cell>>,
-  position: Position,
-): boolean {
+function canAdvanceLeft(board: ReadonlyArray<ReadonlyArray<Cell>>, position: Position): boolean {
   if (0 === position.x) return false;
   if ("ROAD" === board[position.y][position.x - 2]) return false;
   return true;

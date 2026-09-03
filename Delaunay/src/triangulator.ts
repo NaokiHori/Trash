@@ -74,10 +74,7 @@ export class Triangulator {
   }
 
   public addPoint(point: Point) {
-    const [goodTriangles, badTriangles] = findBadTriangles(
-      point,
-      this.triangles,
-    );
+    const [goodTriangles, badTriangles] = findBadTriangles(point, this.triangles);
     const edges = findUniqueEdges(badTriangles);
     const newTriangles = createTriangles(point, edges);
     this.triangles = goodTriangles.concat(newTriangles);

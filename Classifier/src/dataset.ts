@@ -18,9 +18,7 @@ function pickUpDataPoint(normalVector: Vector): {
       (Y_LIMITS[1] - Y_LIMITS[0]) * Math.random() + Y_LIMITS[0],
     ];
     const numerator = innerProduct(normalVector, vector);
-    const denominator = Math.sqrt(
-      Math.pow(normalVector[1], 2) + Math.pow(normalVector[2], 2),
-    );
+    const denominator = Math.sqrt(Math.pow(normalVector[1], 2) + Math.pow(normalVector[2], 2));
     const signedDistance = numerator / denominator;
     if (threshold < Math.abs(signedDistance)) {
       return { vector, category: 0 < signedDistance ? 1 : -1 };
@@ -50,10 +48,7 @@ function computeStatisticalMoments(dataPoints: Array<DataPoint>): {
   return { mean, std };
 }
 
-function standardize(
-  statisticalMoments: { mean: Vector; std: Vector },
-  vector: Vector,
-): Vector {
+function standardize(statisticalMoments: { mean: Vector; std: Vector }, vector: Vector): Vector {
   return [
     1,
     (vector[1] - statisticalMoments.mean[1]) / statisticalMoments.std[1],
@@ -173,10 +168,7 @@ export class Dataset {
     computeGradients(nitems, h, multipliers, gradients);
     for (;;) {
       for (let i = 0; i < nitems; i++) {
-        newMultipliers[i] = Math.max(
-          0,
-          multipliers[i] + this._learningRate * gradients[i],
-        );
+        newMultipliers[i] = Math.max(0, multipliers[i] + this._learningRate * gradients[i]);
       }
       computeGradients(nitems, h, newMultipliers, newGradients);
       const { newLearningRate, isCompleted } = computeNewLearningRate(
@@ -240,10 +232,8 @@ export class Dataset {
     //   0
     weights[0] =
       scaledWeights[0] -
-      (scaledWeights[1] * statisticalMoments.mean[1]) /
-        statisticalMoments.std[1] -
-      (scaledWeights[2] * statisticalMoments.mean[2]) /
-        statisticalMoments.std[2];
+      (scaledWeights[1] * statisticalMoments.mean[1]) / statisticalMoments.std[1] -
+      (scaledWeights[2] * statisticalMoments.mean[2]) / statisticalMoments.std[2];
     weights[1] = scaledWeights[1] / statisticalMoments.std[1];
     weights[2] = scaledWeights[2] / statisticalMoments.std[2];
     this._epoch += 1;

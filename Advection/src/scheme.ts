@@ -32,11 +32,7 @@ export class Scheme {
   private _counter: number;
   private _currentScheme: OneOfSchemes;
 
-  public constructor(
-    specifiedScheme: string | null,
-    length: number,
-    nitems: number,
-  ) {
+  public constructor(specifiedScheme: string | null, length: number, nitems: number) {
     if (specifiedScheme !== null) {
       for (const [counter, scheme] of schemeList.entries()) {
         const s = new scheme(length, nitems);
@@ -46,9 +42,7 @@ export class Scheme {
           return;
         }
       }
-      console.warn(
-        `Unknown scheme "${specifiedScheme}" is specified: use default`,
-      );
+      console.warn(`Unknown scheme "${specifiedScheme}" is specified: use default`);
     }
     this._counter = 0;
     const scheme = schemeList[this._counter];

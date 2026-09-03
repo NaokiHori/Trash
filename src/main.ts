@@ -77,9 +77,7 @@ class Page {
 }
 
 function getCurrentPageIndex(pages: Array<Page>): number {
-  const currentPageIndex: number = pages.findIndex(
-    (page: Page) => page.isActive,
-  );
+  const currentPageIndex: number = pages.findIndex((page: Page) => page.isActive);
   if (currentPageIndex === -1) {
     throw new Error("No active page exists");
   }
@@ -88,18 +86,14 @@ function getCurrentPageIndex(pages: Array<Page>): number {
 
 function switchPage(pages: Array<Page>, direction: number): number {
   const currentPageIndex: number = getCurrentPageIndex(pages);
-  const newActivePageIndex: number =
-    (currentPageIndex + direction + pages.length) % pages.length;
+  const newActivePageIndex: number = (currentPageIndex + direction + pages.length) % pages.length;
   pages.forEach((page: Page, index: number) => {
     page.isActive = index === newActivePageIndex;
   });
   return newActivePageIndex;
 }
 
-function updateCarouselPagination(
-  currentPageIndex: number,
-  totalPages: number,
-) {
+function updateCarouselPagination(currentPageIndex: number, totalPages: number) {
   const carouselPagination = getElementById("carousel-pagination");
   carouselPagination.textContent = `${(currentPageIndex + 1).toString()} / ${totalPages.toString()}`;
 }
@@ -174,12 +168,8 @@ function main() {
   for (const page of pages) {
     page.linkWithParent(carouselItems);
   }
-  const prevButton = getElementById(
-    "carousel-button-to-prev",
-  ) as HTMLButtonElement;
-  const nextButton = getElementById(
-    "carousel-button-to-next",
-  ) as HTMLButtonElement;
+  const prevButton = getElementById("carousel-button-to-prev") as HTMLButtonElement;
+  const nextButton = getElementById("carousel-button-to-next") as HTMLButtonElement;
   prevButton.addEventListener("click", () => {
     const newActivePageIndex = switchPage(pages, -1);
     updateCarouselPagination(newActivePageIndex, pages.length);

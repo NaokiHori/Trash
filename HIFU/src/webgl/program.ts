@@ -3,9 +3,7 @@ import { VertexAttribute } from "./vertexAttribute";
 
 function initShader(
   gl: WebGLRenderingContext,
-  type:
-    | WebGLRenderingContext["FRAGMENT_SHADER"]
-    | WebGLRenderingContext["VERTEX_SHADER"],
+  type: WebGLRenderingContext["FRAGMENT_SHADER"] | WebGLRenderingContext["VERTEX_SHADER"],
   source: string,
 ): WebGLShader {
   // creates a shader of the given type
@@ -38,23 +36,14 @@ export class Program {
     vertexShaderSource: string;
     fragmentShaderSource: string;
   }) {
-    const vertexShader: WebGLShader = initShader(
-      gl,
-      gl.VERTEX_SHADER,
-      vertexShaderSource,
-    );
-    const fragmentShader: WebGLShader = initShader(
-      gl,
-      gl.FRAGMENT_SHADER,
-      fragmentShaderSource,
-    );
+    const vertexShader: WebGLShader = initShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+    const fragmentShader: WebGLShader = initShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
     const webGLProgram = gl.createProgram();
     gl.attachShader(webGLProgram, vertexShader);
     gl.attachShader(webGLProgram, fragmentShader);
     gl.linkProgram(webGLProgram);
     if (!gl.getProgramParameter(webGLProgram, gl.LINK_STATUS)) {
-      const info: string =
-        gl.getProgramInfoLog(webGLProgram) ?? "unknown message";
+      const info: string = gl.getProgramInfoLog(webGLProgram) ?? "unknown message";
       gl.deleteProgram(webGLProgram);
       throw new Error(`Failed to link program: ${info}`);
     }
@@ -149,10 +138,7 @@ export class Program {
       program: webGLProgram,
       attributeName,
     });
-    vertexBufferObject.bindAndBindVertexAttribute(
-      vertexAttribute,
-      numberOfItemsForEachVertex,
-    );
+    vertexBufferObject.bindAndBindVertexAttribute(vertexAttribute, numberOfItemsForEachVertex);
     vertexBufferObject.bindAndUpdateData(data);
     return vertexBufferObject;
   }
@@ -163,9 +149,7 @@ function throwUniformNotFoundException(uniformName: string): never {
 }
 
 function throwInvalidNumberOfItemsException(nitems: number): never {
-  throw new Error(
-    `Invalid number of items to register as a uniform: ${nitems.toString()}`,
-  );
+  throw new Error(`Invalid number of items to register as a uniform: ${nitems.toString()}`);
 }
 
 function throwUnsupportedDataTypeException(dataType: string): never {

@@ -42,10 +42,7 @@ export class MusclScheme extends BaseScheme {
           velocity *
           (values[i] -
             0.5 *
-              fluxLimiter(
-                values[i] - values[i - 1],
-                values[i + 1] - values[i],
-              ) *
+              fluxLimiter(values[i] - values[i - 1], values[i + 1] - values[i]) *
               (values[i + 1] - values[i]));
       }
     } else {
@@ -54,10 +51,7 @@ export class MusclScheme extends BaseScheme {
           velocity *
           (values[i - 1] +
             0.5 *
-              fluxLimiter(
-                values[i - 1] - values[i - 2],
-                values[i] - values[i - 1],
-              ) *
+              fluxLimiter(values[i - 1] - values[i - 2], values[i] - values[i - 1]) *
               (values[i] - values[i - 1]));
       }
     }

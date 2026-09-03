@@ -8,11 +8,7 @@ class EditModeButton {
   private readonly _editMode: EditMode;
   private _isSelected: boolean;
 
-  public constructor(
-    containerElement: HTMLDivElement,
-    editMode: EditMode,
-    isSelected: boolean,
-  ) {
+  public constructor(containerElement: HTMLDivElement, editMode: EditMode, isSelected: boolean) {
     const element = createChildElement({
       tagName: "button",
       parentElement: containerElement,

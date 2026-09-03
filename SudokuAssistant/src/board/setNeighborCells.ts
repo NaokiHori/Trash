@@ -23,10 +23,7 @@ function getSameRowCells(position: Position, cells: Array<Cell>): Array<Cell> {
   return neighborCells;
 }
 
-function getSameColumnCells(
-  position: Position,
-  cells: Array<Cell>,
-): Array<Cell> {
+function getSameColumnCells(position: Position, cells: Array<Cell>): Array<Cell> {
   const neighborCells = new Array<Cell>();
   const column: number = position.column;
   for (let row = 0; row < BOARD_SIZE; row++) {
@@ -38,23 +35,12 @@ function getSameColumnCells(
   return neighborCells;
 }
 
-function getSameBlockCells(
-  position: Position,
-  cells: Array<Cell>,
-): Array<Cell> {
+function getSameBlockCells(position: Position, cells: Array<Cell>): Array<Cell> {
   const neighborCells = new Array<Cell>();
   const blockRow: number = Math.floor(position.row / BASE_SIZE);
   const blockColumn: number = Math.floor(position.column / BASE_SIZE);
-  for (
-    let row = BASE_SIZE * blockRow;
-    row < BASE_SIZE * (blockRow + 1);
-    row++
-  ) {
-    for (
-      let column = BASE_SIZE * blockColumn;
-      column < BASE_SIZE * (blockColumn + 1);
-      column++
-    ) {
+  for (let row = BASE_SIZE * blockRow; row < BASE_SIZE * (blockRow + 1); row++) {
+    for (let column = BASE_SIZE * blockColumn; column < BASE_SIZE * (blockColumn + 1); column++) {
       if (position.row === row && position.column === column) {
         continue;
       }

@@ -6,10 +6,7 @@ class SvgItem {
 
   public constructor(qualifiedName: string) {
     const namespaceUri = "http://www.w3.org/2000/svg";
-    const element: Element = document.createElementNS(
-      namespaceUri,
-      qualifiedName,
-    );
+    const element: Element = document.createElementNS(namespaceUri, qualifiedName);
     this._element = element;
     this.isDisplayed = false;
   }
@@ -92,9 +89,7 @@ export class Graph {
 
   public addPolygon(triangle: Triangle) {
     const reusePolygon = this._numActivePolygons < this._polygons.length;
-    const polygon = reusePolygon
-      ? this._polygons[this._numActivePolygons]
-      : new Polygon();
+    const polygon = reusePolygon ? this._polygons[this._numActivePolygons] : new Polygon();
     polygon.position = triangle;
     polygon.isDisplayed = true;
     if (!reusePolygon) {

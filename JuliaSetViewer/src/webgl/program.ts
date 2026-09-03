@@ -1,8 +1,6 @@
 function initShader(
   gl: WebGLRenderingContext,
-  type:
-    | WebGLRenderingContext["FRAGMENT_SHADER"]
-    | WebGLRenderingContext["VERTEX_SHADER"],
+  type: WebGLRenderingContext["FRAGMENT_SHADER"] | WebGLRenderingContext["VERTEX_SHADER"],
   source: string,
 ): WebGLShader {
   // creates a shader of the given type
@@ -34,16 +32,8 @@ export class Program {
     vertexShaderSource: string;
     fragmentShaderSource: string;
   }) {
-    const vertexShader: WebGLShader = initShader(
-      gl,
-      gl.VERTEX_SHADER,
-      vertexShaderSource,
-    );
-    const fragmentShader: WebGLShader = initShader(
-      gl,
-      gl.FRAGMENT_SHADER,
-      fragmentShaderSource,
-    );
+    const vertexShader: WebGLShader = initShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
+    const fragmentShader: WebGLShader = initShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
     const program: WebGLProgram = gl.createProgram();
     gl.attachShader(program, vertexShader);
     gl.attachShader(program, fragmentShader);

@@ -11,12 +11,7 @@ function drawTriangles(graph: Graph, triangles: Array<Triangle>) {
   }
 }
 
-function setUpPoints(
-  nitems: number,
-  graph: Graph,
-  points: Array<Point>,
-  onComplete: () => void,
-) {
+function setUpPoints(nitems: number, graph: Graph, points: Array<Point>, onComplete: () => void) {
   const { width, height } = graph.size;
   const margin = 0.02 * Math.min(width, height);
   const initPoint = (): Point => {

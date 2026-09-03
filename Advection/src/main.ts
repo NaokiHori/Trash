@@ -15,10 +15,7 @@ function main() {
   if (labelElement === null) {
     throw new Error("label div element not found");
   }
-  const buttons = [
-    document.getElementById("to-prev"),
-    document.getElementById("to-next"),
-  ];
+  const buttons = [document.getElementById("to-prev"), document.getElementById("to-next")];
   if (buttons[0] === null) {
     throw new Error("to-prev button not found");
   }

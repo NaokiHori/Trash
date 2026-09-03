@@ -37,20 +37,14 @@ export class QuickScheme extends BaseScheme {
         dValues[i] =
           coef *
           0.125 *
-          (3 * values[i - 1] +
-            3 * values[i] -
-            7 * values[i + 1] +
-            1 * values[i + 2]);
+          (3 * values[i - 1] + 3 * values[i] - 7 * values[i + 1] + 1 * values[i + 2]);
       }
     } else {
       for (let i = N_HALO; i < nitems + N_HALO; i++) {
         dValues[i] =
           -coef *
           0.125 *
-          (1 * values[i - 2] -
-            7 * values[i - 1] +
-            3 * values[i] +
-            3 * values[i + 1]);
+          (1 * values[i - 2] - 7 * values[i - 1] + 3 * values[i] + 3 * values[i + 1]);
       }
     }
     for (let i = N_HALO; i < nitems + N_HALO; i++) {

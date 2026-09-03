@@ -39,9 +39,7 @@ export class BaseScheme {
     const nitems = this._nitems;
     const halfWidth = 0.125;
     const getValue = (x: number): number => {
-      return length * (0.5 - halfWidth) < x && x < length * (0.5 + halfWidth)
-        ? 1
-        : 0;
+      return length * (0.5 - halfWidth) < x && x < length * (0.5 + halfWidth) ? 1 : 0;
     };
     for (let i = -n_halo; i < nitems + n_halo; i++) {
       const x = (length * (0.5 * (2 * i + 1))) / nitems;
@@ -50,10 +48,7 @@ export class BaseScheme {
     }
   }
 
-  protected _getArray(
-    n_halo: number,
-    values: Array<number>,
-  ): Readonly<Array<number>> {
+  protected _getArray(n_halo: number, values: Array<number>): Readonly<Array<number>> {
     const nitems = this._nitems;
     return values.slice(n_halo, nitems + n_halo);
   }

@@ -1,11 +1,6 @@
 import { createChildElement } from "../dom";
 import { Position } from "./position";
-import {
-  EMPTY_VALUE,
-  SUDOKU_VALUES,
-  SudokuValue,
-  isEmpty,
-} from "../sudokuValue";
+import { EMPTY_VALUE, SUDOKU_VALUES, SudokuValue, isEmpty } from "../sudokuValue";
 
 type CellMode = "Normal" | "Memo";
 
@@ -185,10 +180,7 @@ export class Cell {
 
   public setSubCellDisability(value: SudokuValue, isDisabled: boolean) {
     this._subCellValuesDisabled[value] = isDisabled;
-    this._subCellElements[value].setAttribute(
-      "isDisabled",
-      isDisabled.toString(),
-    );
+    this._subCellElements[value].setAttribute("isDisabled", isDisabled.toString());
   }
 
   public highlightSubCell(value: SudokuValue) {
@@ -263,9 +255,7 @@ export class Cell {
         neighborCells.sameColumn.every((neighborCell: Cell) =>
           isUnshared(sudokuValue, neighborCell),
         ) ||
-        neighborCells.sameBlock.every((neighborCell: Cell) =>
-          isUnshared(sudokuValue, neighborCell),
-        )
+        neighborCells.sameBlock.every((neighborCell: Cell) => isUnshared(sudokuValue, neighborCell))
       ) {
         this.setSubCellUniqueness(sudokuValue, true);
       }

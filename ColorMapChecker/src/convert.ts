@@ -1,8 +1,6 @@
 // convert HSV value [0:1] to RGB value [0:1]
 // ref: https://github.com/python/cpython/blob/3.11/Lib/colorsys.py
-export function hsvToRgb(
-  hsv: [number, number, number],
-): [number, number, number] {
+export function hsvToRgb(hsv: [number, number, number]): [number, number, number] {
   const h = hsv[0];
   const s = hsv[1];
   const v = hsv[2];
@@ -30,9 +28,7 @@ export function hsvToRgb(
 
 // convert RGB value [0:1] to HSV value [0:1]
 // ref: https://github.com/python/cpython/blob/3.11/Lib/colorsys.py
-export function rgbToHsv(
-  rgb: [number, number, number],
-): [number, number, number] {
+export function rgbToHsv(rgb: [number, number, number]): [number, number, number] {
   const r = rgb[0];
   const g = rgb[1];
   const b = rgb[2];

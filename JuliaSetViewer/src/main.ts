@@ -21,14 +21,8 @@ function main({ enableImageSaver }: { enableImageSaver: boolean }) {
   webGL.domainSize = domainSize.get();
   webGL.orbitType = [1, 2, 3].sort(() => Math.random() - 0.5)[0];
   webGL.center = center;
-  webGL.orbitTrapCenter = [
-    Math.E * (Math.random() - 0.5),
-    Math.E * (Math.random() - 0.5),
-  ];
-  webGL.recurrenceOffset = [
-    Math.E * (Math.random() - 0.5),
-    Math.E * (Math.random() - 0.5),
-  ];
+  webGL.orbitTrapCenter = [Math.E * (Math.random() - 0.5), Math.E * (Math.random() - 0.5)];
+  webGL.recurrenceOffset = [Math.E * (Math.random() - 0.5), Math.E * (Math.random() - 0.5)];
   window.addEventListener("resize", () => {
     canvas.adjustSize();
     webGL.updateResolution(canvas.width, canvas.height);

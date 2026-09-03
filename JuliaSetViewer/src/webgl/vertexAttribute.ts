@@ -16,11 +16,7 @@ export class VertexAttribute {
     program.use({
       gl,
       callback: (webGLProgram: WebGLProgram) => {
-        const attributeIndex: GLuint = getAttributeIndex(
-          gl,
-          webGLProgram,
-          attributeName,
-        );
+        const attributeIndex: GLuint = getAttributeIndex(gl, webGLProgram, attributeName);
         // NOTE: enable it on creation
         gl.enableVertexAttribArray(attributeIndex);
       },
@@ -45,10 +41,7 @@ export class VertexAttribute {
       );
     }
     // check if the buffer is currently bound
-    if (
-      (gl.getParameter(gl.ARRAY_BUFFER_BINDING) as WebGLBuffer) !==
-      vertexBufferObject.buffer
-    ) {
+    if ((gl.getParameter(gl.ARRAY_BUFFER_BINDING) as WebGLBuffer) !== vertexBufferObject.buffer) {
       throw new Error(`Given array buffer is not currently bound`);
     }
     const attributeName: string = this._attributeName;

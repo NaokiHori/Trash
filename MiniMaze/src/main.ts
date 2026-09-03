@@ -2,11 +2,7 @@ import { Canvas } from "./canvas";
 import { Maze } from "./maze";
 import { Button } from "./button";
 
-function continueMazeGeneration(
-  canvas: Canvas,
-  maze: Maze,
-  solveButton: Button,
-) {
+function continueMazeGeneration(canvas: Canvas, maze: Maze, solveButton: Button) {
   const { isCompleted } = maze.make();
   maze.draw(canvas.ctx, [canvas.width, canvas.height]);
   if (!isCompleted) {
@@ -28,11 +24,7 @@ function continueMazeSolving(canvas: Canvas, maze: Maze) {
   }
 }
 
-function handleKeyDown(
-  keyboardEvent: KeyboardEvent,
-  canvas: Canvas,
-  maze: Maze,
-) {
+function handleKeyDown(keyboardEvent: KeyboardEvent, canvas: Canvas, maze: Maze) {
   switch (keyboardEvent.key) {
     case "ArrowUp":
       maze.moveCursor("DOWN");

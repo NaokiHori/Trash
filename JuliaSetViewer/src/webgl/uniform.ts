@@ -7,9 +7,7 @@ function throwUniformNotFoundException(name: string): never {
 }
 
 function throwInvalidNumberOfItemsException(nitems: number): never {
-  throw new Error(
-    `Invalid number of items to register as a uniform: ${nitems.toString()}`,
-  );
+  throw new Error(`Invalid number of items to register as a uniform: ${nitems.toString()}`);
 }
 
 export class Uniform {
@@ -32,8 +30,7 @@ export class Uniform {
   }) {
     const uniformLocation: WebGLUniformLocation | null = program.use({
       gl,
-      callback: (webGLProgram: WebGLProgram) =>
-        gl.getUniformLocation(webGLProgram, name),
+      callback: (webGLProgram: WebGLProgram) => gl.getUniformLocation(webGLProgram, name),
     });
     if (uniformLocation === null) {
       throwUniformNotFoundException(name);

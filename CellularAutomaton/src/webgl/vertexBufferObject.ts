@@ -24,9 +24,7 @@ export class VertexBufferObject {
     this._buffer = buffer;
     // TODO: assuming Float32Array buffer
     const size: GLsizeiptr =
-      Float32Array.BYTES_PER_ELEMENT *
-      numberOfVertices *
-      numberOfItemsForEachVertex;
+      Float32Array.BYTES_PER_ELEMENT * numberOfVertices * numberOfItemsForEachVertex;
     this.bindAndExecute(() => {
       gl.bufferData(BUFFER_TARGET, size, usage);
     });
@@ -37,8 +35,7 @@ export class VertexBufferObject {
   public bindAndUpdateData(data: Float32Array) {
     const gl = this._gl;
     this.bindAndExecute(() => {
-      const expectedLength: number =
-        this._numberOfVertices * this._numberOfItemsForEachVertex;
+      const expectedLength: number = this._numberOfVertices * this._numberOfItemsForEachVertex;
       if (data.length !== expectedLength) {
         throw new Error(
           `data length ${data.length.toString()} does not agree with an expected value ${expectedLength.toString()}`,
@@ -54,10 +51,7 @@ export class VertexBufferObject {
     });
   }
 
-  public bindAndBindVertexAttribute(
-    vertexAttribute: VertexAttribute,
-    size: GLint,
-  ) {
+  public bindAndBindVertexAttribute(vertexAttribute: VertexAttribute, size: GLint) {
     const gl = this._gl;
     this.bindAndExecute(() => {
       const attributeIndex = vertexAttribute.attributeIndex;
@@ -69,14 +63,7 @@ export class VertexBufferObject {
       const stride: GLsizei = 0;
       // TODO: assuming the buffer points to the first item
       const offset: GLintptr = 0;
-      gl.vertexAttribPointer(
-        attributeIndex,
-        size,
-        type,
-        normalized,
-        stride,
-        offset,
-      );
+      gl.vertexAttribPointer(attributeIndex, size, type, normalized, stride, offset);
     });
   }
 
@@ -90,8 +77,7 @@ export class VertexBufferObject {
 
   private bindAndExecute(callback: () => void) {
     const gl = this._gl;
-    const currentlyBoundBuffer: WebGLBuffer | null =
-      getCurrentlyBoundBuffer(gl);
+    const currentlyBoundBuffer: WebGLBuffer | null = getCurrentlyBoundBuffer(gl);
     if (currentlyBoundBuffer !== null) {
       throw new Error(`Trying to bind a buffer with another buffer bound`);
     }
@@ -101,9 +87,7 @@ export class VertexBufferObject {
   }
 }
 
-function getCurrentlyBoundBuffer(
-  gl: WebGL2RenderingContext,
-): WebGLBuffer | null {
+function getCurrentlyBoundBuffer(gl: WebGL2RenderingContext): WebGLBuffer | null {
   // NOTE: gl.getParameter inherently returns any-typed variable
   return gl.getParameter(gl.ARRAY_BUFFER_BINDING) as WebGLBuffer | null;
 }

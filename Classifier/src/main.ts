@@ -8,9 +8,7 @@ import { Dataset, DataPoint } from "./dataset";
 
 const LOGGER_DEFAULT_MESSAGE = "Click button to proceed";
 
-function getLineSegment(
-  weights: Readonly<Vector>,
-): [[number, number], [number, number]] {
+function getLineSegment(weights: Readonly<Vector>): [[number, number], [number, number]] {
   const intersections: [[number, number], [number, number]] = [
     [0, 0],
     [0, 0],
@@ -18,8 +16,7 @@ function getLineSegment(
   let counter = 0;
   // intersection with Y_LIMITS + y = 0
   for (let pm = 0; pm < 2; pm++) {
-    const intersection_x: number =
-      -(weights[0] + weights[2] * Y_LIMITS[pm]) / weights[1];
+    const intersection_x: number = -(weights[0] + weights[2] * Y_LIMITS[pm]) / weights[1];
     const intersection_y: number = Y_LIMITS[pm];
     if (X_LIMITS[0] <= intersection_x && intersection_x <= X_LIMITS[1]) {
       intersections[counter][0] = intersection_x;
@@ -30,8 +27,7 @@ function getLineSegment(
   // intersection with X_LIMITS + x = 0
   for (let pm = 0; pm < 2; pm++) {
     const intersection_x: number = X_LIMITS[pm];
-    const intersection_y: number =
-      -(weights[0] + weights[1] * X_LIMITS[pm]) / weights[2];
+    const intersection_y: number = -(weights[0] + weights[1] * X_LIMITS[pm]) / weights[2];
     if (Y_LIMITS[0] <= intersection_y && intersection_y <= Y_LIMITS[1]) {
       intersections[counter][0] = intersection_x;
       intersections[counter][1] = intersection_y;

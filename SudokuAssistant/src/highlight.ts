@@ -11,9 +11,7 @@ export class Highlight {
     };
   }
 
-  public setOnUpdateHandler(
-    onUpdateHandler: (highlightedValue: SudokuValue) => void,
-  ) {
+  public setOnUpdateHandler(onUpdateHandler: (highlightedValue: SudokuValue) => void) {
     this._onUpdateHandler = onUpdateHandler;
   }
 

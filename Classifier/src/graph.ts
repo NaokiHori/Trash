@@ -25,14 +25,8 @@ class Point {
   }
 
   public set position(position: [number, number]) {
-    this._element.setAttribute(
-      "cx",
-      convertX(this._parentElement, position[0]).toString(),
-    );
-    this._element.setAttribute(
-      "cy",
-      convertY(this._parentElement, position[1]).toString(),
-    );
+    this._element.setAttribute("cx", convertX(this._parentElement, position[0]).toString());
+    this._element.setAttribute("cy", convertY(this._parentElement, position[1]).toString());
   }
 
   public set color(value: string) {
@@ -68,22 +62,10 @@ class LineSegment {
   }
 
   public set position(edges: [[number, number], [number, number]]) {
-    this._element.setAttribute(
-      "x1",
-      convertX(this._parentElement, edges[0][0]).toString(),
-    );
-    this._element.setAttribute(
-      "y1",
-      convertY(this._parentElement, edges[0][1]).toString(),
-    );
-    this._element.setAttribute(
-      "x2",
-      convertX(this._parentElement, edges[1][0]).toString(),
-    );
-    this._element.setAttribute(
-      "y2",
-      convertY(this._parentElement, edges[1][1]).toString(),
-    );
+    this._element.setAttribute("x1", convertX(this._parentElement, edges[0][0]).toString());
+    this._element.setAttribute("y1", convertY(this._parentElement, edges[0][1]).toString());
+    this._element.setAttribute("x2", convertX(this._parentElement, edges[1][0]).toString());
+    this._element.setAttribute("y2", convertY(this._parentElement, edges[1][1]).toString());
   }
 }
 

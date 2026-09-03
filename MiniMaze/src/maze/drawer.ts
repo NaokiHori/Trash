@@ -110,10 +110,7 @@ export class Drawer {
   }
 }
 
-function getColor(
-  boardSize: BoardSize,
-  radiusVector: Position,
-): [number, number, number] {
+function getColor(boardSize: BoardSize, radiusVector: Position): [number, number, number] {
   const angleInRadian = Math.atan2(radiusVector.y, radiusVector.x);
   const angleInDegree = Math.floor((180 / Math.PI) * (Math.PI + angleInRadian));
   const magnitude = norm(radiusVector);

@@ -53,10 +53,7 @@ export class ThincScheme extends BaseScheme {
         normals[i] = 0;
         intercepts[i] = 0;
       } else {
-        const ns = [
-          values[i - 1] < values[i] ? 1 : -1,
-          values[i] < values[i + 1] ? 1 : -1,
-        ];
+        const ns = [values[i - 1] < values[i] ? 1 : -1, values[i] < values[i + 1] ? 1 : -1];
         const n = 0.5 * ns[0] + 0.5 * ns[1];
         normals[i] = n / Math.max(Math.abs(n), Number.EPSILON);
         intercepts[i] = (-0.5 / BETA) * Math.log(1 / values[i] - 1);
