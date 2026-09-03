@@ -1,11 +1,12 @@
 * {
-  font-family: "Courier New";
-  color: #ffffff;
+  font-family: "Courier New", monospace;
+  color: #e6e6e6;
 }
 
 html {
   height: 100dvh;
-  background-color: #000000;
+  background-color: #0b0b0c;
+  color-scheme: dark;
 }
 
 body {
@@ -20,7 +21,7 @@ body {
 }
 
 #carousel-container {
-  width: calc(min(80%, 600px));
+  width: min(80%, 600px);
   display: flex;
   flex-wrap: nowrap;
   flex-direction: column;
@@ -47,7 +48,9 @@ div.carousel-item > a {
 }
 
 img.carousel-image {
-  width: calc(min(75dvw, 50dvh));
+  width: min(75dvw, 50dvh);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
 }
 
 #carousel-footer {
@@ -66,18 +69,19 @@ button.carousel-button {
   padding-right: 0.25rem;
   padding-top: 0;
   padding-bottom: 0;
-  color: #ffffff;
-  background-color: #000000;
+  color: #cccccc;
+  background-color: transparent;
   border-radius: 1rem;
-  border-color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.35);
   border-style: solid;
   border-width: 0.1rem;
   font-size: 3rem;
 }
 
 button.carousel-button:hover {
-  color: #000000;
-  background-color: #ffffff;
+  color: #0b0b0c;
+  background-color: #e6e6e6;
+  border-color: #e6e6e6;
   cursor: pointer;
 }
 
@@ -90,17 +94,19 @@ button.carousel-button:hover {
   flex-direction: row;
   justify-content: center;
   font-size: 2rem;
+  color: rgba(255, 255, 255, 0.4);
 }
 
 footer {
   text-align: center;
-  padding: 10px;
-  background-color: rgba(255, 255, 255, 0.1);
+  padding: 10px 10px calc(10px + env(safe-area-inset-bottom));
+  background-color: rgba(255, 255, 255, 0.06);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   position: fixed;
   width: 100%;
   bottom: 0;
 }
 
 footer > a {
-  color: white;
+  color: #cccccc;
 }
