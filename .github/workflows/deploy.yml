@@ -11,6 +11,7 @@ jobs:
   build-and-deploy:
     name: Build and deploy
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -22,11 +23,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
       - name: Build Docker image
-        run: docker compose build
+        run: docker compose build app
       - name: Quality checks
         run: |
-          docker compose run --rm app npx tsc
           docker compose up -d app
+          make tsc
           make lint
           make fmtcheck
           docker compose down

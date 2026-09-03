@@ -8,7 +8,7 @@ Series of shitty web applications I developed for fun.
 ## Set up
 
 ```bash
-docker compose build
+docker compose build app
 ```
 
 ## Launch development server
@@ -16,6 +16,14 @@ docker compose build
 ```bash
 docker compose up
 ```
+
+Access `http://localhost:5173/` or
+
+```bash
+open http://localhost:5173/
+```
+
+Check available dev tools:
 
 ```bash
 make help
