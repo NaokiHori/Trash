@@ -24,7 +24,7 @@ make help
 ## (Dev) Dependencies included in the container
 
 - @types/node
-- prettier
 - typescript
+- oxfmt
 - oxlint
 - vite

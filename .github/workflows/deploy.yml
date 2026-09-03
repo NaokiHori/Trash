@@ -26,9 +26,9 @@ jobs:
       - name: Quality checks
         run: |
           docker compose run --rm app npx tsc
-          docker compose run --rm app npx prettier . --check
           docker compose up -d app
           make lint
+          make fmtcheck
           docker compose down
       - name: Build
         run: |

@@ -1,11 +1,11 @@
 SERVICE := app
 
 help:
-	@echo "help    : show this message"
-	@echo "build   : build HTML artifacts"
-	@echo "lint    : run linter"
-	@echo "prettier: prettify files"
-	@echo "tsc     : run type check"
+	@echo "help  : show this message"
+	@echo "build : build HTML artifacts"
+	@echo "lint  : run linter"
+	@echo "fmt   : run formatter"
+	@echo "tsc   : run type check"
 
 build:
 	docker compose exec $(SERVICE) npx vite build
@@ -13,8 +13,11 @@ build:
 lint:
 	docker compose exec $(SERVICE) npx oxlint
 
-prettier:
-	docker compose exec $(SERVICE) npx prettier . --write
+fmt:
+	docker compose exec $(SERVICE) npx oxfmt
+
+fmtcheck:
+	docker compose exec $(SERVICE) npx oxfmt --check
 
 tsc:
 	docker compose exec $(SERVICE) npx tsc
