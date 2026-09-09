@@ -1,6 +1,9 @@
-FROM node:latest
+FROM node:alpine
 
 WORKDIR /project
+RUN chown -R node:node /project
+USER node
+
 RUN npm init -y --init-type=module
 RUN npm install --save-dev \
   @types/node \
