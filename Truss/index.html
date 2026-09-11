@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Truss Bridge</title>
+    <script type="module" src="./src/main.ts"></script>
+  </head>
+
+  <body>
+    <div id="truss-label">[TRUSS TYPE NOT SPECIFIED]</div>
+    <div id="truss-changer-container">
+      <button class="truss-changer" id="to-prev">&lt;</button>
+      <button class="truss-changer" id="run">RUN</button>
+      <button class="truss-changer" id="to-next">&gt;</button>
+    </div>
+    <svg id="graph" viewBox="-105 -55 210 110" preserveAspectRatio="xMidYMid meet">
+      <g id="supports">
+        <rect id="support-left" x="-200" y="0" width="100" height="1e10"></rect>
+        <rect id="support-right" x="100" y="0" width="100" height="1e10"></rect>
+      </g>
+      <g id="truss-edges"></g>
+      <g id="truss-nodes"></g>
+    </svg>
+    <svg id="strain-legend" width="95%" viewBox="0 0 300 40">
+      <defs>
+        <linearGradient id="strain-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="hsl(180deg 100% 80%)"></stop>
+          <stop offset="50%" stop-color="rgb(80% 80% 80%)"></stop>
+          <stop offset="100%" stop-color="hsl(0deg 100% 80%)"></stop>
+        </linearGradient>
+      </defs>
+      <rect x="10" y="10" width="280" height="8" fill="url(#strain-gradient)"></rect>
+      <text x="10" y="32" fill="#ffffff" font-size="8" text-anchor="start">compression</text>
+      <text x="290" y="32" fill="#ffffff" font-size="8" text-anchor="end">tension</text>
+    </svg>
+    <footer>
+      <a href="https://github.com/NaokiHori/Trash/tree/main/Truss">&#xA9; 2026 Naoki Hori</a>
+    </footer>
+  </body>
+</html>
