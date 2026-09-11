@@ -8,6 +8,7 @@ import advectionIcon from "../Advection/icon.jpg";
 import rouletteIcon from "../Roulette/icon.jpg";
 import cellularAutomatonIcon from "../CellularAutomaton/icon.jpg";
 import hifuIcon from "../HIFU/icon.jpg";
+import trussIcon from "../Truss/icon.jpg";
 
 function getElementById(elementId: string): HTMLElement {
   const element: HTMLElement | null = document.getElementById(elementId);
@@ -161,6 +162,12 @@ function main() {
       title: "HIFU",
       href: `${ROOT}/HIFU/index.html`,
       imageSource: hifuIcon,
+    }),
+    new Page({
+      isActive: false,
+      title: "Truss",
+      href: `${ROOT}/Truss/index.html`,
+      imageSource: trussIcon,
     }),
   ];
   updateCarouselPagination(getCurrentPageIndex(pages), pages.length);

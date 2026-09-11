@@ -22,6 +22,7 @@ export default defineConfig({
         MiniMaze: resolve(root, "MiniMaze", "index.html"),
         Roulette: resolve(root, "Roulette", "index.html"),
         SudokuAssistant: resolve(root, "SudokuAssistant", "index.html"),
+        Truss: resolve(root, "Truss", "index.html"),
       },
     },
   },
