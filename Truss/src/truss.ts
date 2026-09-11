@@ -77,13 +77,17 @@ export class TrussEdge {
     const line = this.line;
     const nodes = this.nodes;
     const strain = this.getStrain();
-    if (0 < strain) {
-      const saturation = (100 * Math.abs(strain)) / referenceStrain;
-      line.setColor(`hsl(0deg ${saturation}% 80%)`);
-    } else if (strain < 0) {
-      const saturation = (100 * Math.abs(strain)) / referenceStrain;
-      line.setColor(`hsl(180deg ${saturation}% 80%)`);
+    function strainToColor(strain: number) {
+      if (strain === 0) {
+        return "hsl(0deg 0% 75%)";
+      }
+      const magnitude = Math.min(Math.abs(strain) / referenceStrain, 1);
+      const saturation = 40 + 60 * magnitude;
+      const lightness = 75 - 35 * magnitude;
+      const hue = strain > 0 ? 30 : 220;
+      return `hsl(${hue}deg ${saturation}% ${lightness}%)`;
     }
+    line.setColor(strainToColor(strain));
     line.updatePosition(
       nodes[0].x + nodes[0].dx,
       nodes[0].y + nodes[0].dy,

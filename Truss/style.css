@@ -70,7 +70,7 @@ button.truss-changer:focus-visible {
 }
 
 .truss-edge {
-  stroke: #aaaaaa;
+  stroke: hsl(0deg 0% 75%);
   stroke-width: 1;
   stroke-linecap: round;
 }
@@ -78,7 +78,7 @@ button.truss-changer:focus-visible {
 .truss-node {
   fill: #070605;
   stroke: #ffffff;
-  stroke-width: 1;
+  stroke-width: 0.5;
 }
 
 .truss-node.focused {
