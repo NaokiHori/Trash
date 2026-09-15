@@ -109,7 +109,6 @@ export class Truss {
   private current: number;
 
   constructor() {
-    this.current = 0;
     this.trusses = [
       () => new BrownTruss(),
       () => new HoweTruss(),
@@ -117,6 +116,7 @@ export class Truss {
       () => new PrattTruss(),
       () => new WarrenTruss(),
     ];
+    this.current = Math.floor(Math.random() * this.trusses.length);
     this.truss = this.trusses[this.current]();
   }
 
