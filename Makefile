@@ -16,8 +16,5 @@ lint:
 fmt:
 	docker compose exec $(SERVICE) npx oxfmt
 
-fmtcheck:
-	docker compose exec $(SERVICE) npx oxfmt --check
-
 tsc:
 	docker compose exec $(SERVICE) npx tsc
