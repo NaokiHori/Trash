@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./style.css" />
+    <title>Cart Pole Controller</title>
+    <script type="module" src="./src/main.ts"></script>
+  </head>
+
+  <body>
+    <svg id="graph" viewBox="-0.125 -0.125 0.25 0.25" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <pattern
+          id="ticks-minor"
+          x="-0.025"
+          y="0"
+          width="0.05"
+          height="0.008"
+          patternUnits="userSpaceOnUse"
+        >
+          <line class="tick" x1="0.025" y1="0" x2="0.025" y2="0.008" />
+        </pattern>
+        <pattern
+          id="ticks-major"
+          x="-0.125"
+          y="0"
+          width="0.25"
+          height="0.016"
+          patternUnits="userSpaceOnUse"
+        >
+          <line class="tick major" x1="0.125" y1="0" x2="0.125" y2="0.016" />
+        </pattern>
+        <filter id="glow" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="0.004" result="b" />
+          <feMerge>
+            <feMergeNode in="b" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+      </defs>
+      <rect x="-50" y="0" width="100" height="0.008" fill="url(#ticks-minor)" />
+      <rect x="-50" y="0" width="100" height="0.016" fill="url(#ticks-major)" />
+      <line class="horizontal-line" x1="-50" y1="0" x2="50" y2="0" />
+    </svg>
+    <footer>
+      <a href="https://github.com/NaokiHori/Trash/tree/main/CartPole">&#xA9; 2026 Naoki Hori</a>
+    </footer>
+  </body>
+</html>

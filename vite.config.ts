@@ -20,6 +20,7 @@ export default defineConfig({
         HIFU: resolve(root, "HIFU", "index.html"),
         JuliaSetViewer: resolve(root, "JuliaSetViewer", "index.html"),
         MiniMaze: resolve(root, "MiniMaze", "index.html"),
+        CartPole: resolve(root, "CartPole", "index.html"),
         Roulette: resolve(root, "Roulette", "index.html"),
         SudokuAssistant: resolve(root, "SudokuAssistant", "index.html"),
         Truss: resolve(root, "Truss", "index.html"),

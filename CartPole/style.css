@@ -1,0 +1,84 @@
+html,
+body {
+  overflow: hidden;
+  margin: 0;
+  padding-block: 1rem;
+  width: 100dvw;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+  align-items: center;
+  background-color: #070605;
+  font-family: Arial, sans-serif;
+}
+
+#graph {
+  width: 95%;
+  flex-grow: 1;
+  border: 2px solid #aaaaaa;
+  border-radius: 10px;
+  background-color: #000000;
+  cursor: pointer;
+}
+
+#graph[is-controlled="true"] {
+  border-color: #4cc9f0;
+}
+
+#graph[is-controlled="false"] {
+  border-color: #f0724c;
+}
+
+:root {
+  --rail: #888888;
+}
+
+circle.pendulum-mass {
+  fill: #e8e8ea;
+  filter: url(#glow);
+  stroke: transparent;
+  stroke-width: 0.03;
+  pointer-events: all;
+  transition: fill 0.15s ease;
+}
+
+line.link {
+  stroke-width: 0.003;
+  stroke: #9a9aa0;
+  stroke-linecap: round;
+}
+
+rect.cart {
+  fill: #e8e8ea;
+  rx: 0.004;
+  stroke: #ffffff;
+  stroke-width: 0.001;
+}
+
+line.horizontal-line {
+  stroke: var(--rail);
+  stroke-width: 0.0015;
+}
+
+line.tick {
+  stroke: var(--rail);
+  stroke-width: 0.001;
+}
+
+line.tick.major {
+  stroke: var(--rail);
+  stroke-width: 0.0015;
+}
+
+footer {
+  width: 100%;
+  padding: 0.5rem 0;
+  text-align: center;
+  background-color: #272625;
+}
+
+footer > a {
+  color: #ffffff;
+  font-size: 0.9rem;
+}
