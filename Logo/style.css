@@ -1,0 +1,128 @@
+html,
+body {
+  overflow: hidden;
+  margin: 0;
+  padding-block: 1rem;
+  width: 100dvw;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  row-gap: 1rem;
+  align-items: center;
+  background-color: #070605;
+  font-family: Arial, sans-serif;
+}
+
+#download-open {
+  padding: 0.5rem 1rem;
+  border: 1px solid #aaaaaa;
+  border-radius: 6px;
+  background-color: #ffffff;
+  color: #070605;
+  font-family: inherit;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+#download-open:hover {
+  filter: brightness(1.05);
+}
+
+#download-dialog {
+  border: 2px solid #aaaaaa;
+  border-radius: 10px;
+  padding: 1.5rem;
+  background-color: #272625;
+  color: #ffffff;
+  font-family: inherit;
+  min-width: 280px;
+  max-width: min(90vw, 400px);
+}
+
+#download-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+}
+
+#download-dialog h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+}
+
+#download-dialog fieldset {
+  border: 1px solid #444444;
+  border-radius: 6px;
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+}
+
+#download-dialog legend {
+  padding: 0 0.4rem;
+  font-size: 0.85rem;
+  color: #cccccc;
+}
+
+#download-dialog fieldset label {
+  display: flex;
+  align-items: center;
+  column-gap: 0.5rem;
+  margin-block: 0.3rem;
+}
+
+#size-fieldset input[type="number"] {
+  width: 100%;
+  padding: 0.3rem;
+  box-sizing: border-box;
+  background-color: #070605;
+  border: 1px solid #444444;
+  border-radius: 4px;
+  color: #ffffff;
+  font-family: inherit;
+}
+
+#size-fieldset.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  column-gap: 0.5rem;
+}
+
+.dialog-actions button {
+  padding: 0.4rem 0.9rem;
+  border-radius: 6px;
+  border: 1px solid #aaaaaa;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+#download-confirm {
+  background-color: #ffffff;
+  color: #070605;
+}
+
+#download-cancel {
+  background-color: transparent;
+  color: #ffffff;
+}
+
+#graph {
+  width: 95%;
+  flex-grow: 1;
+  border: 2px solid #aaaaaa;
+  border-radius: 10px;
+}
+
+footer {
+  width: 100%;
+  padding: 0.5rem 0;
+  text-align: center;
+  background-color: #272625;
+}
+
+footer > a {
+  color: #ffffff;
+  font-size: 0.9rem;
+}

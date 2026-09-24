@@ -19,6 +19,7 @@ export default defineConfig({
         Delaunay: resolve(root, "Delaunay", "index.html"),
         HIFU: resolve(root, "HIFU", "index.html"),
         JuliaSetViewer: resolve(root, "JuliaSetViewer", "index.html"),
+        Logo: resolve(root, "Logo", "index.html"),
         MiniMaze: resolve(root, "MiniMaze", "index.html"),
         CartPole: resolve(root, "CartPole", "index.html"),
         Roulette: resolve(root, "Roulette", "index.html"),

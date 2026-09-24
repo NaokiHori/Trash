@@ -10,6 +10,7 @@ import cellularAutomatonIcon from "../CellularAutomaton/icon.jpg";
 import hifuIcon from "../HIFU/icon.jpg";
 import trussIcon from "../Truss/icon.jpg";
 import cartPoleIcon from "../CartPole/icon.jpg";
+import logoIcon from "../Logo/icon.jpg";
 
 function getElementById(elementId: string): HTMLElement {
   const element: HTMLElement | null = document.getElementById(elementId);
@@ -175,6 +176,12 @@ function main() {
       title: "Cart Pole",
       href: `${ROOT}/CartPole/index.html`,
       imageSource: cartPoleIcon,
+    }),
+    new Page({
+      isActive: false,
+      title: "Logo",
+      href: `${ROOT}/Logo/index.html`,
+      imageSource: logoIcon,
     }),
   ];
   updateCarouselPagination(getCurrentPageIndex(pages), pages.length);
