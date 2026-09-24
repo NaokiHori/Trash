@@ -17,17 +17,7 @@ docker compose build app
 docker compose up
 ```
 
-Access `http://localhost:5173/` or
-
-```bash
-open http://localhost:5173/
-```
-
-Check available dev tools:
-
-```bash
-make help
-```
+Access `http://localhost:5173/`.
 
 ## (Dev) Dependencies included in the container
 
