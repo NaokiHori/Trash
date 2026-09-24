@@ -136,7 +136,7 @@ function main() {
     // }),
     new Page({
       isActive: false,
-      title: "Delaunay triangulator",
+      title: "Triangulator",
       href: `${ROOT}/Delaunay/index.html`,
       imageSource: delaynayIcon,
     }),
