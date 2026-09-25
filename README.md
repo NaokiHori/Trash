@@ -30,4 +30,3 @@ Access `http://localhost:5173/`.
 The following oxlint-rules are disabled:
 
 - `typescript/prefer-readonly-parameter-types`: DOM objects cannot be read-only
-- `oxc/no-async-await`: another rule `typescript(promise-function-async)` is contradicting

@@ -1,30 +1,35 @@
 import { Truss } from "./truss";
 
-const nodesElement = getElementByIdOrThrow("truss-nodes");
-const edgesElement = getElementByIdOrThrow("truss-edges");
-const labelElement = getElementByIdOrThrow("truss-label");
-
-function getElementByIdOrThrow(id: string): HTMLElement {
-  const element = document.getElementById(id);
+function getElementByIdOrThrow<T extends Element>(
+  type: new (...args: unknown[]) => T,
+  id: string,
+): T {
+  const element = document.querySelector(`#${id}`);
   if (null === element) {
+    throw new Error();
+  }
+  if (!(element instanceof type)) {
     throw new Error();
   }
   return element;
 }
 
-function setupSVG(truss: Truss) {
+function setupSVG(truss: Readonly<Truss>): void {
+  const nodesElement = getElementByIdOrThrow(SVGGElement, "truss-nodes");
+  const edgesElement = getElementByIdOrThrow(SVGGElement, "truss-edges");
+  const labelElement = getElementByIdOrThrow(HTMLDivElement, "truss-label");
   labelElement.textContent = truss.getLabel();
   nodesElement.replaceChildren();
   edgesElement.replaceChildren();
   for (const node of truss.getNodes()) {
-    nodesElement.appendChild(node.getCircle().getElement());
+    nodesElement.append(node.getCircle().getElement());
   }
   for (const edge of truss.getEdges()) {
-    edgesElement.appendChild(edge.getLine().getElement());
+    edgesElement.append(edge.getLine().getElement());
   }
 }
 
-function updateSVG(truss: Truss) {
+function updateSVG(truss: Readonly<Truss>): void {
   for (const node of truss.getNodes()) {
     node.update();
   }
@@ -37,17 +42,17 @@ function updateSVG(truss: Truss) {
   }
 }
 
-function main() {
+function main(): void {
   const truss = new Truss();
-  getElementByIdOrThrow("to-prev").addEventListener("click", () => {
+  getElementByIdOrThrow(HTMLButtonElement, "to-prev").addEventListener("click", () => {
     truss.toPrev();
     setupSVG(truss);
   });
-  getElementByIdOrThrow("to-next").addEventListener("click", () => {
+  getElementByIdOrThrow(HTMLButtonElement, "to-next").addEventListener("click", () => {
     truss.toNext();
     setupSVG(truss);
   });
-  getElementByIdOrThrow("run").addEventListener("click", () => {
+  getElementByIdOrThrow(HTMLButtonElement, "run").addEventListener("click", () => {
     truss.solve();
     updateSVG(truss);
   });
