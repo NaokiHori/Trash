@@ -11,7 +11,7 @@ build:
 	docker compose exec $(SERVICE) npx vite build
 
 lint:
-	docker compose exec $(SERVICE) npx oxlint
+	docker compose exec $(SERVICE) npx oxlint --type-aware -D correctness
 
 fmt:
 	docker compose exec $(SERVICE) npx oxfmt

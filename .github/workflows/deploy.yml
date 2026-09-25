@@ -37,7 +37,7 @@ jobs:
           docker compose up -d ${{ env.CONTAINER_APP_SERVICE }}
           # quality check
           docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx tsc
-          docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx oxlint
+          docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx oxlint --type-aware -D correctness
           docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx oxfmt --check
           # build artifacts
           docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx \

@@ -10,6 +10,7 @@ RUN npm install --save-dev \
   typescript \
   oxfmt \
   oxlint \
+  oxlint-tsgolint \
   vite
 
 WORKDIR /project/src
