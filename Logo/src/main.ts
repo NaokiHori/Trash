@@ -8,16 +8,21 @@ function getUrlParameter(parameter: string): string | null {
 
 function getColorUrlParameter(parameter: string): string | null {
   const color = getUrlParameter(parameter);
-  if (color) {
-    return `#${color}`;
-  } else {
+  if (color === null) {
     return color;
   }
+  return `#${color}`;
 }
 
-function getElementByIdOrThrow(id: string): HTMLElement {
-  const element = document.getElementById(id);
+function getElementByIdOrThrow<T extends Element>(
+  type: new (...args: unknown[]) => T,
+  id: string,
+): T {
+  const element = document.querySelector(`#${id}`);
   if (null === element) {
+    throw new Error();
+  }
+  if (!(element instanceof type)) {
     throw new Error();
   }
   return element;
@@ -37,18 +42,20 @@ function getWavePath(size: number): Array<PathElement> {
     const b: Point = [x - 0.5 * eachWaveWidth, y];
     const e: Point = [x + 0.5 * eachWaveWidth, y];
     const c: Point = [x, 0 === i % 2 ? y - waveAmp : y + waveAmp];
-    result.push(new PathElementM(b));
-    result.push(new PathElementS([c, e]));
+    result.push(new PathElementM(b), new PathElementS([c, e]));
   }
   return result;
 }
 
+function rotate(p: Readonly<Point>, arg: number): Point {
+  return [p[0] * Math.cos(arg) - p[1] * Math.sin(arg), p[0] * Math.sin(arg) + p[1] * Math.cos(arg)];
+}
+
+function translate(p: Readonly<Point>, dp: Readonly<Point>): Point {
+  return [p[0] + dp[0], p[1] + dp[1]];
+}
+
 function getSpiralPath(size: number, isLeft: boolean): Array<PathElement> {
-  const rotate = (p: Point, arg: number): Point => [
-    p[0] * Math.cos(arg) - p[1] * Math.sin(arg),
-    p[0] * Math.sin(arg) + p[1] * Math.cos(arg),
-  ];
-  const translate = (p: Point, dp: Point): Point => [p[0] + dp[0], p[1] + dp[1]];
   // Center points calculation
   const cx = isLeft ? -0.2 * size : 0.2 * size;
   const cy = -0.1 * size + (isLeft ? 0.01885 * size : -0.01885 * size);
@@ -59,7 +66,7 @@ function getSpiralPath(size: number, isLeft: boolean): Array<PathElement> {
   const argMax = 4 * Math.PI + baseShift;
   const step = (argMax - argMin) / nargs;
   const args = Array.from({ length: nargs }, (_, i) => argMax - i * step);
-  const darg = (args[args.length - 1] - args[0]) / nargs;
+  const darg = (args[nargs - 1] - args[0]) / nargs;
   const dr = 0.005 * size;
   let r = 0.015 * size;
   const result = new Array<PathElement>();
@@ -71,50 +78,34 @@ function getSpiralPath(size: number, isLeft: boolean): Array<PathElement> {
     const b = translate(rotate(bRaw, arg), center);
     const e = translate(rotate(eRaw, arg), center);
     const c = translate(rotate(cRaw, arg), center);
-    result.push(new PathElementM(b));
-    result.push(new PathElementS([c, e]));
+    result.push(new PathElementM(b), new PathElementS([c, e]));
     r += dr;
   }
   return result;
 }
 
-function main() {
-  const size = 100;
-  const graph = getElementByIdOrThrow("graph");
-  const foregroundColor = getColorUrlParameter("foreground-color");
-  const backgroundColor = getColorUrlParameter("background-color");
-  const rect = new Rect(-0.5 * size, -0.5 * size, size, size);
-  const waterMark = new Text("Naoki HORI", 0, 0.45 * size, "#fdca42");
-  rect.setFill(backgroundColor ?? "#ffcc44");
-  const pathElementsList = [
-    getWavePath(size),
-    getSpiralPath(size, true),
-    getSpiralPath(size, false),
-  ];
-  graph.appendChild(rect.getElement());
-  graph.appendChild(waterMark.getElement());
-  pathElementsList.forEach((pathElements: Array<PathElement>) => {
-    const path = new Path(pathElements);
-    path.setFill("transparent");
-    path.setStroke(foregroundColor ?? "#664400");
-    path.setStrokeWidth(5);
-    path.setStrokeLinecap("round");
-    graph.appendChild(path.getElement());
-  });
-  const downloadOpenButton = getElementByIdOrThrow("download-open");
-  const downloadDialog = getElementByIdOrThrow("download-dialog");
-  const downloadCancelButton = getElementByIdOrThrow("download-cancel");
-  const downloadForm = getElementByIdOrThrow("download-form");
+function setupDownload(graph: SVGSVGElement): void {
+  const downloadOpenButton = getElementByIdOrThrow(HTMLButtonElement, "download-open");
+  const downloadDialog = getElementByIdOrThrow(HTMLDialogElement, "download-dialog");
+  const downloadCancelButton = getElementByIdOrThrow(HTMLButtonElement, "download-cancel");
+  const downloadForm = getElementByIdOrThrow(HTMLFormElement, "download-form");
   if (!(downloadDialog instanceof HTMLDialogElement)) {
     throw new Error();
   }
   if (!(downloadForm instanceof HTMLFormElement)) {
     throw new Error();
   }
-  downloadOpenButton.addEventListener("click", () => downloadDialog.showModal());
-  downloadCancelButton.addEventListener("click", () => downloadDialog.close());
+  downloadOpenButton.addEventListener("click", () => {
+    downloadDialog.showModal();
+  });
+  downloadCancelButton.addEventListener("click", () => {
+    downloadDialog.close();
+  });
   downloadForm.addEventListener("submit", () => {
-    const format = new FormData(downloadForm).get("format") as string;
+    const format = new FormData(downloadForm).get("format");
+    if (null === format) {
+      return;
+    }
     const size = Number(new FormData(downloadForm).get("size"));
     const prefix = "logo";
     switch (format) {
@@ -128,9 +119,38 @@ function main() {
         downloadSvg(graph, prefix, size);
         break;
       default:
-        console.warn(format, size);
+      // nothing to do
     }
   });
+}
+
+function main(): void {
+  const size = 100;
+  const graph = getElementByIdOrThrow(SVGSVGElement, "graph");
+  if (!(graph instanceof SVGSVGElement)) {
+    throw new Error();
+  }
+  const foregroundColor = getColorUrlParameter("foreground-color");
+  const backgroundColor = getColorUrlParameter("background-color");
+  const rect = new Rect(-0.5 * size, -0.5 * size, size, size);
+  const waterMark = new Text("Naoki HORI", 0, 0.45 * size, "#fdca42");
+  rect.setFill(backgroundColor ?? "#ffcc44");
+  const pathElementsList = [
+    getWavePath(size),
+    getSpiralPath(size, true),
+    getSpiralPath(size, false),
+  ];
+  graph.append(rect.getElement());
+  graph.append(waterMark.getElement());
+  for (const pathElements of pathElementsList) {
+    const path = new Path(pathElements);
+    path.setFill("transparent");
+    path.setStroke(foregroundColor ?? "#664400");
+    path.setStrokeWidth(5);
+    path.setStrokeLinecap("round");
+    graph.append(path.getElement());
+  }
+  setupDownload(graph);
 }
 
 window.addEventListener("load", () => {
