@@ -9,11 +9,14 @@ export class RouletteView {
   private readonly nColors: number;
 
   public constructor(members: ReadonlyArray<string>) {
-    const rouletteElement = document.getElementById("roulette");
+    const rouletteElement = document.querySelector("#roulette");
     if (rouletteElement === null) {
       throw new Error("roulette element not found");
     }
-    const labelsElement = document.getElementById("labels");
+    if (!(rouletteElement instanceof HTMLElement)) {
+      throw new Error();
+    }
+    const labelsElement = document.querySelector("#labels");
     if (labelsElement === null) {
       throw new Error("labels element not found");
     }
@@ -21,7 +24,7 @@ export class RouletteView {
       const labelElement = document.createElement("div");
       labelElement.className = "label";
       labelElement.textContent = member;
-      labelsElement.appendChild(labelElement);
+      labelsElement.append(labelElement);
       return labelElement;
     });
     const nColors = members.length;
@@ -30,7 +33,7 @@ export class RouletteView {
     this.nColors = nColors;
   }
 
-  public draw(selectedIndex: number, isFinalized: boolean) {
+  public draw(selectedIndex: number, isFinalized: boolean): void {
     for (const [index, labelElement] of this.labelElements.entries()) {
       // border color is colored in the same way as the roulette
       // once finalized, make it darker to be less visible

@@ -2,6 +2,10 @@ import * as Utils from "./util";
 
 const STEP_MAX = 180;
 
+function easeOutCubic(t: number): number {
+  return 1 - Math.pow(1 - t, 3);
+}
+
 export class RouletteState {
   private readonly nColors: number;
   private position: number;
@@ -15,7 +19,7 @@ export class RouletteState {
     this.step = 0;
   }
 
-  public update() {
+  public update(): void {
     const increment = this.getIncrement();
     this.position = (this.position + increment + 1) % 1;
     this.step += 1;
@@ -34,8 +38,4 @@ export class RouletteState {
     const t_bef = easeOutCubic(this.step / STEP_MAX);
     return 2 * Math.PI * (t_aft - t_bef);
   }
-}
-
-function easeOutCubic(t: number): number {
-  return 1 - Math.pow(1 - t, 3);
 }
