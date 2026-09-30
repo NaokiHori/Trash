@@ -1,3 +1,3 @@
 # Classifier
 
-Visualize processes of classification algorithms
+Visualize processes of classification algorithm (support vector machine).

@@ -14,7 +14,7 @@ export default defineConfig({
         main: resolve(root, ".", "index.html"),
         Advection: resolve(root, "Advection", "index.html"),
         CellularAutomaton: resolve(root, "CellularAutomaton", "index.html"),
-        // Classifier: resolve(root, "Classifier", "index.html"),
+        Classifier: resolve(root, "Classifier", "index.html"),
         ColorMapChecker: resolve(root, "ColorMapChecker", "index.html"),
         Delaunay: resolve(root, "Delaunay", "index.html"),
         HIFU: resolve(root, "HIFU", "index.html"),

@@ -1,122 +1,130 @@
-import { X_LIMITS, Y_LIMITS } from "./param";
+import { Animation } from "./animation";
 import { getNitems } from "./getNitems";
-import { DivElement } from "./dom";
-import { Button } from "./button";
-import { Vector } from "./vector";
+import { ButtonElement, CanvasElement, DivElement } from "./dom";
 import { Graph } from "./graph";
-import { Dataset, DataPoint } from "./dataset";
+import { Sample, Dataset } from "./dataset";
+import { getPattern } from "./pattern";
 
 const LOGGER_DEFAULT_MESSAGE = "Click button to proceed";
 
-function getLineSegment(weights: Readonly<Vector>): [[number, number], [number, number]] {
-  const intersections: [[number, number], [number, number]] = [
-    [0, 0],
-    [0, 0],
-  ];
-  let counter = 0;
-  // intersection with Y_LIMITS + y = 0
-  for (let pm = 0; pm < 2; pm++) {
-    const intersection_x: number = -(weights[0] + weights[2] * Y_LIMITS[pm]) / weights[1];
-    const intersection_y: number = Y_LIMITS[pm];
-    if (X_LIMITS[0] <= intersection_x && intersection_x <= X_LIMITS[1]) {
-      intersections[counter][0] = intersection_x;
-      intersections[counter][1] = intersection_y;
-      counter += 1;
-    }
-  }
-  // intersection with X_LIMITS + x = 0
-  for (let pm = 0; pm < 2; pm++) {
-    const intersection_x: number = X_LIMITS[pm];
-    const intersection_y: number = -(weights[0] + weights[1] * X_LIMITS[pm]) / weights[2];
-    if (Y_LIMITS[0] <= intersection_y && intersection_y <= Y_LIMITS[1]) {
-      intersections[counter][0] = intersection_x;
-      intersections[counter][1] = intersection_y;
-      counter += 1;
-    }
-  }
-  return intersections;
+interface UIComponents {
+  button: ButtonElement;
+  logger: DivElement;
+  graph: Graph;
+  canvas: CanvasElement;
 }
 
-function showPoints(
-  nitems: number,
-  i: number,
-  graph: Graph,
-  dataset: Dataset,
-  button: Button,
-  logger: DivElement,
-) {
-  if (i === nitems) {
-    button.disabled = false;
-    button.textContent = "Start training";
-    logger.textContent = LOGGER_DEFAULT_MESSAGE;
-    return;
-  }
-  logger.textContent = `Setting points: ${i.toString()} / ${nitems.toString()}`;
-  const dataPoint: DataPoint = dataset.getDataPoint(i);
-  const point = graph.points[i];
-  const vector: Vector = dataPoint.vector;
-  const category: number = dataPoint.category;
-  point.position = [vector[1], vector[2]];
-  point.color = category < 0 ? "#0000ff" : "#ff0000";
-  point.show();
-  requestAnimationFrame(() => {
-    showPoints(nitems, i + 1, graph, dataset, button, logger);
-  });
-}
-
-function continueTraining(
-  nitems: number,
-  graph: Graph,
-  logger: DivElement,
-  dataset: Dataset,
-  button: Button,
-) {
-  const isTrainingCompleted = dataset.isCompleted;
-  if (isTrainingCompleted) {
-    button.textContent = "Training completed";
-    logger.textContent = `Completed in ${dataset.epoch.toString()} iterations`;
-    return;
-  }
-  dataset.train();
-  // highlight support vectors (enlarging point size)
-  for (let i = 0; i < nitems; i++) {
-    const point = graph.points[i];
-    point.isHighlighted = dataset.isSupportVector(i);
-  }
-  graph.decisionBoundary.position = getLineSegment(dataset.weights);
-  logger.textContent = `Epoch ${dataset.epoch.toString()}`;
-  requestAnimationFrame(() => {
-    continueTraining(nitems, graph, logger, dataset, button);
-  });
-}
-
-function main() {
-  const nitems = getNitems(128);
-  const dataset = new Dataset(nitems);
-  const button = new Button("proceed-button");
-  button.textContent = "Set points";
+function setupUI(nitems: number): UIComponents {
+  const button = new ButtonElement("proceed-button");
+  button.setTextContent("Set points");
   const logger = new DivElement("logger");
-  logger.textContent = LOGGER_DEFAULT_MESSAGE;
+  logger.setTextContent(LOGGER_DEFAULT_MESSAGE);
   const graph = new Graph("graph", nitems);
-  button.onClick([
-    (clickedButton: Button) => {
-      clickedButton.disabled = true;
-      showPoints(nitems, 0, graph, dataset, clickedButton, logger);
-    },
-    (clickedButton: Button) => {
-      clickedButton.disabled = true;
-      button.textContent = "Training in progress";
-      graph.decisionBoundary.show();
-      continueTraining(nitems, graph, logger, dataset, clickedButton);
-    },
-  ]);
-  window.addEventListener("resize", () => {
-    for (let i = 0; i < nitems; i++) {
-      const dataPoint: Readonly<DataPoint> = dataset.getDataPoint(i);
-      graph.points[i].position = [dataPoint.vector[1], dataPoint.vector[2]];
+  const canvas = new CanvasElement("contour-canvas");
+  canvas.setWidth(128);
+  canvas.setHeight(128);
+  return { button, logger, graph, canvas };
+}
+
+function createInitialAnimation(
+  nitems: number,
+  dataset: Dataset,
+  { button, logger, graph }: UIComponents,
+): Animation {
+  const initialAnimation = new Animation(120, (counter: number) => {
+    if (nitems === counter) {
+      button.setDisabled(false);
+      button.setTextContent("Start training");
+      logger.setTextContent(LOGGER_DEFAULT_MESSAGE);
+      initialAnimation.stop();
+      return;
     }
-    graph.decisionBoundary.position = getLineSegment(dataset.weights);
+    logger.setTextContent(`Setting points: ${counter.toString()} / ${nitems.toString()}`);
+    const sample: Sample = dataset.getSample(counter);
+    const point = graph.getPoints()[counter];
+    const category: number = sample.category;
+    point.setPosition([sample.vector[0], sample.vector[1]]);
+    point.setColor(category < 0 ? "#0000ff" : "#ff0000");
+    point.setIsHighlighted(false);
+    point.show();
   });
+  return initialAnimation;
+}
+
+function createTrainingAnimation(
+  nitems: number,
+  dataset: Dataset,
+  { button, logger, graph, canvas }: UIComponents,
+): Animation {
+  const trainingAnimation = new Animation(60, () => {
+    const isTrainingCompleted = dataset.getIsCompleted();
+    if (isTrainingCompleted) {
+      button.setTextContent("Training completed");
+      logger.setTextContent(`Completed in ${dataset.getStep().toString()} iterations`);
+      trainingAnimation.stop();
+      return;
+    }
+    const residual = dataset.train();
+    for (let i = 0; i < nitems; i += 1) {
+      const point = graph.getPoints()[i];
+      point.setIsHighlighted(dataset.isSupportVector(i));
+    }
+    canvas.draw(dataset);
+    logger.setTextContent(
+      `Step ${dataset.getStep().toString()} Residual ${residual.toExponential(1)}`,
+    );
+  });
+  return trainingAnimation;
+}
+
+function attachEventListeners(
+  nitems: number,
+  dataset: Dataset,
+  ui: UIComponents,
+  initialAnimation: Animation,
+  trainingAnimation: Animation,
+): void {
+  ui.button.addEventListener(() => {
+    const button = ui.button;
+    const clickCounter = button.getClickCounter();
+    switch (clickCounter) {
+      case 0:
+        button.setDisabled(true);
+        initialAnimation.start();
+        button.setClickCounter(1);
+        break;
+      case 1:
+        button.setDisabled(false);
+        button.setTextContent("Stop training");
+        trainingAnimation.start();
+        button.setClickCounter(2);
+        break;
+      case 2:
+        button.setDisabled(false);
+        trainingAnimation.stop();
+        button.setTextContent("Restart training");
+        button.setClickCounter(1);
+        break;
+      default:
+        throw new Error();
+    }
+  });
+  window.addEventListener("resize", () => {
+    for (let i = 0; i < nitems; i += 1) {
+      const sample = dataset.getSample(i);
+      ui.graph.getPoints()[i].setPosition([sample.vector[0], sample.vector[1]]);
+    }
+  });
+}
+
+function main(): void {
+  const nitems = getNitems(256);
+  const [categorizer, computeKernel] = getPattern();
+  const dataset = new Dataset(nitems, categorizer, computeKernel);
+  const ui = setupUI(nitems);
+  const initialAnimation = createInitialAnimation(nitems, dataset, ui);
+  const trainingAnimation = createTrainingAnimation(nitems, dataset, ui);
+  attachEventListeners(nitems, dataset, ui, initialAnimation, trainingAnimation);
 }
 
 window.addEventListener("load", () => {

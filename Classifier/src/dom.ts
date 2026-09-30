@@ -1,20 +1,17 @@
-export function getElementById(id: string): HTMLElement {
-  const element: HTMLElement | null = document.getElementById(id);
+export { ButtonElement } from "./dom/buttonElement";
+export { CanvasElement } from "./dom/canvasElement";
+export { DivElement } from "./dom/divElement";
+
+export function getElementByIdOrThrow<T extends Element>(
+  type: new (...args: unknown[]) => T,
+  id: string,
+): T {
+  const element = document.querySelector(`#${id}`);
   if (null === element) {
-    throw new Error(`Failed to get element by ID: ${id}`);
+    throw new Error();
+  }
+  if (!(element instanceof type)) {
+    throw new Error();
   }
   return element;
-}
-
-export class DivElement {
-  private _divElement: HTMLDivElement;
-
-  public constructor(elementId: string) {
-    const divElement = getElementById(elementId) as HTMLDivElement;
-    this._divElement = divElement;
-  }
-
-  public set textContent(textContent: string) {
-    this._divElement.textContent = textContent;
-  }
 }

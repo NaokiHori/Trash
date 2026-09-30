@@ -1,8 +1,8 @@
 import sudokuAssistantIcon from "../SudokuAssistant/icon.jpg";
 import miniMazeIcon from "../MiniMaze/icon.jpg";
 import juliaSetViewerIcon from "../JuliaSetViewer/icon.jpg";
+import classifierIcon from "../Classifier/icon.jpg";
 import colorMapCheckerIcon from "../ColorMapChecker/icon.jpg";
-// import animatedClassifierIcon from "../Classifier/icon.jpg";
 import delaynayIcon from "../Delaunay/icon.jpg";
 import advectionIcon from "../Advection/icon.jpg";
 import rouletteIcon from "../Roulette/icon.jpg";
@@ -98,12 +98,12 @@ export const ALL_PAGES: Array<Page> = [
     href: `${ROOT}/ColorMapChecker/index.html`,
     imageSource: colorMapCheckerIcon,
   }),
-  // new Page({
-  //   isActive: false,
-  //   title: "Classifier",
-  //   href: `${ROOT}/Classifier/index.html`,
-  //   imageSource: animatedClassifierIcon,
-  // }),
+  new Page({
+    isActive: false,
+    title: "Classifier",
+    href: `${ROOT}/Classifier/index.html`,
+    imageSource: classifierIcon,
+  }),
   new Page({
     isActive: false,
     title: "Triangulator",

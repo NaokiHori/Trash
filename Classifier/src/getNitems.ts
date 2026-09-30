@@ -11,12 +11,10 @@ export function getNitems(defaultNitems: number): number {
       nitems = nitems < maxNitems ? nitems : maxNitems;
       nitems = minNitems < nitems ? nitems : minNitems;
       return nitems;
-    } else {
-      // decide randomly if the input is invalid
-      return Math.floor((maxNitems - 1) * Math.random() + minNitems);
     }
-  } else {
-    // use default value
-    return defaultNitems;
+    // decide randomly if the input is invalid
+    return Math.floor((maxNitems - 1) * Math.random() + minNitems);
   }
+  // use default value
+  return defaultNitems;
 }

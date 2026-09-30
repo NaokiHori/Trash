@@ -1,261 +1,201 @@
 import { X_LIMITS, Y_LIMITS } from "./param";
-import { Vector, innerProduct } from "./vector";
 
-export interface DataPoint {
+export type Vector = [number, number];
+export type Category = -1 | 1;
+
+const MULTIPLIER_TOLERANCE = 1e-8;
+const C = 1e3;
+
+export interface Sample {
   vector: Vector;
-  category: number;
+  category: Category;
 }
 
-function pickUpDataPoint(normalVector: Vector): {
-  vector: Vector;
-  category: number;
-} {
-  const threshold = 0.1;
-  for (;;) {
-    const vector: Vector = [
-      1,
-      (X_LIMITS[1] - X_LIMITS[0]) * Math.random() + X_LIMITS[0],
-      (Y_LIMITS[1] - Y_LIMITS[0]) * Math.random() + Y_LIMITS[0],
-    ];
-    const numerator = innerProduct(normalVector, vector);
-    const denominator = Math.sqrt(Math.pow(normalVector[1], 2) + Math.pow(normalVector[2], 2));
-    const signedDistance = numerator / denominator;
-    if (threshold < Math.abs(signedDistance)) {
-      return { vector, category: 0 < signedDistance ? 1 : -1 };
-    }
-  }
-}
-
-function computeStatisticalMoments(dataPoints: Array<DataPoint>): {
-  mean: Vector;
-  std: Vector;
-} {
-  const ndims = 3;
-  const mean: Vector = [0, 0, 0];
-  const std: Vector = [0, 0, 0];
-  for (const dataPoint of dataPoints) {
-    const vector = dataPoint.vector;
-    for (let dim = 0; dim < ndims; dim++) {
-      mean[dim] += vector[dim];
-      std[dim] += Math.pow(vector[dim], 2);
-    }
-  }
-  const nitems = dataPoints.length;
-  for (let dim = 0; dim < ndims; dim++) {
-    mean[dim] = mean[dim] / nitems;
-    std[dim] = Math.sqrt(std[dim] / nitems);
-  }
-  return { mean, std };
-}
-
-function standardize(statisticalMoments: { mean: Vector; std: Vector }, vector: Vector): Vector {
-  return [
-    1,
-    (vector[1] - statisticalMoments.mean[1]) / statisticalMoments.std[1],
-    (vector[2] - statisticalMoments.mean[2]) / statisticalMoments.std[2],
-  ];
-}
-
-function computeGradients(
-  nitems: number,
-  h: Readonly<Float64Array>,
-  multipliers: Readonly<Float64Array>,
-  gradients: Float64Array,
-) {
-  for (let i = 0; i < nitems; i++) {
-    gradients[i] = 1;
-    for (let j = 0; j < nitems; j++) {
-      gradients[i] -= h[i * nitems + j] * multipliers[j];
-    }
-  }
-}
-
-function computeNewLearningRate(
-  nitems: number,
-  multipliers: Readonly<Float64Array>,
-  newMultipliers: Readonly<Float64Array>,
-  gradients: Readonly<Float64Array>,
-  newGradients: Readonly<Float64Array>,
-): { newLearningRate: number; isCompleted: boolean } {
-  let numerator = 0;
-  let denominator = 0;
-  for (let i = 0; i < nitems; i++) {
-    const dMultipliers: number = newMultipliers[i] - multipliers[i];
-    const dGradients: number = newGradients[i] - gradients[i];
-    numerator += dMultipliers * dGradients;
-    denominator += dGradients * dGradients;
-  }
-  if (denominator < Number.EPSILON) {
-    return { newLearningRate: 0, isCompleted: true };
-  } else {
-    return {
-      newLearningRate: Math.abs(numerator) / denominator,
-      isCompleted: false,
-    };
-  }
-}
-
-function isSupportVector(multipliers: number): boolean {
-  return Number.EPSILON < multipliers;
+function isSupportVector(multiplier: number): boolean {
+  return MULTIPLIER_TOLERANCE < multiplier;
 }
 
 export class Dataset {
-  private _nitems: number;
-  private _dataPoints: Array<DataPoint>;
-  private _epoch: number;
-  private _learningRate: number;
-  private _h: Float64Array;
-  private _multipliers: Float64Array;
-  private _gradients: Float64Array;
-  private _newMultipliers: Float64Array;
-  private _newGradients: Float64Array;
-  private _weights: Vector;
-  private _statisticalMoments: { mean: Vector; std: Vector };
-  private _isCompleted: boolean;
+  private nitems: number;
+  private samples: Array<Sample>;
+  private step: number;
+  private multipliers: Float64Array;
+  private isCompleted: boolean;
+  private computeKernel: (vector0: Vector, vector1: Vector) => number;
+  private supportVectors: Array<[Readonly<Sample>, number]>;
 
-  public constructor(nitems: number) {
-    const normalVector: Vector = [
-      0.25 * (Math.random() - 0.5),
-      Math.random() - 0.5,
-      Math.random() - 0.5,
-    ];
-    const dataPoints = new Array<DataPoint>();
-    for (let n = 0; n < nitems; n++) {
-      dataPoints.push(pickUpDataPoint(normalVector));
+  public constructor(
+    nitems: number,
+    categorizer: (position: Vector) => Category,
+    computeKernel: (vector0: Vector, vector1: Vector) => number,
+  ) {
+    const samples = new Array<Sample>();
+    for (let n = 0; n < nitems; n += 1) {
+      const vector: Vector = [
+        (X_LIMITS[1] - X_LIMITS[0]) * Math.random() + X_LIMITS[0],
+        (Y_LIMITS[1] - Y_LIMITS[0]) * Math.random() + Y_LIMITS[0],
+      ];
+      samples.push({
+        vector,
+        category: categorizer(vector),
+      });
     }
-    const statisticalMoments = computeStatisticalMoments(dataPoints);
-    const h = new Float64Array(nitems * nitems);
-    for (let i = 0; i < nitems; i++) {
-      const pi = dataPoints[i];
-      const yi = pi.category;
-      const vi = pi.vector;
-      const viScaled: Vector = standardize(statisticalMoments, vi);
-      for (let j = 0; j < nitems; j++) {
-        const pj = dataPoints[j];
-        const yj = pj.category;
-        const vj = pj.vector;
-        const vjScaled: Vector = standardize(statisticalMoments, vj);
-        h[i * nitems + j] = yi * yj * innerProduct(viScaled, vjScaled);
-      }
-    }
-    this._nitems = nitems;
-    this._dataPoints = dataPoints;
-    this._epoch = 0;
-    this._learningRate = 1;
-    this._h = h;
-    this._multipliers = new Float64Array(nitems);
-    this._gradients = new Float64Array(nitems);
-    this._weights = [0, 0, 0];
-    this._newMultipliers = new Float64Array(nitems);
-    this._newGradients = new Float64Array(nitems);
-    this._statisticalMoments = statisticalMoments;
-    this._isCompleted = false;
+    this.nitems = nitems;
+    this.samples = samples;
+    this.step = 0;
+    this.multipliers = new Float64Array(nitems + 1);
+    this.isCompleted = false;
+    this.computeKernel = computeKernel;
+    this.supportVectors = [];
   }
 
-  public train() {
-    if (this._isCompleted) {
-      return;
+  public train(): number {
+    if (this.isCompleted) {
+      return 0;
     }
-    const nitems: number = this._nitems;
-    const dataPoints: Array<DataPoint> = this._dataPoints;
-    const h: Float64Array = this._h;
-    const multipliers: Float64Array = this._multipliers;
-    const gradients: Float64Array = this._gradients;
-    const newMultipliers: Float64Array = this._newMultipliers;
-    const newGradients: Float64Array = this._newGradients;
-    const weights: Vector = this._weights;
-    const statisticalMoments = this._statisticalMoments;
-    computeGradients(nitems, h, multipliers, gradients);
-    for (;;) {
-      for (let i = 0; i < nitems; i++) {
-        newMultipliers[i] = Math.max(0, multipliers[i] + this._learningRate * gradients[i]);
-      }
-      computeGradients(nitems, h, newMultipliers, newGradients);
-      const { newLearningRate, isCompleted } = computeNewLearningRate(
-        nitems,
-        multipliers,
-        newMultipliers,
-        gradients,
-        newGradients,
-      );
-      if (isCompleted) {
-        this._isCompleted = true;
-        break;
-      } else if (this._learningRate <= newLearningRate) {
-        for (let i = 0; i < nitems; i++) {
-          multipliers[i] = newMultipliers[i];
-        }
-        break;
-      } else {
-        this._learningRate = newLearningRate;
-      }
+    const tolerance = 1e-8;
+    const [residual, [index0, index1]] = this.chooseIndices();
+    if (residual < tolerance) {
+      this.isCompleted = true;
     }
-    const scaledWeights: Vector = [0, 0, 0];
-    for (let i = 0; i < nitems; i++) {
-      const dataPoint: DataPoint = dataPoints[i];
-      const vector: Vector = dataPoint.vector;
-      const scaledVector: Vector = standardize(statisticalMoments, vector);
-      const category: number = dataPoint.category;
-      scaledWeights[1] += multipliers[i] * category * scaledVector[1];
-      scaledWeights[2] += multipliers[i] * category * scaledVector[2];
-    }
-    let nSupportVectors = 0;
-    for (let i = 0; i < nitems; i++) {
-      if (!isSupportVector(multipliers[i])) {
-        continue;
-      }
-      const dataPoint: DataPoint = dataPoints[i];
-      const vector: Vector = dataPoint.vector;
-      const scaledVector: Vector = standardize(statisticalMoments, vector);
-      const category: number = dataPoint.category;
-      scaledWeights[0] += category;
-      scaledWeights[0] -= scaledWeights[1] * scaledVector[1];
-      scaledWeights[0] -= scaledWeights[2] * scaledVector[2];
-      nSupportVectors += 1;
-    }
-    scaledWeights[0] /= nSupportVectors;
-    // rescale to recover original Cartesian coordinate
-    // on the scaled coordinate (XY), the decision boundary is given by
-    //   w0 + w1 * X + w2 * Y = 0
-    // by facilitating
-    //   X = (x - meanX) / stdX
-    //   Y = (y - meanY) / stdY
-    // the same linear function on the original coordinate is
-    //   w0 + w1 * (x - meanX) / stdX + w2 * (y - meanY) / stdY = 0
-    // or equivalently
-    //   (w0 - w1 * meanX / stdX - w2 * meanY / stdY)
-    //   +
-    //   (w1 / stdX) * x
-    //   +
-    //   (w2 / stdY) * y
-    //   =
-    //   0
-    weights[0] =
-      scaledWeights[0] -
-      (scaledWeights[1] * statisticalMoments.mean[1]) / statisticalMoments.std[1] -
-      (scaledWeights[2] * statisticalMoments.mean[2]) / statisticalMoments.std[2];
-    weights[1] = scaledWeights[1] / statisticalMoments.std[1];
-    weights[2] = scaledWeights[2] / statisticalMoments.std[2];
-    this._epoch += 1;
+    this.updateMultipliers(index0, index1);
+    this.step += 1;
+    return residual;
   }
 
-  public getDataPoint(i: number): Readonly<DataPoint> {
-    return this._dataPoints[i];
+  public getSample(i: number): Readonly<Sample> {
+    return this.samples[i];
   }
 
   public isSupportVector(i: number): boolean {
-    return isSupportVector(this._multipliers[i]);
+    return isSupportVector(this.multipliers[i]);
   }
 
-  public get weights(): Readonly<Vector> {
-    return this._weights;
+  public getStep(): number {
+    return this.step;
   }
 
-  public get epoch(): number {
-    return this._epoch;
+  public getIsCompleted(): boolean {
+    return this.isCompleted;
   }
 
-  public get isCompleted(): boolean {
-    return this._isCompleted;
+  public updateSupportVectors(): void {
+    const nitems = this.nitems;
+    const samples = this.samples;
+    const multipliers = this.multipliers;
+    this.supportVectors = new Array<[Readonly<Sample>, number]>();
+    for (let i = 0; i < nitems; i += 1) {
+      const multiplier = multipliers[i];
+      if (isSupportVector(multiplier)) {
+        this.supportVectors.push([samples[i], multiplier]);
+      }
+    }
+  }
+
+  public categorize(at: Vector): number {
+    this.updateSupportVectors();
+    const nitems = this.nitems;
+    let value = this.multipliers[nitems];
+    for (const [sample, multiplier] of this.supportVectors) {
+      value += multiplier * sample.category * this.computeKernel(at, sample.vector);
+    }
+    return value;
+  }
+
+  private chooseIndices(): [number, [number, number]] {
+    const nitems = this.nitems;
+    const samples: Array<Sample> = this.samples;
+    const multipliers: Float64Array = this.multipliers;
+    let lowerExists = false;
+    let upperExists = false;
+    let lowerIndex = 0;
+    let upperIndex = 0;
+    let lowerValue = -Infinity;
+    let upperValue = Infinity;
+    for (let i = 0; i < nitems; i += 1) {
+      const sample = samples[i];
+      const multiplier = multipliers[i];
+      let value = sample.category;
+      for (let j = 0; j < nitems; j += 1) {
+        value -=
+          multipliers[j] *
+          samples[j].category *
+          this.computeKernel(sample.vector, samples[j].vector);
+      }
+      const isLower =
+        (sample.category === 1 && multiplier < C - MULTIPLIER_TOLERANCE) ||
+        (sample.category === -1 && MULTIPLIER_TOLERANCE < multiplier);
+      const isUpper =
+        (sample.category === 1 && MULTIPLIER_TOLERANCE < multiplier) ||
+        (sample.category === -1 && multiplier < C - MULTIPLIER_TOLERANCE);
+      if (isLower) {
+        lowerExists = true;
+        if (lowerValue < value) {
+          lowerValue = value;
+          lowerIndex = i;
+        }
+      }
+      if (isUpper) {
+        upperExists = true;
+        if (value < upperValue) {
+          upperValue = value;
+          upperIndex = i;
+        }
+      }
+    }
+    if (!(lowerExists && upperExists)) {
+      return [0, [-1, -1]];
+    }
+    multipliers[nitems] = 0.5 * lowerValue + 0.5 * upperValue;
+    return [lowerValue - upperValue, [lowerIndex, upperIndex]];
+  }
+
+  private updateMultipliers(index0: number, index1: number): void {
+    const samples: Array<Sample> = this.samples;
+    const multipliers: Float64Array = this.multipliers;
+    const sample0 = samples[index0];
+    const sample1 = samples[index1];
+    const category0 = sample0.category;
+    const category1 = sample1.category;
+    const total = category0 * multipliers[index0] + category1 * multipliers[index1];
+    const k00 = this.computeKernel(sample0.vector, sample0.vector);
+    const k01 = this.computeKernel(sample0.vector, sample1.vector);
+    const k11 = this.computeKernel(sample1.vector, sample1.vector);
+    const denominator = 2 * k01 - k00 - k11;
+    if (Math.abs(denominator) < Number.EPSILON) {
+      return;
+    }
+    const [sum0, sum1] = this.computeSum(index0, index1);
+    let multiplier0 =
+      (category0 * category1 - 1 + total * category0 * (k01 - k11) + category0 * (sum0 - sum1)) /
+      denominator;
+    const lower =
+      category0 === category1 ? Math.max(0, total * category0 - C) : Math.max(0, total * category0);
+    const upper =
+      category0 === category1 ? Math.min(C, total * category0) : Math.min(C, C + total * category0);
+    multiplier0 = Math.max(multiplier0, lower);
+    multiplier0 = Math.min(multiplier0, upper);
+    multipliers[index0] = multiplier0;
+    multipliers[index1] = category1 * (total - category0 * multiplier0);
+  }
+
+  private computeSum(index0: number, index1: number): [number, number] {
+    const nitems = this.nitems;
+    const samples: Array<Sample> = this.samples;
+    const multipliers: Float64Array = this.multipliers;
+    const sample0 = samples[index0];
+    const sample1 = samples[index1];
+    let sum0 = 0;
+    let sum1 = 0;
+    for (let i = 0; i < nitems; i += 1) {
+      if (index0 === i || index1 === i) {
+        continue;
+      }
+      const sample = samples[i];
+      const multiplier = multipliers[i];
+      sum0 += multiplier * sample.category * this.computeKernel(sample0.vector, sample.vector);
+      sum1 += multiplier * sample.category * this.computeKernel(sample1.vector, sample.vector);
+    }
+    return [sum0, sum1];
   }
 }
