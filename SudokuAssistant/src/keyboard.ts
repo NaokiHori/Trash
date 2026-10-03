@@ -1,74 +1,75 @@
 import { EditModes } from "./editMode";
-import { NumberButtons } from "./numberButton";
-import { SudokuValue, SUDOKU_VALUES, EMPTY_VALUE } from "./sudokuValue";
+import { NumberButtons } from "./numberButtons";
+import { EMPTY_VALUE, isSudokuValue } from "./sudokuValue";
 import { Board } from "./board";
+
+const ACTION_MAP: Record<string, (board: Board, editModes: EditModes) => void> = {
+  i: (_, editModes) => {
+    editModes.changeTo("Init");
+  },
+  I: (_, editModes) => {
+    editModes.changeTo("Init");
+  },
+  n: (_, editModes) => {
+    editModes.changeTo("Normal");
+  },
+  N: (_, editModes) => {
+    editModes.changeTo("Normal");
+  },
+  m: (_, editModes) => {
+    editModes.changeTo("Memo");
+  },
+  M: (_, editModes) => {
+    editModes.changeTo("Memo");
+  },
+  ArrowDown: (board) => {
+    board.updateSelectedCell("Down");
+  },
+  j: (board) => {
+    board.updateSelectedCell("Down");
+  },
+  ArrowUp: (board) => {
+    board.updateSelectedCell("Up");
+  },
+  k: (board) => {
+    board.updateSelectedCell("Up");
+  },
+  ArrowLeft: (board) => {
+    board.updateSelectedCell("Left");
+  },
+  h: (board) => {
+    board.updateSelectedCell("Left");
+  },
+  ArrowRight: (board) => {
+    board.updateSelectedCell("Right");
+  },
+  l: (board) => {
+    board.updateSelectedCell("Right");
+  },
+};
+
+const CLEAR_KEYS = new Set([" ", "Backspace", "Delete"]);
 
 export function setKeyboardEvents(
   key: string,
   board: Board,
   editModes: EditModes,
   numberButtons: NumberButtons,
-) {
-  // handle numbers first
+): void {
   const value = Number(key);
-  if (value in SUDOKU_VALUES) {
-    numberButtons.select(value as SudokuValue);
-  } else {
-    // no number
-    switch (key) {
-      case " ":
-      case "Backspace":
-      case "Delete": {
-        numberButtons.select(EMPTY_VALUE);
-        break;
-      }
-      case "i":
-      case "I": {
-        editModes.changeTo("Init");
-        break;
-      }
-      case "n":
-      case "N": {
-        editModes.changeTo("Normal");
-        break;
-      }
-      case "m":
-      case "M": {
-        editModes.changeTo("Memo");
-        break;
-      }
-      case "r":
-      case "R": {
-        if ("Init" === editModes.currentMode) {
-          board.reset();
-        } else {
-          console.log("Cannot reset board unless the current mode is 'Init'");
-        }
-        break;
-      }
-      case "ArrowDown":
-      case "j": {
-        board.updateSelectedCell("Down");
-        break;
-      }
-      case "ArrowUp":
-      case "k": {
-        board.updateSelectedCell("Up");
-        break;
-      }
-      case "ArrowLeft":
-      case "h": {
-        board.updateSelectedCell("Left");
-        break;
-      }
-      case "ArrowRight":
-      case "l": {
-        board.updateSelectedCell("Right");
-        break;
-      }
-      default: {
-        console.log(`No keyboard event is implemented for ${key}`);
-      }
-    }
+  if (isSudokuValue(value)) {
+    numberButtons.select(value);
+    return;
   }
+  if (CLEAR_KEYS.has(key)) {
+    numberButtons.select(EMPTY_VALUE);
+    return;
+  }
+  if (key === "r" || key === "R") {
+    if (editModes.getCurrentMode() === "Init") {
+      board.reset();
+    }
+    return;
+  }
+  ACTION_MAP[key](board, editModes);
 }

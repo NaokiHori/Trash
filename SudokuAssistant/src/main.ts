@@ -1,13 +1,12 @@
 import { Body } from "./body";
 import { EditModes } from "./editMode";
 import { Board } from "./board";
-import { NumberButtons } from "./numberButton";
-import { createFooterElement } from "./footer";
+import { NumberButtons } from "./numberButtons";
 import { setKeyboardEvents } from "./keyboard";
 import { Highlight } from "./highlight";
 import { SudokuValue, EMPTY_VALUE } from "./sudokuValue";
 
-function main() {
+function main(): void {
   // instantiate elements
   const body = new Body();
   const editModes = new EditModes(body);
@@ -23,7 +22,6 @@ function main() {
     [0, 0, 0, 0, 0, 2, 0, 0, 0],
   ]);
   const numberButtons = new NumberButtons(body);
-  createFooterElement(body);
   const highlight = new Highlight();
   // register event handlers
   highlight.setOnUpdateHandler((highlightedValue: SudokuValue) => {
@@ -32,15 +30,15 @@ function main() {
   });
   body.setOnClickHandler(() => {
     board.unselect();
-    highlight.value = EMPTY_VALUE;
+    highlight.setValue(EMPTY_VALUE);
   });
   board.setOnClickHandler((cellValue: SudokuValue) => {
     board.unselect();
-    highlight.value = cellValue;
+    highlight.setValue(cellValue);
   });
   numberButtons.setOnClickHandler((clickedButtonValue: SudokuValue) => {
-    board.validateAndUpdateValue(editModes, clickedButtonValue);
-    highlight.value = clickedButtonValue;
+    board.validateAndUpdateValue(editModes.getCurrentMode(), clickedButtonValue);
+    highlight.setValue(clickedButtonValue);
   });
   document.addEventListener("keydown", (keyboardEvent: KeyboardEvent) => {
     const key: string = keyboardEvent.key;

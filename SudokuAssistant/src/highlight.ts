@@ -1,26 +1,26 @@
 import { EMPTY_VALUE, SudokuValue } from "./sudokuValue";
 
 export class Highlight {
-  private _highlightedValue: SudokuValue;
-  private _onUpdateHandler: (highlightedValue: SudokuValue) => void;
+  private highlightedValue: SudokuValue;
+  private onUpdateHandler: (highlightedValue: SudokuValue) => void;
 
   public constructor() {
-    this._highlightedValue = EMPTY_VALUE;
-    this._onUpdateHandler = () => {
+    this.highlightedValue = EMPTY_VALUE;
+    this.onUpdateHandler = (): void => {
       /* will be registered by the "value" setter */
     };
   }
 
-  public setOnUpdateHandler(onUpdateHandler: (highlightedValue: SudokuValue) => void) {
-    this._onUpdateHandler = onUpdateHandler;
+  public setOnUpdateHandler(onUpdateHandler: (highlightedValue: SudokuValue) => void): void {
+    this.onUpdateHandler = onUpdateHandler;
   }
 
-  public get value(): SudokuValue {
-    return this._highlightedValue;
+  public getValue(): SudokuValue {
+    return this.highlightedValue;
   }
 
-  public set value(highlightedValue: SudokuValue) {
-    this._highlightedValue = highlightedValue;
-    this._onUpdateHandler(highlightedValue);
+  public setValue(highlightedValue: SudokuValue): void {
+    this.highlightedValue = highlightedValue;
+    this.onUpdateHandler(highlightedValue);
   }
 }

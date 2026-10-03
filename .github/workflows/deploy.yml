@@ -39,6 +39,7 @@ jobs:
           docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx tsc
           docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx oxlint --type-aware -D correctness
           docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx oxfmt --check
+          docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx vitest run
           # build artifacts
           docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx \
             vite build \

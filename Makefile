@@ -18,3 +18,6 @@ fmt:
 
 tsc:
 	docker compose exec $(SERVICE) npx tsc
+
+test:
+	docker compose exec $(SERVICE) npx vitest run

@@ -1,16 +1,16 @@
 export class Body {
-  private readonly _element: HTMLElement;
+  private element: Readonly<HTMLElement>;
 
   public constructor() {
     const element: HTMLElement = document.body;
-    this._element = element;
+    this.element = element;
   }
 
-  public get element(): HTMLElement {
-    return this._element;
+  public getElement(): HTMLElement {
+    return this.element;
   }
 
-  public setOnClickHandler(handler: () => void) {
-    this._element.addEventListener("click", handler);
+  public setOnClickHandler(handler: () => void): void {
+    this.element.addEventListener("click", handler);
   }
 }

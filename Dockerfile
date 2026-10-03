@@ -11,7 +11,8 @@ RUN npm install --save-dev \
   oxfmt \
   oxlint \
   oxlint-tsgolint \
-  vite
+  vite \
+  vitest
 
 WORKDIR /project/src
 

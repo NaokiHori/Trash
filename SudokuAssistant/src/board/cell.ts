@@ -1,23 +1,64 @@
-import { createChildElement } from "../dom";
 import { Position } from "./position";
 import { EMPTY_VALUE, SUDOKU_VALUES, SudokuValue, isEmpty } from "../sudokuValue";
+import {
+  createCellElement,
+  createCellTextElement,
+  createSubCellElement,
+} from "./cell/createElement";
 
 type CellMode = "Normal" | "Memo";
 
-const DEFAULT_CELL_MODE: CellMode = "Memo";
+export const DEFAULT_CELL_MODE: CellMode = "Memo";
 
-export class Cell {
-  private readonly _position: Position;
-  private readonly _cellElement: HTMLDivElement;
-  private readonly _cellTextElement: HTMLDivElement;
-  private readonly _subCellElements: ReadonlyArray<HTMLDivElement>;
-  private readonly _subCellValuesValid: Array<boolean>;
-  private readonly _subCellValuesUnique: Array<boolean>;
-  private readonly _subCellValuesDisabled: Array<boolean>;
-  private _value: SudokuValue;
-  private _isDefault: boolean;
-  private _isSelected: boolean;
-  private _cellMode: CellMode;
+// check uniqueness with respect to neighbor cells
+function isUnshared(sudokuValue: SudokuValue, neighborCell: Cell): boolean {
+  if (neighborCell.getCellMode() !== "Memo") {
+    return true;
+  }
+  if (!neighborCell.getSubCellValidity(sudokuValue)) {
+    return true;
+  }
+  if (neighborCell.getSubCellDisability(sudokuValue)) {
+    return true;
+  }
+  return false;
+}
+
+export interface ICell {
+  getIsDefault(): boolean;
+  setIsDefault(isDefault: boolean): void;
+  getValue(): SudokuValue;
+  setValue(value: SudokuValue): void;
+  setCellMode(cellMode: CellMode): void;
+  validate(value: SudokuValue): boolean;
+  resetDisabledMemoValues(): void;
+  getSubCellDisability(value: SudokuValue): boolean;
+  setSubCellDisability(value: SudokuValue, isDisabled: boolean): void;
+  setSubCellValidity(value: SudokuValue, isValid: boolean): void;
+  validateAndUpdateMemoValues(): void;
+  updateUniquenessOfMemoValues(): void;
+  getIsSelected(): boolean;
+  setIsSelected(isSelected: boolean): void;
+  getPosition(): Position;
+  neighborCells: {
+    sameRow: Array<Cell>;
+    sameColumn: Array<Cell>;
+    sameBlock: Array<Cell>;
+  };
+}
+
+export class Cell implements ICell {
+  private position: Readonly<Position>;
+  private cellElement: Readonly<HTMLDivElement>;
+  private cellTextElement: HTMLDivElement;
+  private subCellElements: Readonly<ReadonlyArray<HTMLDivElement>>;
+  private subCellValuesValid: Array<boolean>;
+  private subCellValuesUnique: Array<boolean>;
+  private subCellValuesDisabled: Array<boolean>;
+  private value: SudokuValue;
+  private isDefault: boolean;
+  private isSelected: boolean;
+  private cellMode: CellMode;
   public neighborCells: {
     sameRow: Array<Cell>;
     sameColumn: Array<Cell>;
@@ -28,69 +69,33 @@ export class Cell {
     // element to contain
     //   1. normal value
     //   2. nine memo values
-    const cellElement = createChildElement({
-      tagName: "div",
-      parentElement: containerElement,
-      classListItems: ["cell"],
-      attributes: [
-        { key: "cellMode", value: DEFAULT_CELL_MODE },
-        { key: "row", value: position.row.toString() },
-        { key: "column", value: position.column.toString() },
-        { key: "isHighlighted", value: false.toString() },
-        { key: "isSelected", value: false.toString() },
-      ],
-    }) as HTMLDivElement;
+    const cellElement = createCellElement(containerElement, position);
     // element to keep normal value, which is vertically centered
-    const cellTextElement = createChildElement({
-      tagName: "div",
-      parentElement: cellElement,
-      classListItems: ["text"],
-      attributes: [],
-    }) as HTMLDivElement;
+    const cellTextElement = createCellTextElement(cellElement);
     // elements to keep memo values
     // NOTE: include a dummy element (0-th element) for convenience,
     //   which is hidden by configuring "display: none"
-    const subCellElements = SUDOKU_VALUES.map((sudokuValue: SudokuValue) => {
-      const subCellElement = createChildElement({
-        tagName: "div",
-        parentElement: cellElement,
-        classListItems: ["subcell"],
-        attributes: [
-          { key: "isHighlighted", value: false.toString() },
-          { key: "isUnique", value: false.toString() },
-          { key: "isDisabled", value: false.toString() },
-        ],
-      }) as HTMLDivElement;
-      const subCellTextElement = createChildElement({
-        tagName: "div",
-        parentElement: subCellElement,
-        classListItems: ["text"],
-        attributes: [],
-      }) as HTMLDivElement;
-      subCellTextElement.textContent = sudokuValue.toString();
-      if (isEmpty(sudokuValue)) {
-        subCellElement.style.display = "none";
-      }
-      return subCellElement;
-    });
-    this._position = position;
-    this._cellElement = cellElement;
-    this._cellTextElement = cellTextElement;
-    this._subCellElements = subCellElements;
+    const subCellElements = SUDOKU_VALUES.map((sudokuValue: SudokuValue) =>
+      createSubCellElement(cellElement, sudokuValue),
+    );
+    this.position = position;
+    this.cellElement = cellElement;
+    this.cellTextElement = cellTextElement;
+    this.subCellElements = subCellElements;
     // initially assume all candidates are valid
-    this._subCellValuesValid = Array.from<boolean>({
+    this.subCellValuesValid = Array.from<boolean>({
       length: SUDOKU_VALUES.length,
     }).fill(true);
-    this._subCellValuesUnique = Array.from<boolean>({
+    this.subCellValuesUnique = Array.from<boolean>({
       length: SUDOKU_VALUES.length,
     }).fill(false);
-    this._subCellValuesDisabled = Array.from<boolean>({
+    this.subCellValuesDisabled = Array.from<boolean>({
       length: SUDOKU_VALUES.length,
     }).fill(false);
-    this._value = EMPTY_VALUE;
-    this._isDefault = false;
-    this._isSelected = false;
-    this._cellMode = DEFAULT_CELL_MODE;
+    this.value = EMPTY_VALUE;
+    this.isDefault = false;
+    this.isSelected = false;
+    this.cellMode = DEFAULT_CELL_MODE;
     this.neighborCells = {
       sameRow: new Array<Cell>(),
       sameColumn: new Array<Cell>(),
@@ -98,22 +103,22 @@ export class Cell {
     };
   }
 
-  public setOnClickHandler(handler: (cellValue: SudokuValue) => void) {
-    this._cellElement.addEventListener("click", (event: Event) => {
+  public setOnClickHandler(handler: (cellValue: SudokuValue) => void): void {
+    this.cellElement.addEventListener("click", (event: Event) => {
       // disable the body element click event
       event.stopPropagation();
       // invoke passed handler
-      handler(this.value);
+      handler(this.getValue());
       // select this cell
-      this.isSelected = true;
+      this.setIsSelected(true);
     });
   }
 
-  public reset() {
-    this.isDefault = false;
-    this.isSelected = false;
-    this.cellMode = DEFAULT_CELL_MODE;
-    this.value = EMPTY_VALUE;
+  public reset(): void {
+    this.setIsDefault(false);
+    this.setIsSelected(false);
+    this.setCellMode(DEFAULT_CELL_MODE);
+    this.setValue(EMPTY_VALUE);
     for (const value of SUDOKU_VALUES) {
       this.setSubCellValidity(value, true);
       this.setSubCellUniqueness(value, false);
@@ -121,71 +126,71 @@ export class Cell {
     }
   }
 
-  public get value(): SudokuValue {
-    return this._value;
+  public getValue(): SudokuValue {
+    return this.value;
   }
 
-  public set value(value: SudokuValue) {
-    this._value = value;
-    this._cellTextElement.textContent = isEmpty(value) ? "" : value.toString();
+  public setValue(value: SudokuValue): void {
+    this.value = value;
+    this.cellTextElement.textContent = isEmpty(value) ? "" : value.toString();
   }
 
-  public get isSelected(): boolean {
-    return this._isSelected;
+  public getIsSelected(): boolean {
+    return this.isSelected;
   }
 
-  public set isSelected(flag: boolean) {
-    this._isSelected = flag;
-    this._cellElement.setAttribute("isSelected", flag.toString());
+  public setIsSelected(flag: boolean): void {
+    this.isSelected = flag;
+    this.cellElement.setAttribute("isSelected", flag.toString());
   }
 
-  public set isHighlighted(flag: boolean) {
-    this._cellElement.setAttribute("isHighlighted", flag.toString());
+  public setIsHighlighted(flag: boolean): void {
+    this.cellElement.setAttribute("isHighlighted", flag.toString());
   }
 
-  public get isDefault(): boolean {
-    return this._isDefault;
+  public getIsDefault(): boolean {
+    return this.isDefault;
   }
 
-  public set isDefault(flag: boolean) {
-    this._isDefault = flag;
-    this._cellElement.setAttribute("isDefault", flag.toString());
+  public setIsDefault(flag: boolean): void {
+    this.isDefault = flag;
+    this.cellElement.setAttribute("isDefault", flag.toString());
   }
 
-  public get cellMode(): CellMode {
-    return this._cellMode;
+  public getCellMode(): CellMode {
+    return this.cellMode;
   }
 
-  public set cellMode(cellMode: CellMode) {
-    this._cellMode = cellMode;
-    this._cellElement.setAttribute("cellMode", cellMode);
+  public setCellMode(cellMode: CellMode): void {
+    this.cellMode = cellMode;
+    this.cellElement.setAttribute("cellMode", cellMode);
   }
 
-  public get position(): Position {
-    return this._position;
+  public getPosition(): Position {
+    return this.position;
   }
 
   public getSubCellValidity(value: SudokuValue): boolean {
-    return this._subCellValuesValid[value];
+    return this.subCellValuesValid[value];
   }
 
-  public setSubCellValidity(value: SudokuValue, isValid: boolean) {
-    this._subCellValuesValid[value] = isValid;
-    this._subCellElements[value].setAttribute("isValid", isValid.toString());
+  public setSubCellValidity(value: SudokuValue, isValid: boolean): void {
+    this.subCellValuesValid[value] = isValid;
+    this.subCellElements[value].setAttribute("isValid", isValid.toString());
   }
 
   public getSubCellDisability(value: SudokuValue): boolean {
-    return this._subCellValuesDisabled[value];
+    return this.subCellValuesDisabled[value];
   }
 
-  public setSubCellDisability(value: SudokuValue, isDisabled: boolean) {
-    this._subCellValuesDisabled[value] = isDisabled;
-    this._subCellElements[value].setAttribute("isDisabled", isDisabled.toString());
+  public setSubCellDisability(value: SudokuValue, isDisabled: boolean): void {
+    this.subCellValuesDisabled[value] = isDisabled;
+    this.subCellElements[value].setAttribute("isDisabled", isDisabled.toString());
   }
 
-  public highlightSubCell(value: SudokuValue) {
+  public highlightSubCell(value: SudokuValue): void {
     for (const sudokuValue of SUDOKU_VALUES) {
-      this._subCellElements[sudokuValue].setAttribute(
+      this.subCellElements[sudokuValue].setAttribute(
         "isHighlighted",
         (sudokuValue === value).toString(),
       );
@@ -196,30 +201,30 @@ export class Cell {
     // fetch all neighbor cells
     const neighborCells = this.neighborCells;
     for (const neighborCell of neighborCells.sameRow) {
-      if (neighborCell.value === newValue) {
+      if (neighborCell.getValue() === newValue) {
         return false;
       }
     }
     for (const neighborCell of neighborCells.sameColumn) {
-      if (neighborCell.value === newValue) {
+      if (neighborCell.getValue() === newValue) {
         return false;
       }
     }
     for (const neighborCell of neighborCells.sameBlock) {
-      if (neighborCell.value === newValue) {
+      if (neighborCell.getValue() === newValue) {
         return false;
       }
     }
     return true;
   }
 
-  public resetDisabledMemoValues() {
+  public resetDisabledMemoValues(): void {
     for (const sudokuValue of SUDOKU_VALUES) {
       this.setSubCellDisability(sudokuValue, false);
     }
   }
 
-  public validateAndUpdateMemoValues() {
+  public validateAndUpdateMemoValues(): void {
     // for each value, check if it is a valid candidate
     //   (by checking neighbor cells)
     //   and update the flag
@@ -228,8 +233,8 @@ export class Cell {
     }
   }
 
-  public updateUniquenessOfMemoValues() {
-    if (this.cellMode !== "Memo") {
+  public updateUniquenessOfMemoValues(): void {
+    if (this.getCellMode() !== "Memo") {
       return;
     }
     for (const sudokuValue of SUDOKU_VALUES) {
@@ -262,9 +267,9 @@ export class Cell {
     }
   }
 
-  private setSubCellUniqueness(value: SudokuValue, isUnique: boolean) {
-    this._subCellValuesUnique[value] = isUnique;
-    this._subCellElements[value].setAttribute("isUnique", isUnique.toString());
+  private setSubCellUniqueness(value: SudokuValue, isUnique: boolean): void {
+    this.subCellValuesUnique[value] = isUnique;
+    this.subCellElements[value].setAttribute("isUnique", isUnique.toString());
   }
 
   private isOnlyCandidate(value: SudokuValue): boolean {
@@ -282,18 +287,4 @@ export class Cell {
     }
     return true;
   }
-}
-
-// check uniqueness with respect to neighbor cells
-function isUnshared(sudokuValue: SudokuValue, neighborCell: Cell): boolean {
-  if (neighborCell.cellMode !== "Memo") {
-    return true;
-  }
-  if (!neighborCell.getSubCellValidity(sudokuValue)) {
-    return true;
-  }
-  if (neighborCell.getSubCellDisability(sudokuValue)) {
-    return true;
-  }
-  return false;
 }

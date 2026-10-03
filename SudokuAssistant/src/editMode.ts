@@ -1,88 +1,47 @@
 import { Body } from "./body";
 import { createChildElement } from "./dom";
+import { EditModeButton } from "./editMode/editModeButton";
 
 export type EditMode = "Init" | "Normal" | "Memo";
 
-class EditModeButton {
-  private readonly _element: HTMLButtonElement;
-  private readonly _editMode: EditMode;
-  private _isSelected: boolean;
-
-  public constructor(containerElement: HTMLDivElement, editMode: EditMode, isSelected: boolean) {
-    const element = createChildElement({
-      tagName: "button",
-      parentElement: containerElement,
-      classListItems: ["mode-button"],
-      attributes: [],
-    }) as HTMLButtonElement;
-    element.textContent = editMode;
-    this._element = element;
-    this._editMode = editMode;
-    this._isSelected = isSelected;
-    this.updateSelectedAttribute(isSelected);
-  }
-
-  public setClickEventHandler(handler: () => void) {
-    this._element.addEventListener("click", (event: Event) => {
-      event.stopPropagation();
-      handler();
-    });
-  }
-
-  public get editMode(): EditMode {
-    return this._editMode;
-  }
-
-  public get isSelected(): boolean {
-    return this._isSelected;
-  }
-
-  public set isSelected(isSelected: boolean) {
-    this._isSelected = isSelected;
-    this.updateSelectedAttribute(isSelected);
-  }
-
-  private updateSelectedAttribute(isSelected: boolean) {
-    this._element.setAttribute("selected", isSelected.toString());
-  }
-}
-
 export class EditModes {
-  private readonly _editModeButtons: Array<EditModeButton>;
+  private editModeButtons: Readonly<Array<EditModeButton>>;
 
   public constructor(body: Body) {
-    const containerElement = createChildElement({
+    const containerElement = createChildElement(HTMLDivElement, {
       tagName: "div",
-      parentElement: body.element,
+      parentElement: body.getElement(),
       classListItems: ["mode-buttons"],
       attributes: [],
-    }) as HTMLDivElement;
-    const editModeButtons = new Array<EditModeButton>();
-    editModeButtons.push(new EditModeButton(containerElement, "Init", false));
-    editModeButtons.push(new EditModeButton(containerElement, "Normal", true));
-    editModeButtons.push(new EditModeButton(containerElement, "Memo", false));
-    editModeButtons.forEach((editModeButton: EditModeButton) => {
-      editModeButton.setClickEventHandler(() => {
-        this.changeTo(editModeButton.editMode);
-      });
     });
-    this._editModeButtons = editModeButtons;
+    const editModeButtons = new Array<EditModeButton>();
+    editModeButtons.push(
+      new EditModeButton(containerElement, "Init", false),
+      new EditModeButton(containerElement, "Normal", true),
+      new EditModeButton(containerElement, "Memo", false),
+    );
+    for (const editModeButton of editModeButtons) {
+      editModeButton.setClickEventHandler(() => {
+        this.changeTo(editModeButton.getEditMode());
+      });
+    }
+    this.editModeButtons = editModeButtons;
   }
 
-  public get currentMode(): EditMode {
-    const editModeButtons = this._editModeButtons;
+  public getCurrentMode(): EditMode {
+    const editModeButtons = this.editModeButtons;
     for (const editModeButton of editModeButtons) {
-      if (editModeButton.isSelected) {
-        return editModeButton.editMode;
+      if (editModeButton.getIsSelected()) {
+        return editModeButton.getEditMode();
       }
     }
     throw new Error("No mode is selected");
   }
 
-  public changeTo(editMode: EditMode) {
-    const editModeButtons = this._editModeButtons;
-    editModeButtons.forEach((editModeButton: EditModeButton) => {
-      editModeButton.isSelected = editModeButton.editMode === editMode;
-    });
+  public changeTo(editMode: EditMode): void {
+    const editModeButtons = this.editModeButtons;
+    for (const editModeButton of editModeButtons) {
+      editModeButton.setIsSelected(editModeButton.getEditMode() === editMode);
+    }
   }
 }
