@@ -2,13 +2,13 @@ import { Animation } from "./animation";
 import { Camera } from "./camera";
 import { Controller, fromPoles } from "./controller";
 import { GRAVITATIONAL_ACCELERATION } from "./parameter";
-import { Cart, Pendulum, integrate, checkStabilityCriteria } from "./simulator";
+import { PidParameters, Cart, Pendulum, integrate, checkStabilityCriteria } from "./simulator";
 import { Line } from "./svg";
 
 class Link {
-  svg: Line;
+  private svg: Line;
 
-  constructor(cart: Cart, pendulum: Pendulum) {
+  public constructor(cart: Cart, pendulum: Pendulum) {
     const x1 = cart.getX();
     const y1 = cart.getY();
     const x2 = pendulum.getX();
@@ -16,39 +16,44 @@ class Link {
     this.svg = new Line(["link"], x1, y1, x2, y2);
   }
 
-  draw(cart: Cart, pendulum: Pendulum) {
+  public draw(cart: Cart, pendulum: Pendulum): void {
     const x1 = cart.getX();
     const y1 = cart.getY();
     const x2 = cart.getX() + pendulum.getX();
     const y2 = cart.getY() + pendulum.getY();
     this.svg.updatePosition(x1, y1, x2, y2);
   }
+
+  public getSvg(): Line {
+    return this.svg;
+  }
 }
 
-function getElementByIdOrThrow(id: string): HTMLElement {
-  const element = document.getElementById(id);
+interface Flags {
+  isSwingMode: boolean;
+  isControlled: boolean;
+}
+
+function getGraphByIdOrThrow(id: string): SVGSVGElement {
+  const element = document.querySelector(`#${id}`);
   if (null === element) {
+    throw new Error();
+  }
+  if (!(element instanceof SVGSVGElement)) {
     throw new Error();
   }
   return element;
 }
 
-function main() {
-  const cart = new Cart(0, 0);
-  const pendulum = new Pendulum(0.3 * Math.PI, 0);
-  const link = new Link(cart, pendulum);
-  const graph = getElementByIdOrThrow("graph");
-  graph.appendChild(cart.svg.getElement());
-  graph.appendChild(pendulum.svg.getElement());
-  graph.appendChild(link.svg.getElement());
-  const pidParameters = fromPoles(cart, pendulum);
-  const pendulumController = new Controller(
-    pidParameters.pendulum,
+function fmod(a: number, b: number): number {
+  return a - b * Math.trunc(a / b);
+}
+
+function setupPendulumController(pidParameters: PidParameters, pendulum: Pendulum): Controller {
+  return new Controller(
+    pidParameters,
     (): number => {
-      function fmod(a: number, b: number) {
-        return a - b * Math.trunc(a / b);
-      }
-      let error = 0.5 * Math.PI - pendulum.position;
+      let error = 0.5 * Math.PI - pendulum.getPosition();
       // keep error in [- pi : pi]
       error = fmod(error + Math.PI, 2 * Math.PI);
       if (error < 0) {
@@ -57,68 +62,93 @@ function main() {
       error -= Math.PI;
       return error;
     },
-    (): number => -pendulum.velocity,
+    (): number => -pendulum.getVelocity(),
   );
-  const cartController = new Controller(
-    pidParameters.cart,
-    (): number => -cart.position,
-    (): number => -cart.velocity,
+}
+
+function setupCartController(pidParameters: PidParameters, cart: Cart): Controller {
+  return new Controller(
+    pidParameters,
+    (): number => -cart.getPosition(),
+    (): number => -cart.getVelocity(),
   );
-  if (
-    !checkStabilityCriteria(
-      pendulum,
-      cart,
-      pendulumController.pidParameters,
-      cartController.pidParameters,
-    )
-  ) {
-    console.warn("unstable system");
+}
+
+function updateSystem(
+  visualizeRate: number,
+  pendulum: Pendulum,
+  cart: Cart,
+  pendulumController: Controller,
+  cartController: Controller,
+  flags: Flags,
+): void {
+  const dt = 1e-4;
+  for (let time = 0; time < visualizeRate; time += dt) {
+    if (0.9 < Math.sin(pendulum.getPosition())) {
+      flags.isSwingMode = false;
+    }
+    if (Math.sin(pendulum.getPosition()) < 0.8) {
+      flags.isSwingMode = true;
+    }
+    const externalForce = (function (): number {
+      if (!flags.isControlled) {
+        return 0;
+      } else if (flags.isSwingMode) {
+        return (
+          50 *
+            Math.sin(pendulum.getPosition()) *
+            pendulum.getVelocity() *
+            (-pendulum.getMass() *
+              GRAVITATIONAL_ACCELERATION *
+              pendulum.getLength() *
+              (1 - Math.sin(pendulum.getPosition())) -
+              0.5 *
+                pendulum.getMass() *
+                Math.pow(pendulum.getLength(), 2) *
+                Math.pow(pendulum.getVelocity(), 2)) -
+          10 * cart.getPosition() -
+          10 * cart.getVelocity()
+        );
+      }
+      return pendulumController.computeExternalForce(dt) + cartController.computeExternalForce(dt);
+    })();
+    integrate(dt, externalForce, pendulum, cart);
+  }
+}
+
+function main(): void {
+  const cart = new Cart(0, 0);
+  const pendulum = new Pendulum(0.3 * Math.PI, 0);
+  const link = new Link(cart, pendulum);
+  const graph = getGraphByIdOrThrow("graph");
+  graph.append(cart.getSvg().getElement());
+  graph.append(pendulum.getSvg().getElement());
+  graph.append(link.getSvg().getElement());
+  const pidParameters = fromPoles(cart, pendulum);
+  const pendulumController = setupPendulumController(pidParameters.pendulum, pendulum);
+  const cartController = setupCartController(pidParameters.cart, cart);
+  const { isStable, reasons } = checkStabilityCriteria(
+    pendulum,
+    cart,
+    pendulumController.getPidParameters(),
+    cartController.getPidParameters(),
+  );
+  if (!isStable) {
+    throw new Error(`unstable system: ${reasons.join(",")}`);
   }
   const camera = new Camera(graph);
-  let isControlled = true;
-  let isSwingMode = false;
+  const flags = {
+    isControlled: true,
+    isSwingMode: false,
+  };
   graph.addEventListener("click", () => {
-    isControlled = !isControlled;
-    graph.setAttribute("is-controlled", isControlled.toString());
+    flags.isControlled = !flags.isControlled;
+    graph.setAttribute("is-controlled", flags.isControlled.toString());
   });
-  graph.setAttribute("is-controlled", isControlled.toString());
+  graph.setAttribute("is-controlled", flags.isControlled.toString());
   const animation = new Animation(60, () => {
-    const dt = 1e-4;
     const visualizeRate = 1e-2;
-    for (let time = 0; time < visualizeRate; time += dt) {
-      if (0.9 < Math.sin(pendulum.position)) {
-        isSwingMode = false;
-      }
-      if (Math.sin(pendulum.position) < 0.8) {
-        isSwingMode = true;
-      }
-      const externalForce = (function () {
-        if (!isControlled) {
-          return 0;
-        } else if (isSwingMode) {
-          return (
-            50 *
-              Math.sin(pendulum.position) *
-              pendulum.velocity *
-              (-pendulum.mass *
-                GRAVITATIONAL_ACCELERATION *
-                pendulum.length *
-                (1 - Math.sin(pendulum.position)) -
-                0.5 *
-                  pendulum.mass *
-                  Math.pow(pendulum.length, 2) *
-                  Math.pow(pendulum.velocity, 2)) -
-            10 * cart.position -
-            10 * cart.velocity
-          );
-        } else {
-          return (
-            pendulumController.computeExternalForce(dt) + cartController.computeExternalForce(dt)
-          );
-        }
-      })();
-      integrate(dt, externalForce, pendulum, cart);
-    }
+    updateSystem(visualizeRate, pendulum, cart, pendulumController, cartController, flags);
     link.draw(cart, pendulum);
     cart.draw();
     pendulum.draw(cart);

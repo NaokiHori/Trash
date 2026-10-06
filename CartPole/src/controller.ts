@@ -1,17 +1,8 @@
 import { GRAVITATIONAL_ACCELERATION } from "./parameter";
 import { Cart, Pendulum } from "./simulator";
+import { PidParameters } from "./controller/pidParameters";
 
-export class PidParameters {
-  p: number;
-  i: number;
-  d: number;
-
-  constructor(p: number, i: number, d: number) {
-    this.p = p;
-    this.i = i;
-    this.d = d;
-  }
-}
+export { PidParameters } from "./controller/pidParameters";
 
 interface FromPolesReturn {
   cart: PidParameters;
@@ -20,7 +11,7 @@ interface FromPolesReturn {
 
 function getIdentityMatrix(nItems: number): Float64Array {
   const identity = new Float64Array(nItems * nItems);
-  for (let i = 0; i < nItems; i++) {
+  for (let i = 0; i < nItems; i += 1) {
     identity[i * nItems + i] = 1;
   }
   return identity;
@@ -32,8 +23,8 @@ function computeScalarMatrixMultiplication(
   a: Float64Array,
 ): Float64Array {
   const b = new Float64Array(nItems * nItems);
-  for (let i = 0; i < nItems; i++) {
-    for (let j = 0; j < nItems; j++) {
+  for (let i = 0; i < nItems; i += 1) {
+    for (let j = 0; j < nItems; j += 1) {
       b[i * nItems + j] = k * a[i * nItems + j];
     }
   }
@@ -46,9 +37,9 @@ function computeMatrixMatrixMultiplication(
   b: Float64Array,
 ): Float64Array {
   const c = new Float64Array(nItems * nItems);
-  for (let i = 0; i < nItems; i++) {
-    for (let j = 0; j < nItems; j++) {
-      for (let k = 0; k < nItems; k++) {
+  for (let i = 0; i < nItems; i += 1) {
+    for (let j = 0; j < nItems; j += 1) {
+      for (let k = 0; k < nItems; k += 1) {
         c[i * nItems + j] += a[i * nItems + k] * b[k * nItems + j];
       }
     }
@@ -62,8 +53,8 @@ function computeMatrixVectorMultiplication(
   b: Float64Array,
 ): Float64Array {
   const c = new Float64Array(nItems);
-  for (let i = 0; i < nItems; i++) {
-    for (let j = 0; j < nItems; j++) {
+  for (let i = 0; i < nItems; i += 1) {
+    for (let j = 0; j < nItems; j += 1) {
       c[i] += a[i * nItems + j] * b[j];
     }
   }
@@ -76,8 +67,8 @@ function computeMatrixAddition(
   b: Float64Array,
 ): Float64Array<ArrayBuffer> {
   const c = new Float64Array(nItems * nItems);
-  for (let i = 0; i < nItems; i++) {
-    for (let j = 0; j < nItems; j++) {
+  for (let i = 0; i < nItems; i += 1) {
+    for (let j = 0; j < nItems; j += 1) {
       c[i * nItems + j] = a[i * nItems + j] + b[i * nItems + j];
     }
   }
@@ -86,11 +77,11 @@ function computeMatrixAddition(
 
 function computeInverseMatrix(nItems: number, a: Float64Array): Float64Array {
   const b = getIdentityMatrix(nItems);
-  for (let i = 0; i < nItems; i++) {
+  for (let i = 0; i < nItems; i += 1) {
     // 1. Partial Pivoting: Find the pivot row with the maximum absolute value in column i
     let maxRow = i;
     let maxVal = Math.abs(a[i * nItems + i]);
-    for (let k = i + 1; k < nItems; k++) {
+    for (let k = i + 1; k < nItems; k += 1) {
       const absVal = Math.abs(a[k * nItems + i]);
       if (absVal > maxVal) {
         maxVal = absVal;
@@ -102,7 +93,7 @@ function computeInverseMatrix(nItems: number, a: Float64Array): Float64Array {
     }
     // 2. Swap rows in both 'a' and 'b' if needed
     if (maxRow !== i) {
-      for (let j = 0; j < nItems; j++) {
+      for (let j = 0; j < nItems; j += 1) {
         const idx1 = i * nItems + j;
         const idx2 = maxRow * nItems + j;
         // Swap elements in matrix a
@@ -117,15 +108,15 @@ function computeInverseMatrix(nItems: number, a: Float64Array): Float64Array {
     }
     // 3. Normalize the pivot row so that the pivot element a[i, i] becomes 1
     const pivot = a[i * nItems + i];
-    for (let j = 0; j < nItems; j++) {
+    for (let j = 0; j < nItems; j += 1) {
       a[i * nItems + j] /= pivot;
       b[i * nItems + j] /= pivot;
     }
     // 4. Eliminate elements above and below the pivot
-    for (let r = 0; r < nItems; r++) {
+    for (let r = 0; r < nItems; r += 1) {
       if (r !== i) {
         const factor = a[r * nItems + i];
-        for (let c = 0; c < nItems; c++) {
+        for (let c = 0; c < nItems; c += 1) {
           a[r * nItems + c] -= factor * a[i * nItems + c];
           b[r * nItems + c] -= factor * b[i * nItems + c];
         }
@@ -139,10 +130,12 @@ export function fromPoles(cart: Cart, pendulum: Pendulum): FromPolesReturn {
   const nItems = 4;
   const a = new Float64Array(nItems * nItems);
   a[1] = 1;
-  a[6] = (-GRAVITATIONAL_ACCELERATION * pendulum.mass) / cart.mass;
+  a[6] = (-GRAVITATIONAL_ACCELERATION * pendulum.getMass()) / cart.getMass();
   a[11] = 1;
-  a[14] = (-GRAVITATIONAL_ACCELERATION / pendulum.length) * (1 + pendulum.mass / cart.mass);
-  const b = new Float64Array([0, 1 / cart.mass, 0, 1 / cart.mass / pendulum.length]);
+  a[14] =
+    (-GRAVITATIONAL_ACCELERATION / pendulum.getLength()) *
+    (1 + pendulum.getMass() / cart.getMass());
+  const b = new Float64Array([0, 1 / cart.getMass(), 0, 1 / cart.getMass() / pendulum.getLength()]);
   const etas = [0.7, 0.9];
   const omegas = [20, 6];
   const polynomial = [
@@ -158,7 +151,7 @@ export function fromPoles(cart: Cart, pendulum: Pendulum): FromPolesReturn {
   const a4 = computeMatrixMatrixMultiplication(nItems, a, a3);
   const aPowers = [getIdentityMatrix(nItems), a, a2, a3, a4];
   let characteristic = new Float64Array(nItems * nItems);
-  for (let i = 0; i <= nItems; i++) {
+  for (let i = 0; i <= nItems; i += 1) {
     characteristic = computeMatrixAddition(
       nItems,
       characteristic,
@@ -166,9 +159,9 @@ export function fromPoles(cart: Cart, pendulum: Pendulum): FromPolesReturn {
     );
   }
   const controllability = new Float64Array(nItems * nItems);
-  for (let j = 0; j < nItems; j++) {
+  for (let j = 0; j < nItems; j += 1) {
     const vector = computeMatrixVectorMultiplication(nItems, aPowers[j], b);
-    for (let i = 0; i < nItems; i++) {
+    for (let i = 0; i < nItems; i += 1) {
       controllability[i * nItems + j] = vector[i];
     }
   }
@@ -178,26 +171,18 @@ export function fromPoles(cart: Cart, pendulum: Pendulum): FromPolesReturn {
     characteristic,
   );
   return {
-    cart: {
-      p: k[12],
-      i: 0,
-      d: k[13],
-    },
-    pendulum: {
-      p: k[14],
-      i: 0,
-      d: k[15],
-    },
+    cart: new PidParameters(k[12], 0, k[13]),
+    pendulum: new PidParameters(k[14], 0, k[15]),
   };
 }
 
 export class Controller {
-  pidParameters: PidParameters;
-  computeError: () => number;
-  computeErrorDerivative: () => number;
-  errorSum: number;
+  private pidParameters: PidParameters;
+  private computeError: () => number;
+  private computeErrorDerivative: () => number;
+  private errorSum: number;
 
-  constructor(
+  public constructor(
     pidParameters: PidParameters,
     computeError: () => number,
     computeErrorDerivative: () => number,
@@ -208,14 +193,18 @@ export class Controller {
     this.errorSum = 0;
   }
 
-  computeExternalForce(dt: number): number {
+  public computeExternalForce(dt: number): number {
     const error = this.computeError();
     const errorDerivative = this.computeErrorDerivative();
     this.errorSum += error * dt;
     return (
-      this.pidParameters.p * error +
-      this.pidParameters.i * this.errorSum +
-      this.pidParameters.d * errorDerivative
+      this.pidParameters.getP() * error +
+      this.pidParameters.getI() * this.errorSum +
+      this.pidParameters.getD() * errorDerivative
     );
+  }
+
+  public getPidParameters(): PidParameters {
+    return this.pidParameters;
   }
 }

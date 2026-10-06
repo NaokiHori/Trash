@@ -1,17 +1,15 @@
 export class Camera {
   private x: number = 0;
   private size: number = 0.25;
-  private svg: HTMLElement;
+  private svg: SVGSVGElement;
 
-  constructor(svg: HTMLElement) {
+  public constructor(svg: SVGSVGElement) {
     this.svg = svg;
   }
 
-  update(targetX: number) {
+  public update(targetX: number): void {
     this.x += 0.1 * (targetX - this.x);
-    this.svg.setAttribute(
-      "viewBox",
-      `${this.x - this.size / 2} ${-this.size / 2} ${this.size} ${this.size}`,
-    );
+    const halfSize = this.size / 2;
+    this.svg.setAttribute("viewBox", `${this.x - halfSize} ${-halfSize} ${this.size} ${this.size}`);
   }
 }

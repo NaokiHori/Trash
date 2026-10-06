@@ -11,12 +11,12 @@ export class Animation {
     this.isRunning = false;
   }
 
-  public start() {
+  public start(): void {
     if (this.isRunning) {
       // avoid double running
       return;
     }
-    const proceed = (currentTime: number) => {
+    const proceed = (currentTime: number): void => {
       if (!this.isRunning) {
         // to stop animation loop
         return;
@@ -33,7 +33,7 @@ export class Animation {
     requestAnimationFrame(proceed);
   }
 
-  public stop() {
+  public stop(): void {
     this.isRunning = false;
   }
 
