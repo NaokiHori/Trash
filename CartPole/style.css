@@ -1,3 +1,9 @@
+:root {
+  --rail: #888888;
+  --blue: #4cc9f0;
+  --red: #f0724c;
+}
+
 html,
 body {
   overflow: hidden;
@@ -23,15 +29,11 @@ body {
 }
 
 #graph[is-controlled="true"] {
-  border-color: #4cc9f0;
+  border-color: var(--blue);
 }
 
 #graph[is-controlled="false"] {
-  border-color: #f0724c;
-}
-
-:root {
-  --rail: #888888;
+  border-color: var(--red);
 }
 
 circle.pendulum-mass {
@@ -69,6 +71,18 @@ line.tick {
 line.tick.major {
   stroke: var(--rail);
   stroke-width: 0.0015;
+}
+
+#controller-state {
+  font-size: 0.1%;
+}
+
+#controller-state[is-controlled="true"] {
+  fill: var(--blue);
+}
+
+#controller-state[is-controlled="false"] {
+  fill: var(--red);
 }
 
 footer {

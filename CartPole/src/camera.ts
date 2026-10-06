@@ -7,9 +7,13 @@ export class Camera {
     this.svg = svg;
   }
 
-  public update(targetX: number): void {
+  public updatePosition(targetX: number): void {
     this.x += 0.1 * (targetX - this.x);
     const halfSize = this.size / 2;
     this.svg.setAttribute("viewBox", `${this.x - halfSize} ${-halfSize} ${this.size} ${this.size}`);
+  }
+
+  public getPosition(): number {
+    return this.x;
   }
 }

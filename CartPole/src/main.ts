@@ -4,6 +4,8 @@ import { Controller, fromPoles } from "./controller";
 import { GRAVITATIONAL_ACCELERATION } from "./parameter";
 import { PidParameters, Cart, Pendulum, integrate, checkStabilityCriteria } from "./simulator";
 import { Line } from "./svg";
+import { ControllerStateText } from "./controllerStateText";
+import { getElementByIdOrThrow } from "./dom";
 
 class Link {
   private svg: Line;
@@ -32,17 +34,6 @@ class Link {
 interface Flags {
   isSwingMode: boolean;
   isControlled: boolean;
-}
-
-function getGraphByIdOrThrow(id: string): SVGSVGElement {
-  const element = document.querySelector(`#${id}`);
-  if (null === element) {
-    throw new Error();
-  }
-  if (!(element instanceof SVGSVGElement)) {
-    throw new Error();
-  }
-  return element;
 }
 
 function fmod(a: number, b: number): number {
@@ -120,7 +111,8 @@ function main(): void {
   const cart = new Cart(0, 0);
   const pendulum = new Pendulum(0.3 * Math.PI, 0);
   const link = new Link(cart, pendulum);
-  const graph = getGraphByIdOrThrow("graph");
+  const graph = getElementByIdOrThrow(SVGSVGElement, "graph");
+  const controllerStateText = new ControllerStateText();
   graph.append(cart.getSvg().getElement());
   graph.append(pendulum.getSvg().getElement());
   graph.append(link.getSvg().getElement());
@@ -141,18 +133,23 @@ function main(): void {
     isControlled: true,
     isSwingMode: false,
   };
+  const setControllerState = (isControlled: boolean): void => {
+    graph.setAttribute("is-controlled", isControlled.toString());
+    controllerStateText.setIsControlled(isControlled);
+  };
   graph.addEventListener("click", () => {
     flags.isControlled = !flags.isControlled;
-    graph.setAttribute("is-controlled", flags.isControlled.toString());
+    setControllerState(flags.isControlled);
   });
-  graph.setAttribute("is-controlled", flags.isControlled.toString());
+  setControllerState(flags.isControlled);
   const animation = new Animation(60, () => {
     const visualizeRate = 1e-2;
     updateSystem(visualizeRate, pendulum, cart, pendulumController, cartController, flags);
     link.draw(cart, pendulum);
     cart.draw();
     pendulum.draw(cart);
-    camera.update(cart.getX());
+    camera.updatePosition(cart.getX());
+    controllerStateText.setPosition(camera.getPosition());
   });
   animation.start();
 }
