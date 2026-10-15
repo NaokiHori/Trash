@@ -13,6 +13,8 @@ RUN npm install --save-dev \
   oxlint-tsgolint \
   vite \
   vitest
+RUN npm install --save-optional \
+  @typescript/typescript-linux-arm64
 
 WORKDIR /project/src
 

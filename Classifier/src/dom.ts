@@ -1,12 +1,12 @@
-export { ButtonElement } from "./dom/buttonElement";
 export { CanvasElement } from "./dom/canvasElement";
 export { DivElement } from "./dom/divElement";
+export { ProceedButton } from "./dom/proceedButton";
 
-export function getElementByIdOrThrow<T extends Element>(
+export function querySelectorOrThrow<T extends Element>(
   type: new (...args: unknown[]) => T,
-  id: string,
+  query: string,
 ): T {
-  const element = document.querySelector(`#${id}`);
+  const element = document.querySelector(query);
   if (null === element) {
     throw new Error();
   }

@@ -1,6 +1,6 @@
 import { Animation } from "./animation";
 import { getNitems } from "./getNitems";
-import { ButtonElement, CanvasElement, DivElement } from "./dom";
+import { CanvasElement, DivElement, ProceedButton } from "./dom";
 import { Graph } from "./graph";
 import { Sample, Dataset } from "./dataset";
 import { getPattern } from "./pattern";
@@ -8,19 +8,18 @@ import { getPattern } from "./pattern";
 const LOGGER_DEFAULT_MESSAGE = "Click button to proceed";
 
 interface UIComponents {
-  button: ButtonElement;
+  button: ProceedButton;
   logger: DivElement;
   graph: Graph;
   canvas: CanvasElement;
 }
 
 function setupUI(nitems: number): UIComponents {
-  const button = new ButtonElement("proceed-button");
-  button.setTextContent("Set points");
-  const logger = new DivElement("logger");
+  const button = new ProceedButton("#proceed-button");
+  const logger = new DivElement("#logger");
   logger.setTextContent(LOGGER_DEFAULT_MESSAGE);
-  const graph = new Graph("graph", nitems);
-  const canvas = new CanvasElement("contour-canvas");
+  const graph = new Graph("#graph", nitems);
+  const canvas = new CanvasElement("#contour-canvas");
   canvas.setWidth(128);
   canvas.setHeight(128);
   return { button, logger, graph, canvas };
@@ -84,7 +83,7 @@ function attachEventListeners(
   initialAnimation: Animation,
   trainingAnimation: Animation,
 ): void {
-  ui.button.addEventListener(() => {
+  ui.button.addClickEventListener(() => {
     const button = ui.button;
     const clickCounter = button.getClickCounter();
     switch (clickCounter) {

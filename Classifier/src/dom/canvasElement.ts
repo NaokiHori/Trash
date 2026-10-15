@@ -1,13 +1,13 @@
 import { X_LIMITS, Y_LIMITS } from "../param";
-import { getElementByIdOrThrow } from "../dom";
+import { querySelectorOrThrow } from "../dom";
 import { Dataset } from "../dataset";
 
 export class CanvasElement {
   private canvasElement: HTMLCanvasElement;
   private context: CanvasRenderingContext2D;
 
-  public constructor(elementId: string) {
-    const canvasElement = getElementByIdOrThrow(HTMLCanvasElement, elementId);
+  public constructor(query: string) {
+    const canvasElement = querySelectorOrThrow(HTMLCanvasElement, query);
     const context = canvasElement.getContext("2d");
     if (null === context) {
       throw new Error();
