@@ -144,9 +144,8 @@ export const FORMULAE: Array<Formula> = [
         return 1;
       } else if (x < 0.92) {
         return 1.84 - 2 * x;
-      } else {
-        return x / 0.08 - 11.5;
       }
+      return x / 0.08 - 11.5;
     },
   },
   {

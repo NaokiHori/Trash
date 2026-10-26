@@ -1,17 +1,23 @@
 import { Formula, FORMULAE } from "./formula";
 
+function capitalizeFirstLetter(sequence: string): string {
+  const firstLetter = sequence.charAt(0);
+  const otherLetters = sequence.slice(1);
+  return firstLetter.toUpperCase() + otherLetters;
+}
+
 export class ColorSelector {
-  private _selectElement: HTMLSelectElement;
-  private _selectedFormula: Formula;
+  private selectElement: HTMLSelectElement;
+  private selectedFormula: Formula;
 
   public constructor(container: HTMLDivElement, color: string) {
     // a container div element contains label and select elements
     const div = document.createElement("div");
     const label = document.createElement("label");
     const select = document.createElement("select");
-    container.appendChild(div);
-    div.appendChild(label);
-    div.appendChild(select);
+    container.append(div);
+    div.append(label);
+    div.append(select);
     div.classList.add("color-selector");
     label.textContent = capitalizeFirstLetter(color);
     label.setAttribute("for", `${color}-select`);
@@ -19,7 +25,7 @@ export class ColorSelector {
     select.setAttribute("name", `${color}-options`);
     // choose one of formulae randomly and set
     const selectedIndex = Math.floor(FORMULAE.length * Math.random());
-    this._selectedFormula = FORMULAE[selectedIndex];
+    this.selectedFormula = FORMULAE[selectedIndex];
     for (const [index, formula] of FORMULAE.entries()) {
       const option = document.createElement("option");
       option.setAttribute("value", index.toString());
@@ -27,19 +33,21 @@ export class ColorSelector {
         option.setAttribute("selected", "");
       }
       option.textContent = formula.label;
-      select.appendChild(option);
+      select.append(option);
     }
     select.addEventListener("change", (event: Event) => {
-      const target = event.target as HTMLSelectElement;
-      const index = Number(target.value);
-      this._selectedFormula = FORMULAE[index];
+      const target = event.target;
+      if (target instanceof HTMLSelectElement) {
+        const index = Number(target.value);
+        this.selectedFormula = FORMULAE[index];
+      }
     });
-    this._selectElement = select;
+    this.selectElement = select;
   }
 
   public get equation(): (value: number) => number {
     return (value: number) => {
-      const y = this._selectedFormula.equation(value);
+      const y = this.selectedFormula.equation(value);
       if (y < 0) {
         return 0;
       }
@@ -50,13 +58,7 @@ export class ColorSelector {
     };
   }
 
-  public setChangeHandler(onChange: () => void) {
-    this._selectElement.addEventListener("change", onChange);
+  public setChangeHandler(onChange: () => void): void {
+    this.selectElement.addEventListener("change", onChange);
   }
-}
-
-function capitalizeFirstLetter(sequence: string): string {
-  const firstLetter = sequence.charAt(0);
-  const otherLetters = sequence.slice(1);
-  return firstLetter.toUpperCase() + otherLetters;
 }

@@ -1,7 +1,20 @@
-import { getElementByIdUnwrap } from "./dom";
+import { getElementByIdOrThrow } from "./dom";
 import { ColorMap } from "./colorMap";
 import { Graph } from "./graph";
 import { ColorSelector } from "./colorSelector";
+
+function getColorSelectors(): {
+  red: ColorSelector;
+  green: ColorSelector;
+  blue: ColorSelector;
+} {
+  const container = getElementByIdOrThrow(HTMLDivElement, "color-selectors");
+  return {
+    red: new ColorSelector(container, "red"),
+    green: new ColorSelector(container, "green"),
+    blue: new ColorSelector(container, "blue"),
+  };
+}
 
 function updateScreen(
   colorMap: ColorMap,
@@ -11,7 +24,7 @@ function updateScreen(
     green: ColorSelector;
     blue: ColorSelector;
   },
-) {
+): void {
   colorMap.draw({
     red: colorSelectors.red.equation,
     green: colorSelectors.green.equation,
@@ -24,17 +37,10 @@ function updateScreen(
   });
 }
 
-function main() {
+function main(): void {
   const colorMap = new ColorMap({ elementId: "color-map" });
   const graph = new Graph({ elementId: "graph-canvas" });
-  const colorSelectors = (function () {
-    const container = getElementByIdUnwrap("color-selectors") as HTMLDivElement;
-    return {
-      red: new ColorSelector(container, "red"),
-      green: new ColorSelector(container, "green"),
-      blue: new ColorSelector(container, "blue"),
-    };
-  })();
+  const colorSelectors = getColorSelectors();
   // initial render
   updateScreen(colorMap, graph, colorSelectors);
   // update on select
