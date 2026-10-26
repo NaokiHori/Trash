@@ -2,11 +2,23 @@ import { BaseScheme } from "./base";
 
 const N_HALO = 2;
 
+function fluxLimiter(num: number, den: number): number {
+  if (0 === den) {
+    if (num < 0) {
+      return 0;
+    }
+    return 1;
+  }
+  const r = num / den;
+  // minmod flux limiter
+  return Math.max(0, Math.min(1, r));
+}
+
 export class MusclScheme extends BaseScheme {
   public label = "MUSCL";
-  private _values: Array<number>;
-  private _dValues: Array<number>;
-  private _fluxes: Array<number>;
+  private values: Array<number>;
+  private dValues: Array<number>;
+  private fluxes: Array<number>;
 
   public constructor(length: number, nitems: number) {
     super(length, nitems);
@@ -14,30 +26,30 @@ export class MusclScheme extends BaseScheme {
     const dValues = new Array<number>();
     const fluxes = new Array<number>();
     this.initializeValues(N_HALO, values);
-    for (let i = 0; i < nitems + 2 * N_HALO; i++) {
+    for (let i = 0; i < nitems + 2 * N_HALO; i += 1) {
       dValues.push(0);
       fluxes.push(0);
     }
-    this._values = values;
-    this._dValues = dValues;
-    this._fluxes = fluxes;
+    this.values = values;
+    this.dValues = dValues;
+    this.fluxes = fluxes;
     this.exchangeHalo(N_HALO, values);
   }
 
   public getArray(): Readonly<Array<number>> {
-    return this._getArray(N_HALO, this._values);
+    return this.getArrayInternal(N_HALO, this.values);
   }
 
-  public integrate() {
-    const velocity = this.velocity;
-    const nitems = this.nitems;
-    const values = this._values;
-    const dValues = this._dValues;
-    const fluxes = this._fluxes;
+  public integrate(): void {
+    const velocity = this.getVelocity();
+    const nitems = this.getNitems();
+    const values = this.values;
+    const dValues = this.dValues;
+    const fluxes = this.fluxes;
     const dx = this.getDx();
     const dt = this.getDt();
     if (velocity < 0) {
-      for (let i = N_HALO; i < nitems + N_HALO; i++) {
+      for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
         fluxes[i] =
           velocity *
           (values[i] -
@@ -46,7 +58,7 @@ export class MusclScheme extends BaseScheme {
               (values[i + 1] - values[i]));
       }
     } else {
-      for (let i = N_HALO; i < nitems + N_HALO; i++) {
+      for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
         fluxes[i] =
           velocity *
           (values[i - 1] +
@@ -56,25 +68,12 @@ export class MusclScheme extends BaseScheme {
       }
     }
     this.exchangeHalo(N_HALO, fluxes);
-    for (let i = N_HALO; i < nitems + N_HALO; i++) {
+    for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
       dValues[i] = ((fluxes[i] - fluxes[i + 1]) / dx) * dt;
     }
-    for (let i = N_HALO; i < nitems + N_HALO; i++) {
+    for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
       values[i] += dValues[i];
     }
     this.exchangeHalo(N_HALO, values);
   }
-}
-
-function fluxLimiter(num: number, den: number): number {
-  if (0 === den) {
-    if (num < 0) {
-      return 0;
-    } else {
-      return 1;
-    }
-  }
-  const r = num / den;
-  // minmod flux limiter
-  return Math.max(0, Math.min(1, r));
 }

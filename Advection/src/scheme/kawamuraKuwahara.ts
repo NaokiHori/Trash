@@ -4,36 +4,36 @@ const N_HALO = 2;
 
 export class KawamuraKuwaharaScheme extends BaseScheme {
   public label = "Kawamura-Kuwahara";
-  private _values: Array<number>;
-  private _dValues: Array<number>;
+  private values: Array<number>;
+  private dValues: Array<number>;
 
   public constructor(length: number, nitems: number) {
     super(length, nitems);
     const values = new Array<number>();
     const dValues = new Array<number>();
     this.initializeValues(N_HALO, values);
-    for (let i = 0; i < nitems + 2 * N_HALO; i++) {
+    for (let i = 0; i < nitems + 2 * N_HALO; i += 1) {
       dValues.push(0);
     }
-    this._values = values;
-    this._dValues = dValues;
+    this.values = values;
+    this.dValues = dValues;
     this.exchangeHalo(N_HALO, values);
   }
 
   public getArray(): Readonly<Array<number>> {
-    return this._getArray(N_HALO, this._values);
+    return this.getArrayInternal(N_HALO, this.values);
   }
 
-  public integrate() {
-    const velocity = this.velocity;
-    const nitems = this.nitems;
-    const values = this._values;
-    const dValues = this._dValues;
+  public integrate(): void {
+    const velocity = this.getVelocity();
+    const nitems = this.getNitems();
+    const values = this.values;
+    const dValues = this.dValues;
     const dx = this.getDx();
     const dt = this.getDt();
     const coef = (velocity * dt) / dx;
     if (velocity < 0) {
-      for (let i = N_HALO; i < nitems + N_HALO; i++) {
+      for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
         dValues[i] =
           (coef / 6) *
           (values[i - 2] -
@@ -43,7 +43,7 @@ export class KawamuraKuwaharaScheme extends BaseScheme {
             2 * values[i + 2]);
       }
     } else {
-      for (let i = N_HALO; i < nitems + N_HALO; i++) {
+      for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
         dValues[i] =
           (-coef / 6) *
           (2 * values[i - 2] -
@@ -53,7 +53,7 @@ export class KawamuraKuwaharaScheme extends BaseScheme {
             values[i + 2]);
       }
     }
-    for (let i = N_HALO; i < nitems + N_HALO; i++) {
+    for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
       values[i] += dValues[i];
     }
     this.exchangeHalo(N_HALO, values);

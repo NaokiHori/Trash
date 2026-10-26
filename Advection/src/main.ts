@@ -7,15 +7,15 @@ function getSpecifiedScheme(): string | null {
   return urlParams.get("scheme");
 }
 
-function main() {
+function main(): void {
   const length = 1;
   const nitems = 128;
   const scheme = new Scheme(getSpecifiedScheme(), length, nitems);
-  const labelElement = document.getElementById("scheme-label");
+  const labelElement = document.querySelector("#scheme-label");
   if (labelElement === null) {
     throw new Error("label div element not found");
   }
-  const buttons = [document.getElementById("to-prev"), document.getElementById("to-next")];
+  const buttons = [document.querySelector("#to-prev"), document.querySelector("#to-next")];
   if (buttons[0] === null) {
     throw new Error("to-prev button not found");
   }
@@ -39,7 +39,7 @@ function main() {
   graph.updateCircles(scheme.getArray());
   const animation = new Animation(60, () => {
     const nIterations = 6;
-    for (let i = 0; i < nIterations; i++) {
+    for (let i = 0; i < nIterations; i += 1) {
       scheme.integrate();
     }
     graph.updateCircles(scheme.getArray());

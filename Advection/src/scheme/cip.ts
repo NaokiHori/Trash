@@ -4,10 +4,10 @@ const N_HALO = 1;
 
 export class CipScheme extends BaseScheme {
   public label = "CIP";
-  private _values: Array<number>;
-  private _grads: Array<number>;
-  private _dValues: Array<number>;
-  private _dGrads: Array<number>;
+  private values: Array<number>;
+  private grads: Array<number>;
+  private dValues: Array<number>;
+  private dGrads: Array<number>;
 
   public constructor(length: number, nitems: number) {
     super(length, nitems);
@@ -17,35 +17,35 @@ export class CipScheme extends BaseScheme {
     const dGrads = new Array<number>();
     this.initializeValues(N_HALO, values);
     this.exchangeHalo(N_HALO, values);
-    for (let i = 0; i < nitems + 2 * N_HALO; i++) {
+    for (let i = 0; i < nitems + 2 * N_HALO; i += 1) {
       dValues.push(0);
       dGrads.push(0);
     }
     const dx = this.getDx();
-    for (let i = N_HALO; i < nitems + N_HALO; i++) {
+    for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
       grads[i] = (0.5 / dx) * (-values[i - 1] + values[i + 1]);
     }
     this.exchangeHalo(N_HALO, grads);
-    this._values = values;
-    this._grads = grads;
-    this._dValues = dValues;
-    this._dGrads = dGrads;
+    this.values = values;
+    this.grads = grads;
+    this.dValues = dValues;
+    this.dGrads = dGrads;
   }
 
   public getArray(): Readonly<Array<number>> {
-    return this._getArray(N_HALO, this._values);
+    return this.getArrayInternal(N_HALO, this.values);
   }
 
-  public integrate() {
-    const velocity = this.velocity;
-    const nitems = this.nitems;
-    const values = this._values;
-    const grads = this._grads;
-    const dValues = this._dValues;
-    const dGrads = this._dGrads;
+  public integrate(): void {
+    const velocity = this.getVelocity();
+    const nitems = this.getNitems();
+    const values = this.values;
+    const grads = this.grads;
+    const dValues = this.dValues;
+    const dGrads = this.dGrads;
     const dx = this.getDx();
     const dt = this.getDt();
-    for (let i = N_HALO; i < nitems + N_HALO; i++) {
+    for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
       const d = velocity < 0 ? dx : -dx;
       const g = grads[i];
       const gup = velocity < 0 ? grads[i + 1] : grads[i - 1];
@@ -57,7 +57,7 @@ export class CipScheme extends BaseScheme {
       dValues[i] = a * x ** 3 + b * x ** 2 + g * x;
       dGrads[i] = 3 * a * x ** 2 + 2 * b * x;
     }
-    for (let i = N_HALO; i < nitems + N_HALO; i++) {
+    for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
       values[i] += dValues[i];
       grads[i] += dGrads[i];
     }

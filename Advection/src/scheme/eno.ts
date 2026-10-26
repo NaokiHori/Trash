@@ -4,6 +4,14 @@ const N_HALO = 3;
 
 const MAX_STENCIL_SIZE = 3;
 
+function computeInnerProduct(a: Readonly<Array<number>>, b: Readonly<Array<number>>): number {
+  let result = 0;
+  for (let i = 0; i < MAX_STENCIL_SIZE; i += 1) {
+    result += a[i] * b[i];
+  }
+  return result;
+}
+
 export class EnoScheme extends BaseScheme {
   public label = "ENO";
   private values: Array<number>;
@@ -20,7 +28,7 @@ export class EnoScheme extends BaseScheme {
   }
 
   public getArray(): Readonly<Array<number>> {
-    return this._getArray(N_HALO, this.values);
+    return this.getArrayInternal(N_HALO, this.values);
   }
 
   private static computeDividedDifference(dx: number, values: Readonly<Array<number>>): number {
@@ -40,9 +48,9 @@ export class EnoScheme extends BaseScheme {
     return Math.abs(left) < Math.abs(right);
   }
 
-  public integrate() {
-    const velocity = this.velocity;
-    const nitems = this.nitems;
+  public integrate(): void {
+    const velocity = this.getVelocity();
+    const nitems = this.getNitems();
     const values = this.values;
     const fluxes = this.fluxes;
     const dx = this.getDx();
@@ -53,9 +61,9 @@ export class EnoScheme extends BaseScheme {
       [2 / 6, 5 / 6, -1 / 6],
       [11 / 6, -7 / 6, 2 / 6],
     ];
-    for (let i = N_HALO; i < nitems + N_HALO; i++) {
+    for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
       let iStart = velocity < 0 ? i : i - 1;
-      for (let width = 1; width < MAX_STENCIL_SIZE; width++) {
+      for (let width = 1; width < MAX_STENCIL_SIZE; width += 1) {
         const iEnd = iStart + width;
         if (
           EnoScheme.compare(
@@ -74,17 +82,9 @@ export class EnoScheme extends BaseScheme {
         );
     }
     this.exchangeHalo(N_HALO, fluxes);
-    for (let i = N_HALO; i < nitems + N_HALO; i++) {
+    for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
       values[i] += ((fluxes[i] - fluxes[i + 1]) / dx) * dt;
     }
     this.exchangeHalo(N_HALO, values);
   }
-}
-
-function computeInnerProduct(a: Readonly<Array<number>>, b: Readonly<Array<number>>): number {
-  let result = 0;
-  for (let i = 0; i < MAX_STENCIL_SIZE; i++) {
-    result += a[i] * b[i];
-  }
-  return result;
 }

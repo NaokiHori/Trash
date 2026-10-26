@@ -29,55 +29,55 @@ const schemeList = [
 type OneOfSchemes = InstanceType<(typeof schemeList)[number]>;
 
 export class Scheme {
-  private _counter: number;
-  private _currentScheme: OneOfSchemes;
+  private counter: number;
+  private currentScheme: OneOfSchemes;
 
   public constructor(specifiedScheme: string | null, length: number, nitems: number) {
     if (specifiedScheme !== null) {
       for (const [counter, scheme] of schemeList.entries()) {
         const s = new scheme(length, nitems);
         if (s.label.toLowerCase() === specifiedScheme.toLowerCase()) {
-          this._counter = counter;
-          this._currentScheme = s;
+          this.counter = counter;
+          this.currentScheme = s;
           return;
         }
       }
-      console.warn(`Unknown scheme "${specifiedScheme}" is specified: use default`);
+      throw new Error(`Unknown scheme "${specifiedScheme}" is specified: use default`);
     }
-    this._counter = 0;
-    const scheme = schemeList[this._counter];
-    this._currentScheme = new scheme(length, nitems);
+    this.counter = 0;
+    const scheme = schemeList[this.counter];
+    this.currentScheme = new scheme(length, nitems);
   }
 
-  public toPrev() {
-    this._counter = (this._counter + schemeList.length - 1) % schemeList.length;
-    this._currentScheme = new schemeList[this._counter](
-      this._currentScheme.length,
-      this._currentScheme.nitems,
+  public toPrev(): void {
+    this.counter = (this.counter + schemeList.length - 1) % schemeList.length;
+    this.currentScheme = new schemeList[this.counter](
+      this.currentScheme.getLength(),
+      this.currentScheme.getNitems(),
     );
   }
 
-  public toNext() {
-    this._counter = (this._counter + schemeList.length + 1) % schemeList.length;
-    this._currentScheme = new schemeList[this._counter](
-      this._currentScheme.length,
-      this._currentScheme.nitems,
+  public toNext(): void {
+    this.counter = (this.counter + schemeList.length + 1) % schemeList.length;
+    this.currentScheme = new schemeList[this.counter](
+      this.currentScheme.getLength(),
+      this.currentScheme.getNitems(),
     );
   }
 
-  public flipVelocity() {
-    this._currentScheme.flipVelocity();
+  public flipVelocity(): void {
+    this.currentScheme.flipVelocity();
   }
 
-  public integrate() {
-    this._currentScheme.integrate();
+  public integrate(): void {
+    this.currentScheme.integrate();
   }
 
   public getArray(): Readonly<Array<number>> {
-    return this._currentScheme.getArray();
+    return this.currentScheme.getArray();
   }
 
   public getLabel(): string {
-    return this._currentScheme.label;
+    return this.currentScheme.label;
   }
 }

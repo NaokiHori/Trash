@@ -4,45 +4,12 @@ const N_HALO = 3;
 
 const MAX_STENCIL_SIZE = 3;
 
-export class WenoScheme extends BaseScheme {
-  public label = "WENO";
-  private values: Array<number>;
-  private fluxes: Array<number>;
-
-  public constructor(length: number, nitems: number) {
-    super(length, nitems);
-    const values = new Array<number>();
-    const fluxes = new Array<number>();
-    this.initializeValues(N_HALO, values);
-    this.exchangeHalo(N_HALO, values);
-    this.values = values;
-    this.fluxes = fluxes;
+function computeInnerProduct(a: Readonly<Array<number>>, b: Readonly<Array<number>>): number {
+  let result = 0;
+  for (let i = 0; i < MAX_STENCIL_SIZE; i += 1) {
+    result += a[i] * b[i];
   }
-
-  public getArray(): Readonly<Array<number>> {
-    return this._getArray(N_HALO, this.values);
-  }
-
-  public integrate() {
-    const velocity = this.velocity;
-    const nitems = this.nitems;
-    const values = this.values;
-    const fluxes = this.fluxes;
-    const dx = this.getDx();
-    const dt = this.getDt();
-    for (let i = N_HALO; i < nitems + N_HALO; i++) {
-      const isNegativeFlow = velocity < 0;
-      const localValues: [number, number, number, number, number] = isNegativeFlow
-        ? [values[i + 2], values[i + 1], values[i], values[i - 1], values[i - 2]]
-        : [values[i - 3], values[i - 2], values[i - 1], values[i], values[i + 1]];
-      fluxes[i] = velocity * computeCellFaceValue(localValues);
-    }
-    this.exchangeHalo(N_HALO, fluxes);
-    for (let i = N_HALO; i < nitems + N_HALO; i++) {
-      values[i] += ((fluxes[i] - fluxes[i + 1]) / dx) * dt;
-    }
-    this.exchangeHalo(N_HALO, values);
-  }
+  return result;
 }
 
 function computeCellFaceValue(localValues: [number, number, number, number, number]): number {
@@ -70,10 +37,43 @@ function computeCellFaceValue(localValues: [number, number, number, number, numb
   );
 }
 
-function computeInnerProduct(a: Readonly<Array<number>>, b: Readonly<Array<number>>): number {
-  let result = 0;
-  for (let i = 0; i < MAX_STENCIL_SIZE; i++) {
-    result += a[i] * b[i];
+export class WenoScheme extends BaseScheme {
+  public label = "WENO";
+  private values: Array<number>;
+  private fluxes: Array<number>;
+
+  public constructor(length: number, nitems: number) {
+    super(length, nitems);
+    const values = new Array<number>();
+    const fluxes = new Array<number>();
+    this.initializeValues(N_HALO, values);
+    this.exchangeHalo(N_HALO, values);
+    this.values = values;
+    this.fluxes = fluxes;
   }
-  return result;
+
+  public getArray(): Readonly<Array<number>> {
+    return this.getArrayInternal(N_HALO, this.values);
+  }
+
+  public integrate(): void {
+    const velocity = this.getVelocity();
+    const nitems = this.getNitems();
+    const values = this.values;
+    const fluxes = this.fluxes;
+    const dx = this.getDx();
+    const dt = this.getDt();
+    for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
+      const isNegativeFlow = velocity < 0;
+      const localValues: [number, number, number, number, number] = isNegativeFlow
+        ? [values[i + 2], values[i + 1], values[i], values[i - 1], values[i - 2]]
+        : [values[i - 3], values[i - 2], values[i - 1], values[i], values[i + 1]];
+      fluxes[i] = velocity * computeCellFaceValue(localValues);
+    }
+    this.exchangeHalo(N_HALO, fluxes);
+    for (let i = N_HALO; i < nitems + N_HALO; i += 1) {
+      values[i] += ((fluxes[i] - fluxes[i + 1]) / dx) * dt;
+    }
+    this.exchangeHalo(N_HALO, values);
+  }
 }
