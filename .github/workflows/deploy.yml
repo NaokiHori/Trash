@@ -17,41 +17,25 @@ jobs:
     permissions:
       contents: read
     env:
-      CONTAINER_APP_SERVICE: "app"
-      CONTAINER_DIST: "/project/dist"
-      CONTAINER_USER: "node"
-      HOST_DIST: "./dist"
+      ARTIFACT_BASE: "https://naokihori.github.io/Trash/"
+      ARTIFACT_DESTINATION: "./dist"
     steps:
-      - name: Setup GitHub Pages
-        id: configure_pages
-        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - name: Checkout repository
         uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
         with:
           persist-credentials: false
       - name: Build Docker image
-        run: docker compose build ${{ env.CONTAINER_APP_SERVICE }}
+        run: make build-image
       - name: Perform quality checks and build artifacts
         run: |
-          docker compose up -d ${{ env.CONTAINER_APP_SERVICE }}
-          # quality check
-          docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx tsc
-          docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx oxlint --type-aware -D correctness
-          docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx oxfmt --check
-          docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx vitest run
-          # build artifacts
-          docker compose exec -u "${{ env.CONTAINER_USER }}" ${{ env.CONTAINER_APP_SERVICE }} npx \
-            vite build \
-            --emptyOutDir \
-            --outDir=${{ env.CONTAINER_DIST }} \
-            --base=${{ steps.configure_pages.outputs.base_path }}
-          CONTAINER_ID=$(docker compose ps -q ${{ env.CONTAINER_APP_SERVICE }})
-          docker cp "${CONTAINER_ID}:${{ env.CONTAINER_DIST }}" "${{ env.HOST_DIST }}"
-          docker compose down
+          make polish
+          make build \
+            ARTIFACT_BASE=${{ env.ARTIFACT_BASE }} \
+            ARTIFACT_DESTINATION=${{ env.ARTIFACT_DESTINATION }}
       - name: Upload artifacts
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          path: ${{ env.HOST_DIST }}
+          path: ${{ env.ARTIFACT_DESTINATION }}
   deploy:
     name: Deploy
     needs: build
@@ -64,6 +48,9 @@ jobs:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Setup GitHub Pages
+        id: configure_pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128 # v5.0.0

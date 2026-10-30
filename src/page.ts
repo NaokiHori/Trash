@@ -1,18 +1,18 @@
-import sudokuAssistantIcon from "../SudokuAssistant/icon.jpg";
-import miniMazeIcon from "../MiniMaze/icon.jpg";
-import juliaSetViewerIcon from "../JuliaSetViewer/icon.jpg";
-import classifierIcon from "../Classifier/icon.jpg";
-import colorMapCheckerIcon from "../ColorMapChecker/icon.jpg";
-import delaynayIcon from "../Delaunay/icon.jpg";
-import advectionIcon from "../Advection/icon.jpg";
-import rouletteIcon from "../Roulette/icon.jpg";
-import cellularAutomatonIcon from "../CellularAutomaton/icon.jpg";
-import hifuIcon from "../HIFU/icon.jpg";
-import trussIcon from "../Truss/icon.jpg";
-import cartPoleIcon from "../CartPole/icon.jpg";
-import logoIcon from "../Logo/icon.jpg";
+import sudokuAssistantIcon from "../pages/SudokuAssistant/icon.jpg";
+import miniMazeIcon from "../pages/MiniMaze/icon.jpg";
+import juliaSetViewerIcon from "../pages/JuliaSetViewer/icon.jpg";
+import classifierIcon from "../pages/Classifier/icon.jpg";
+import colorMapCheckerIcon from "../pages/ColorMapChecker/icon.jpg";
+import delaynayIcon from "../pages/Delaunay/icon.jpg";
+import advectionIcon from "../pages/Advection/icon.jpg";
+import rouletteIcon from "../pages/Roulette/icon.jpg";
+import cellularAutomatonIcon from "../pages/CellularAutomaton/icon.jpg";
+import hifuIcon from "../pages/HIFU/icon.jpg";
+import trussIcon from "../pages/Truss/icon.jpg";
+import cartPoleIcon from "../pages/CartPole/icon.jpg";
+import logoIcon from "../pages/Logo/icon.jpg";
 
-const ROOT = ".";
+const ROOT = "pages";
 
 export class Page {
   private element: HTMLDivElement;

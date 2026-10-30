@@ -1,23 +1,8 @@
 FROM node:alpine
 
-WORKDIR /project
-RUN chown -R node:node /project
+RUN mkdir /app && chown node:node /app
 USER node
+WORKDIR /app
 
-RUN npm init -y --init-type=module
-RUN npm install --save-dev \
-  @types/node \
-  typescript \
-  oxfmt \
-  oxlint \
-  oxlint-tsgolint \
-  vite \
-  vitest
-RUN npm install --save-optional \
-  @typescript/typescript-linux-arm64
-
-WORKDIR /project/src
-
-EXPOSE 5173
-
-CMD ["npx", "vite", "--host"]
+COPY --chown=node:node tools/* .
+RUN npm install
