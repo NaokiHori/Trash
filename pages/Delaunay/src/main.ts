@@ -12,7 +12,7 @@ function drawTriangles(graph: Graph, triangles: Array<Triangle>) {
 }
 
 function setUpPoints(nitems: number, graph: Graph, points: Array<Point>, onComplete: () => void) {
-  const { width, height } = graph.size;
+  const { width, height } = graph.getSize();
   const margin = 0.02 * Math.min(width, height);
   const initPoint = (): Point => {
     const r = 0.5;
@@ -55,7 +55,7 @@ function triangulate(
       return;
     }
     triangulator.addPoint(points[iter]);
-    drawTriangles(graph, triangulator.triangles);
+    drawTriangles(graph, triangulator.getTriangles());
     requestAnimationFrame(() => {
       worker(iter + 1);
     });
@@ -69,37 +69,37 @@ function main() {
   const points = new Array<Point>();
   const triangulator = new Triangulator();
   const button = new Button("proceed-button");
-  button.textContent = "Start";
+  button.setTextContent("Start");
   button.onClick([
     (clickedButton: Button) => {
-      clickedButton.disabled = true;
-      clickedButton.textContent = "Setting points";
+      clickedButton.setDisabled(true);
+      clickedButton.setTextContent("Setting points");
       const onComplete = () => {
-        clickedButton.disabled = false;
-        clickedButton.textContent = "Start triangulaion";
+        clickedButton.setDisabled(false);
+        clickedButton.setTextContent("Start triangulaion");
       };
       setUpPoints(nitems, graph, points, onComplete);
     },
     (clickedButton: Button) => {
-      clickedButton.disabled = true;
-      clickedButton.textContent = "Triangulation in progress";
+      clickedButton.setDisabled(true);
+      clickedButton.setTextContent("Triangulation in progress");
       triangulator.setupAuxiliaryTriangle(points);
       const onComplete = () => {
         triangulator.removeAuxiliaryTriangle();
-        drawTriangles(graph, triangulator.triangles);
-        clickedButton.disabled = false;
-        clickedButton.textContent = "Reset";
+        drawTriangles(graph, triangulator.getTriangles());
+        clickedButton.setDisabled(false);
+        clickedButton.setTextContent("Reset");
       };
       triangulate(nitems, graph, points, triangulator, onComplete);
     },
     (clickedButton: Button) => {
-      clickedButton.disabled = true;
+      clickedButton.setDisabled(true);
       graph.resetCircles();
       graph.resetPolygons();
       points.length = 0;
       triangulator.reset();
-      clickedButton.disabled = false;
-      button.textContent = "Start";
+      clickedButton.setDisabled(false);
+      button.setTextContent("Start");
     },
   ]);
   window.addEventListener("resize", () => {

@@ -1,20 +1,20 @@
 import { Point, Edge, Triangle, twoPointsEqual, edgesOverlap } from "./types";
 
 export class Triangulator {
-  private _auxiliaryTriangle: Triangle | null;
-  public triangles: Array<Triangle>;
+  private auxiliaryTriangle: Triangle | null;
+  private triangles: Array<Triangle>;
 
   public constructor() {
     this.triangles = new Array<Triangle>();
-    this._auxiliaryTriangle = null;
+    this.auxiliaryTriangle = null;
   }
 
-  public reset() {
+  public reset(): void {
     this.triangles = new Array<Triangle>();
-    this._auxiliaryTriangle = null;
+    this.auxiliaryTriangle = null;
   }
 
-  public setupAuxiliaryTriangle(points: Array<Point>) {
+  public setupAuxiliaryTriangle(points: Array<Point>): void {
     const min: Point = {
       x: Number.MAX_VALUE,
       y: Number.MAX_VALUE,
@@ -48,12 +48,12 @@ export class Triangulator {
         y: middle.y - 100 * delta,
       },
     ];
-    this._auxiliaryTriangle = auxiliaryTriangle;
+    this.auxiliaryTriangle = auxiliaryTriangle;
     this.triangles.push(auxiliaryTriangle);
   }
 
-  public removeAuxiliaryTriangle() {
-    const auxiliaryTriangle = this._auxiliaryTriangle;
+  public removeAuxiliaryTriangle(): void {
+    const auxiliaryTriangle = this.auxiliaryTriangle;
     if (auxiliaryTriangle === null) {
       return;
     }
@@ -73,11 +73,15 @@ export class Triangulator {
     });
   }
 
-  public addPoint(point: Point) {
+  public addPoint(point: Point): void {
     const [goodTriangles, badTriangles] = findBadTriangles(point, this.triangles);
     const edges = findUniqueEdges(badTriangles);
     const newTriangles = createTriangles(point, edges);
     this.triangles = goodTriangles.concat(newTriangles);
+  }
+
+  public getTriangles(): Array<Triangle> {
+    return this.triangles;
   }
 }
 

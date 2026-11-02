@@ -4,7 +4,7 @@ export function getNitems(): number {
   const maxNitems = 4096;
   const urlParams = new URLSearchParams(window.location.search);
   const nitemsStr: string | null = urlParams.get("nitems");
-  if (!nitemsStr) {
+  if (nitemsStr === null) {
     return defaultNitems;
   }
   let nitems = Number(nitemsStr);

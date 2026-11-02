@@ -1,20 +1,23 @@
-import { getElementById } from "./dom";
+import { getElementByIdOrThrow } from "./dom";
 
 export class Button {
-  private _clickCounter: number;
-  private _element: HTMLButtonElement;
+  private clickCounter: number;
+  private element: HTMLButtonElement;
 
   public constructor(elementId: string) {
-    const element = getElementById(elementId) as HTMLButtonElement;
-    this._clickCounter = 0;
-    this._element = element;
+    const element = getElementByIdOrThrow(elementId);
+    if (!(element instanceof HTMLButtonElement)) {
+      throw new TypeError();
+    }
+    this.clickCounter = 0;
+    this.element = element;
   }
 
   public onClick(
     handlers: [(button: Button) => void, (button: Button) => void, (button: Button) => void],
-  ) {
-    this._element.addEventListener("click", () => {
-      const reminder = this._clickCounter % 3;
+  ): void {
+    this.element.addEventListener("click", () => {
+      const reminder = this.clickCounter % 3;
       if (0 === reminder) {
         handlers[0](this);
       } else if (1 === reminder) {
@@ -22,15 +25,15 @@ export class Button {
       } else {
         handlers[2](this);
       }
-      this._clickCounter += 1;
+      this.clickCounter += 1;
     });
   }
 
-  public set disabled(flag: boolean) {
-    this._element.disabled = flag;
+  public setDisabled(flag: boolean): void {
+    this.element.disabled = flag;
   }
 
-  public set textContent(textContent: string) {
-    this._element.textContent = textContent;
+  public setTextContent(textContent: string): void {
+    this.element.textContent = textContent;
   }
 }
