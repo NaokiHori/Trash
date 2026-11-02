@@ -1,7 +1,7 @@
 import { Position, Cell, BoardSize } from "./types";
 
 export class Drawer {
-  private _offScreenCanvas: HTMLCanvasElement;
+  private offScreenCanvas: HTMLCanvasElement;
 
   public constructor() {
     const canvas = document.createElement("canvas");
@@ -29,7 +29,7 @@ export class Drawer {
       }
     }
     ctx.putImageData(imageData, 0, 0);
-    this._offScreenCanvas = canvas;
+    this.offScreenCanvas = canvas;
   }
 
   public draw(
@@ -45,11 +45,9 @@ export class Drawer {
     goal: Position,
   ) {
     const N_HALO = 1;
-    const boardWidth: number = boardSize.width;
-    const boardHeight: number = boardSize.height;
-    const dx: number = screenSize[0] / (boardWidth + 2 * N_HALO);
-    const dy: number = screenSize[1] / (boardHeight + 2 * N_HALO);
-    ctx.drawImage(this._offScreenCanvas, 0, 0, screenSize[0], screenSize[1]);
+    const dx: number = screenSize[0] / (boardSize.width + 2 * N_HALO);
+    const dy: number = screenSize[1] / (boardSize.height + 2 * N_HALO);
+    ctx.drawImage(this.offScreenCanvas, 0, 0, screenSize[0], screenSize[1]);
     const drawRect = (row: number, column: number) => {
       const disps = [0.02 * dx, 0.02 * dy];
       ctx.fillRect(
@@ -59,54 +57,78 @@ export class Drawer {
         dy + 2 * disps[1],
       );
     };
-    // wall
-    {
-      ctx.fillStyle = "#000000";
-      for (let row = 0; row < boardHeight; row++) {
-        for (let column = 0; column < boardWidth; column++) {
-          if ("WALL" === board[row][column]) {
-            drawRect(row, column);
-          }
-        }
-      }
-      for (let row = -1; row < boardHeight + 1; row++) {
-        drawRect(row, -1);
-        drawRect(row, boardWidth);
-      }
-      for (let column = 0; column < boardWidth; column++) {
-        drawRect(-1, column);
-        drawRect(boardHeight, column);
-      }
-    }
-    // dead-end
-    {
-      ctx.fillStyle = "#444444";
-      for (let row = 0; row < boardHeight; row++) {
-        for (let column = 0; column < boardWidth; column++) {
-          if ("DEADEND" === board[row][column]) {
-            drawRect(row, column);
-          }
-        }
-      }
-    }
-    // trajectory
+    this.drawWalls(ctx, boardSize, board, drawRect);
+    this.drawDeadEnds(ctx, boardSize, board, drawRect);
     if (completeMaking && !isSolverInvoked) {
-      ctx.fillStyle = "#ffffff";
-      for (const point of trajectory) {
-        drawRect(point.y, point.x);
-      }
+      this.drawTrajectoryAndCursor(ctx, trajectory, cursor, drawRect);
     }
-    // cursor
-    if (completeMaking && !isSolverInvoked) {
-      ctx.fillStyle = "#ffffff";
-      drawRect(cursor.y, cursor.x);
-    }
-    // start and goal
     if (completeMaking) {
-      ctx.fillStyle = "#ffffff";
-      drawRect(start.y, start.x);
-      drawRect(goal.y, goal.x);
+      this.drawStartAndGoal(ctx, start, goal, drawRect);
     }
+  }
+
+  private drawWalls(
+    ctx: CanvasRenderingContext2D,
+    boardSize: BoardSize,
+    board: ReadonlyArray<ReadonlyArray<Cell>>,
+    drawRect: (row: number, column: number) => void,
+  ) {
+    ctx.fillStyle = "#000000";
+    for (let row = 0; row < boardSize.height; row++) {
+      for (let column = 0; column < boardSize.width; column++) {
+        if ("WALL" === board[row][column]) {
+          drawRect(row, column);
+        }
+      }
+    }
+    for (let row = -1; row < boardSize.height + 1; row++) {
+      drawRect(row, -1);
+      drawRect(row, boardSize.width);
+    }
+    for (let column = 0; column < boardSize.width; column++) {
+      drawRect(-1, column);
+      drawRect(boardSize.height, column);
+    }
+  }
+
+  private drawDeadEnds(
+    ctx: CanvasRenderingContext2D,
+    boardSize: BoardSize,
+    board: ReadonlyArray<ReadonlyArray<Cell>>,
+    drawRect: (row: number, column: number) => void,
+  ) {
+    ctx.fillStyle = "#444444";
+    for (let row = 0; row < boardSize.height; row++) {
+      for (let column = 0; column < boardSize.width; column++) {
+        if ("DEADEND" === board[row][column]) {
+          drawRect(row, column);
+        }
+      }
+    }
+  }
+
+  private drawTrajectoryAndCursor(
+    ctx: CanvasRenderingContext2D,
+    trajectory: ReadonlyArray<Position>,
+    cursor: Position,
+    drawRect: (row: number, column: number) => void,
+  ) {
+    ctx.fillStyle = "#ffffff";
+    for (const point of trajectory) {
+      drawRect(point.y, point.x);
+    }
+    drawRect(cursor.y, cursor.x);
+  }
+
+  private drawStartAndGoal(
+    ctx: CanvasRenderingContext2D,
+    start: Position,
+    goal: Position,
+    drawRect: (row: number, column: number) => void,
+  ) {
+    ctx.fillStyle = "#ffffff";
+    drawRect(start.y, start.x);
+    drawRect(goal.y, goal.x);
   }
 }
 
@@ -139,9 +161,8 @@ function getColor(boardSize: BoardSize, radiusVector: Position): [number, number
     return [min, ((240 - hue) / 60) * (max - min) + min, max];
   } else if (hue < 300) {
     return [((hue - 240) / 60) * (max - min) + min, min, max];
-  } else {
-    return [max, min, ((360 - hue) / 60) * (max - min) + min];
   }
+  return [max, min, ((360 - hue) / 60) * (max - min) + min];
 }
 
 function norm(position: Position): number {

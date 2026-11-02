@@ -6,10 +6,10 @@ interface WalkPattern {
 }
 
 export class Maker {
-  private _boardSize: BoardSize;
-  private _board: Array<Array<Cell>>;
-  private _isCompleted: boolean;
-  private _startingPointCandidates: Array<Position>;
+  private boardSize: BoardSize;
+  private board: Array<Array<Cell>>;
+  private isCompleted: boolean;
+  private startingPointCandidates: Array<Position>;
 
   public constructor(boardSize: BoardSize) {
     const board: Array<Array<Cell>> = Array.from({ length: boardSize.height }, () =>
@@ -24,10 +24,10 @@ export class Maker {
       }
     }
     board[startingPointCandidates[0].y][startingPointCandidates[0].x] = "ROAD";
-    this._boardSize = { ...boardSize };
-    this._board = board;
-    this._isCompleted = false;
-    this._startingPointCandidates = updateStartingPointCandidates(
+    this.boardSize = { ...boardSize };
+    this.board = board;
+    this.isCompleted = false;
+    this.startingPointCandidates = updateStartingPointCandidates(
       boardSize,
       board,
       startingPointCandidates,
@@ -35,12 +35,12 @@ export class Maker {
   }
 
   public updateBoard(): { isCompleted: boolean } {
-    const startingPointCandidates: Array<Position> = this._startingPointCandidates;
-    const boardSize: BoardSize = this._boardSize;
-    const board: ReadonlyArray<Array<Cell>> = this._board;
+    const startingPointCandidates: Array<Position> = this.startingPointCandidates;
+    const boardSize: BoardSize = this.boardSize;
+    const board: ReadonlyArray<Array<Cell>> = this.board;
     const position: Position | null = findStartingPoint(startingPointCandidates, boardSize, board);
     if (null === position) {
-      this._isCompleted = true;
+      this.isCompleted = true;
       return { isCompleted: true };
     }
     const walkPatterns: Array<WalkPattern> = this.getWalkPatterns();
@@ -53,26 +53,26 @@ export class Maker {
       }
       break randomWalk;
     }
-    this._startingPointCandidates = updateStartingPointCandidates(
+    this.startingPointCandidates = updateStartingPointCandidates(
       boardSize,
       board,
       startingPointCandidates,
     );
-    this._isCompleted = false;
+    this.isCompleted = false;
     return { isCompleted: false };
   }
 
-  public get board(): Array<Array<Cell>> {
-    return this._board;
+  public getBoard(): Array<Array<Cell>> {
+    return this.board;
   }
 
-  public get isCompleted(): boolean {
-    return this._isCompleted;
+  public getIsCompleted(): boolean {
+    return this.isCompleted;
   }
 
   private getWalkPatterns(): Array<WalkPattern> {
-    const boardSize = this._boardSize;
-    const board = this._board;
+    const boardSize = this.boardSize;
+    const board = this.board;
     return [
       {
         canWalk: (position: Position) => canAdvanceLeft(board, position),
@@ -116,7 +116,7 @@ function shuffle<T>(vec: Array<T>) {
 }
 
 function getEvenNumbers(maxValue: number) {
-  return [...Array(maxValue).keys()].filter((n: number) => n % 2 === 0);
+  return [...Array.from({ length: maxValue }).keys()].filter((n: number) => n % 2 === 0);
 }
 
 function findStartingPoint(

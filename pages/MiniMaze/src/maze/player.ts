@@ -1,14 +1,14 @@
 import { Cell, Direction, BoardSize, Position } from "./types";
 
 export class Player {
-  private _cursor: Position;
-  private _trajectory: Array<Position>;
+  private cursor: Position;
+  private trajectory: Array<Position>;
 
   public constructor() {
     const cursor: Position = { x: 0, y: 0 };
     const trajectory: Array<Position> = [{ ...cursor }];
-    this._cursor = cursor;
-    this._trajectory = trajectory;
+    this.cursor = cursor;
+    this.trajectory = trajectory;
   }
 
   public moveCursor(
@@ -16,8 +16,8 @@ export class Player {
     boardSize: BoardSize,
     board: ReadonlyArray<ReadonlyArray<Cell>>,
   ) {
-    const cursor: Position = this._cursor;
-    const trajectory: Array<Position> = this._trajectory;
+    const cursor: Position = this.cursor;
+    const trajectory: Array<Position> = this.trajectory;
     switch (direction) {
       case "DOWN":
         if (0 === cursor.y) return;
@@ -48,12 +48,12 @@ export class Player {
     }
   }
 
-  public get cursor(): Position {
-    return this._cursor;
+  public getCursor(): Position {
+    return this.cursor;
   }
 
-  public get trajectory(): ReadonlyArray<Position> {
-    return this._trajectory;
+  public getTrajectory(): ReadonlyArray<Position> {
+    return this.trajectory;
   }
 }
 

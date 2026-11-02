@@ -5,13 +5,13 @@ import { Solver } from "./maze/solver";
 import { Drawer } from "./maze/drawer";
 
 export class Maze {
-  private _boardSize: Readonly<BoardSize>;
-  private _maker: Maker;
-  private _player: Player;
-  private _solver: Solver;
-  private _drawer: Drawer;
-  private _start: Readonly<Position>;
-  private _goal: Readonly<Position>;
+  private boardSize: Readonly<BoardSize>;
+  private maker: Maker;
+  private player: Player;
+  private solver: Solver;
+  private drawer: Drawer;
+  private start: Readonly<Position>;
+  private goal: Readonly<Position>;
 
   public constructor(size: { width: number; height: number }) {
     const boardSize: BoardSize = decideBoardSize(size);
@@ -19,21 +19,21 @@ export class Maze {
     const player = new Player();
     const solver = new Solver();
     const drawer = new Drawer();
-    this._boardSize = boardSize;
-    this._maker = maker;
-    this._player = player;
-    this._solver = solver;
-    this._drawer = drawer;
-    this._start = { x: 0, y: 0 };
-    this._goal = { x: boardSize.width - 1, y: boardSize.height - 1 };
+    this.boardSize = boardSize;
+    this.maker = maker;
+    this.player = player;
+    this.solver = solver;
+    this.drawer = drawer;
+    this.start = { x: 0, y: 0 };
+    this.goal = { x: boardSize.width - 1, y: boardSize.height - 1 };
   }
 
   public make(): { isCompleted: boolean } {
-    return this._maker.updateBoard();
+    return this.maker.updateBoard();
   }
 
   public solve(): { isCompleted: boolean } {
-    return this._solver.solve(this._boardSize, this._maker.board, this._start, this._goal);
+    return this.solver.solve(this.boardSize, this.maker.getBoard(), this.start, this.goal);
   }
 
   public moveCursor(direction: Direction) {
@@ -41,23 +41,23 @@ export class Maze {
       console.log("Cannot play it until the making process has been completed");
       return;
     }
-    if (this._solver.isInvoked) {
+    if (this.solver.getIsInvoked()) {
       console.log("Solver has been invoked; cursor movements are not allowed");
       return;
     }
-    const boardSize: Readonly<BoardSize> = this._boardSize;
-    const board: ReadonlyArray<ReadonlyArray<Cell>> = this._maker.board;
-    this._player.moveCursor(direction, boardSize, board);
+    const boardSize: Readonly<BoardSize> = this.boardSize;
+    const board: ReadonlyArray<ReadonlyArray<Cell>> = this.maker.getBoard();
+    this.player.moveCursor(direction, boardSize, board);
   }
 
   public draw(ctx: CanvasRenderingContext2D, screenSize: [number, number]) {
     const completeMaking: boolean = this.completeMaking();
-    const isSolverInvoked: boolean = this._solver.isInvoked;
-    const boardSize: BoardSize = this._boardSize;
-    const board: ReadonlyArray<ReadonlyArray<Cell>> = this._maker.board;
-    const cursor: Position = this._player.cursor;
-    const trajectory: ReadonlyArray<Position> = this._player.trajectory;
-    this._drawer.draw(
+    const isSolverInvoked: boolean = this.solver.getIsInvoked();
+    const boardSize: BoardSize = this.boardSize;
+    const board: ReadonlyArray<ReadonlyArray<Cell>> = this.maker.getBoard();
+    const cursor: Position = this.player.getCursor();
+    const trajectory: ReadonlyArray<Position> = this.player.getTrajectory();
+    this.drawer.draw(
       ctx,
       screenSize,
       completeMaking,
@@ -66,13 +66,13 @@ export class Maze {
       board,
       cursor,
       trajectory,
-      this._start,
-      this._goal,
+      this.start,
+      this.goal,
     );
   }
 
   private completeMaking(): boolean {
-    return this._maker.isCompleted;
+    return this.maker.getIsCompleted();
   }
 }
 

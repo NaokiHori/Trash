@@ -5,125 +5,8 @@ interface WalkPattern {
   readonly walk: (position: Readonly<Position>) => void;
 }
 
-export class Solver {
-  private _isInvoked: boolean;
-
-  public constructor() {
-    this._isInvoked = false;
-  }
-
-  public solve(
-    boardSize: Readonly<BoardSize>,
-    board: ReadonlyArray<Array<Cell>>,
-    start: Readonly<Position>,
-    goal: Readonly<Position>,
-  ): { isCompleted: boolean } {
-    this._isInvoked = true;
-    const position: Position | null = findStartingPoint(boardSize, board, start, goal);
-    if (null === position) {
-      return { isCompleted: true };
-    }
-    board[position.y][position.x] = "DEADEND";
-    const walkPatterns: ReadonlyArray<Readonly<WalkPattern>> = this.getWalkPatterns(
-      boardSize,
-      board,
-      start,
-      goal,
-    );
-    randomWalk: for (;;) {
-      for (const walkPattern of walkPatterns) {
-        if (walkPattern.canWalk(position)) {
-          walkPattern.walk(position);
-          continue randomWalk;
-        }
-      }
-      break randomWalk;
-    }
-    return { isCompleted: false };
-  }
-
-  public get isInvoked(): boolean {
-    return this._isInvoked;
-  }
-
-  private getWalkPatterns(
-    boardSize: Readonly<BoardSize>,
-    board: ReadonlyArray<Array<Cell>>,
-    start: Readonly<Position>,
-    goal: Readonly<Position>,
-  ): Array<WalkPattern> {
-    return [
-      {
-        canWalk: (position: Position) => {
-          const isAtLeftBound: boolean = 0 === position.x;
-          const newPosition: Position = {
-            x: position.x - 1,
-            y: position.y,
-          };
-          return !isAtLeftBound && isDeadEnd(boardSize, board, start, goal, newPosition);
-        },
-        walk: (position: Position) => {
-          board[position.y][--position.x] = "DEADEND";
-        },
-      },
-      {
-        canWalk: (position: Position) => {
-          const isAtRightBound: boolean = boardSize.width - 1 === position.x;
-          const newPosition: Position = {
-            x: position.x + 1,
-            y: position.y,
-          };
-          return !isAtRightBound && isDeadEnd(boardSize, board, start, goal, newPosition);
-        },
-        walk: (position: Position) => {
-          board[position.y][++position.x] = "DEADEND";
-        },
-      },
-      {
-        canWalk: (position: Position) => {
-          const isAtBottomBound: boolean = 0 === position.y;
-          const newPosition: Position = {
-            x: position.x,
-            y: position.y - 1,
-          };
-          return !isAtBottomBound && isDeadEnd(boardSize, board, start, goal, newPosition);
-        },
-        walk: (position: Position) => {
-          board[--position.y][position.x] = "DEADEND";
-        },
-      },
-      {
-        canWalk: (position: Position) => {
-          const isAtTopBound: boolean = boardSize.height - 1 === position.y;
-          const newPosition: Position = {
-            x: position.x,
-            y: position.y + 1,
-          };
-          return !isAtTopBound && isDeadEnd(boardSize, board, start, goal, newPosition);
-        },
-        walk: (position: Position) => {
-          board[++position.y][position.x] = "DEADEND";
-        },
-      },
-    ];
-  }
-}
-
-function findStartingPoint(
-  boardSize: Readonly<BoardSize>,
-  board: ReadonlyArray<ReadonlyArray<Cell>>,
-  start: Readonly<Position>,
-  goal: Readonly<Position>,
-): Position | null {
-  for (let row = 0; row < boardSize.height; row++) {
-    for (let column = 0; column < boardSize.width; column++) {
-      const position: Readonly<Position> = { x: column, y: row };
-      if (isDeadEnd(boardSize, board, start, goal, position)) {
-        return position;
-      }
-    }
-  }
-  return null;
+function isClosed(cell: Readonly<Cell>): boolean {
+  return "WALL" === cell || "DEADEND" === cell;
 }
 
 function isDeadEnd(
@@ -159,6 +42,104 @@ function isDeadEnd(
   return 3 === criteria.filter(Boolean).length;
 }
 
-function isClosed(cell: Readonly<Cell>): boolean {
-  return "WALL" === cell || "DEADEND" === cell;
+function findStartingPoint(
+  boardSize: Readonly<BoardSize>,
+  board: ReadonlyArray<ReadonlyArray<Cell>>,
+  start: Readonly<Position>,
+  goal: Readonly<Position>,
+): Position | null {
+  for (let row = 0; row < boardSize.height; row++) {
+    for (let column = 0; column < boardSize.width; column++) {
+      const position: Readonly<Position> = { x: column, y: row };
+      if (isDeadEnd(boardSize, board, start, goal, position)) {
+        return position;
+      }
+    }
+  }
+  return null;
+}
+
+export class Solver {
+  private isInvoked: boolean;
+
+  public constructor() {
+    this.isInvoked = false;
+  }
+
+  public solve(
+    boardSize: Readonly<BoardSize>,
+    board: ReadonlyArray<Array<Cell>>,
+    start: Readonly<Position>,
+    goal: Readonly<Position>,
+  ): { isCompleted: boolean } {
+    this.isInvoked = true;
+    const position: Position | null = findStartingPoint(boardSize, board, start, goal);
+    if (null === position) {
+      return { isCompleted: true };
+    }
+    board[position.y][position.x] = "DEADEND";
+    const walkPatterns: ReadonlyArray<Readonly<WalkPattern>> = this.getWalkPatterns(
+      boardSize,
+      board,
+      start,
+      goal,
+    );
+    randomWalk: for (;;) {
+      for (const walkPattern of walkPatterns) {
+        if (walkPattern.canWalk(position)) {
+          walkPattern.walk(position);
+          continue randomWalk;
+        }
+      }
+      break randomWalk;
+    }
+    return { isCompleted: false };
+  }
+
+  public getIsInvoked(): boolean {
+    return this.isInvoked;
+  }
+
+  private getWalkPatterns(
+    boardSize: Readonly<BoardSize>,
+    board: ReadonlyArray<Array<Cell>>,
+    start: Readonly<Position>,
+    goal: Readonly<Position>,
+  ): Array<WalkPattern> {
+    const directions = [
+      {
+        dx: -1,
+        dy: 0,
+        isOutOfBounds: (position: Position) => position.x === 0,
+        move: (position: Position) => --position.x,
+      },
+      {
+        dx: 1,
+        dy: 0,
+        isOutOfBounds: (position: Position) => position.x === boardSize.width - 1,
+        move: (position: Position) => ++position.x,
+      },
+      {
+        dx: 0,
+        dy: -1,
+        isOutOfBounds: (position: Position) => position.y === 0,
+        move: (position: Position) => --position.y,
+      },
+      {
+        dx: 0,
+        dy: 1,
+        isOutOfBounds: (position: Position) => position.y === boardSize.height - 1,
+        move: (position: Position) => ++position.y,
+      },
+    ];
+    return directions.map(({ dx, dy, isOutOfBounds, move }) => ({
+      canWalk: (position: Position) =>
+        !isOutOfBounds(position) &&
+        isDeadEnd(boardSize, board, start, goal, { x: position.x + dx, y: position.y + dy }),
+      walk: (position: Position) => {
+        move(position);
+        board[position.y][position.x] = "DEADEND";
+      },
+    }));
+  }
 }
