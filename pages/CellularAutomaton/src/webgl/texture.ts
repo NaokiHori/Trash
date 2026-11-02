@@ -1,27 +1,27 @@
 const TEXTURE_TARGET: GLenum = WebGL2RenderingContext.TEXTURE_2D;
 
 export class Texture {
-  private _gl: WebGL2RenderingContext;
-  private _webGLTexture: WebGLTexture;
+  private gl: WebGL2RenderingContext;
+  private webGLTexture: WebGLTexture;
 
   public constructor({ gl }: { gl: WebGL2RenderingContext }) {
     const webGLTexture: WebGLTexture = gl.createTexture();
-    this._gl = gl;
-    this._webGLTexture = webGLTexture;
+    this.gl = gl;
+    this.webGLTexture = webGLTexture;
   }
 
-  public bindAndExecute(callback: (boundTexture: Texture) => void) {
-    const webGLTexture = this._webGLTexture;
-    this._gl.bindTexture(TEXTURE_TARGET, webGLTexture);
+  public bindAndExecute(callback: (boundTexture: Texture) => void): void {
+    const webGLTexture = this.webGLTexture;
+    this.gl.bindTexture(TEXTURE_TARGET, webGLTexture);
     callback(this);
-    this._gl.bindTexture(TEXTURE_TARGET, null);
+    this.gl.bindTexture(TEXTURE_TARGET, null);
   }
 
-  public get target(): GLenum {
+  public getTarget(): GLenum {
     return TEXTURE_TARGET;
   }
 
-  public get webGLTexture(): WebGLTexture {
-    return this._webGLTexture;
+  public getWebGLTexture(): WebGLTexture {
+    return this.webGLTexture;
   }
 }

@@ -34,12 +34,12 @@ function setupRectangleDomain(
 }
 
 export class CellularAutomaton {
-  private _gl: WebGL2RenderingContext;
-  private _program: Program;
-  private _pingPongBuffers: PingPongBuffers;
-  private _indexBufferObject: IndexBufferObject;
-  private _width: number;
-  private _height: number;
+  private gl: WebGL2RenderingContext;
+  private program: Program;
+  private pingPongBuffers: PingPongBuffers;
+  private indexBufferObject: IndexBufferObject;
+  private width: number;
+  private height: number;
 
   public constructor(canvas: HTMLCanvasElement) {
     const gl: WebGL2RenderingContext = getWebGL2RenderingContext({
@@ -72,19 +72,19 @@ export class CellularAutomaton {
       pingPongBuffers.setData(data);
     })();
     const indexBufferObject = setupRectangleDomain(gl, program, width / height);
-    this._gl = gl;
-    this._program = program;
-    this._pingPongBuffers = pingPongBuffers;
-    this._indexBufferObject = indexBufferObject;
-    this._width = width;
-    this._height = height;
+    this.gl = gl;
+    this.program = program;
+    this.pingPongBuffers = pingPongBuffers;
+    this.indexBufferObject = indexBufferObject;
+    this.width = width;
+    this.height = height;
   }
 
   public handleResizeEvent(canvas: HTMLCanvasElement) {
     const canvasWidth: number = canvas.width;
     const canvasHeight: number = canvas.height;
-    const scalarWidth = this._width;
-    const scalarHeight = this._height;
+    const scalarWidth = this.width;
+    const scalarHeight = this.height;
     const scale = (function computeScale() {
       const canvasAspectRatio: number = canvasWidth / canvasHeight;
       const scalarAspectRatio: number = scalarWidth / scalarHeight;
@@ -92,7 +92,7 @@ export class CellularAutomaton {
         ? [1 / scalarAspectRatio, canvasAspectRatio / scalarAspectRatio]
         : [1 / canvasAspectRatio, 1];
     })();
-    this._program.setUniform({
+    this.program.setUniform({
       dataType: "FLOAT32",
       uniformName: "u_scale",
       data: scale,
@@ -100,16 +100,16 @@ export class CellularAutomaton {
   }
 
   public update() {
-    this._pingPongBuffers.update();
+    this.pingPongBuffers.update();
   }
 
   public draw(canvas: HTMLCanvasElement) {
-    const gl = this._gl;
-    const pingPongBuffer = this._pingPongBuffers.getCurrentBuffer();
+    const gl = this.gl;
+    const pingPongBuffer = this.pingPongBuffers.getCurrentBuffer();
     gl.viewport(0, 0, canvas.width, canvas.height);
-    this._program.use(() => {
-      pingPongBuffer.texture.bindAndExecute(() => {
-        this._indexBufferObject.bindAndDraw(gl.TRIANGLES);
+    this.program.use(() => {
+      pingPongBuffer.getTexture().bindAndExecute(() => {
+        this.indexBufferObject.bindAndDraw(gl.TRIANGLES);
       });
     });
   }

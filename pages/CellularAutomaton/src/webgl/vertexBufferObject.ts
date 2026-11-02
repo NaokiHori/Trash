@@ -3,10 +3,10 @@ import { VertexAttribute } from "./vertexAttribute";
 const BUFFER_TARGET: GLenum = WebGL2RenderingContext.ARRAY_BUFFER;
 
 export class VertexBufferObject {
-  private _gl: WebGL2RenderingContext;
-  private _buffer: WebGLBuffer;
-  private _numberOfVertices: number;
-  private _numberOfItemsForEachVertex: number;
+  private gl: WebGL2RenderingContext;
+  private buffer: WebGLBuffer;
+  private numberOfVertices: number;
+  private numberOfItemsForEachVertex: number;
 
   public constructor({
     gl,
@@ -20,22 +20,22 @@ export class VertexBufferObject {
     usage: GLenum;
   }) {
     const buffer: WebGLBuffer = gl.createBuffer();
-    this._gl = gl;
-    this._buffer = buffer;
-    // TODO: assuming Float32Array buffer
+    this.gl = gl;
+    this.buffer = buffer;
+    // NOTE: assuming Float32Array buffer
     const size: GLsizeiptr =
       Float32Array.BYTES_PER_ELEMENT * numberOfVertices * numberOfItemsForEachVertex;
     this.bindAndExecute(() => {
       gl.bufferData(BUFFER_TARGET, size, usage);
     });
-    this._numberOfVertices = numberOfVertices;
-    this._numberOfItemsForEachVertex = numberOfItemsForEachVertex;
+    this.numberOfVertices = numberOfVertices;
+    this.numberOfItemsForEachVertex = numberOfItemsForEachVertex;
   }
 
-  public bindAndUpdateData(data: Float32Array) {
-    const gl = this._gl;
+  public bindAndUpdateData(data: Float32Array): void {
+    const gl = this.gl;
     this.bindAndExecute(() => {
-      const expectedLength: number = this._numberOfVertices * this._numberOfItemsForEachVertex;
+      const expectedLength: number = this.numberOfVertices * this.numberOfItemsForEachVertex;
       if (data.length !== expectedLength) {
         throw new Error(
           `data length ${data.length.toString()} does not agree with an expected value ${expectedLength.toString()}`,
@@ -45,49 +45,47 @@ export class VertexBufferObject {
     });
   }
 
-  public bindAndDraw(mode: GLenum) {
+  public bindAndDraw(mode: GLenum): void {
     this.bindAndExecute(() => {
-      this._gl.drawArrays(mode, 0, this._numberOfVertices);
+      this.gl.drawArrays(mode, 0, this.numberOfVertices);
     });
   }
 
-  public bindAndBindVertexAttribute(vertexAttribute: VertexAttribute, size: GLint) {
-    const gl = this._gl;
+  public bindAndBindVertexAttribute(vertexAttribute: VertexAttribute, size: GLint): void {
+    const gl = this.gl;
     this.bindAndExecute(() => {
-      const attributeIndex = vertexAttribute.attributeIndex;
-      // TODO: for now the data is assumed to be a Float32Array buffer
+      const attributeIndex = vertexAttribute.getAttributeIndex();
+      // NOTE: assuming Float32Array buffer
       const type: GLenum = gl.FLOAT;
-      // TODO: for type = gl.FLOAT, this parameter has no effect
+      // NOTE: for type = gl.FLOAT, this parameter has no effect
       const normalized = false;
-      // TODO: assuming the data is tightly packed
+      // NOTE: assuming the data is tightly packed
       const stride: GLsizei = 0;
-      // TODO: assuming the buffer points to the first item
+      // NOTE: assuming the buffer points to the first item
       const offset: GLintptr = 0;
       gl.vertexAttribPointer(attributeIndex, size, type, normalized, stride, offset);
     });
   }
 
-  public get buffer(): WebGLBuffer {
-    return this._buffer;
-  }
-
-  public get numberOfItemsForEachVertex(): number {
-    return this._numberOfItemsForEachVertex;
-  }
-
-  private bindAndExecute(callback: () => void) {
-    const gl = this._gl;
+  private bindAndExecute(callback: () => void): void {
+    const gl = this.gl;
     const currentlyBoundBuffer: WebGLBuffer | null = getCurrentlyBoundBuffer(gl);
     if (currentlyBoundBuffer !== null) {
       throw new Error(`Trying to bind a buffer with another buffer bound`);
     }
-    gl.bindBuffer(BUFFER_TARGET, this._buffer);
+    gl.bindBuffer(BUFFER_TARGET, this.buffer);
     callback();
     gl.bindBuffer(BUFFER_TARGET, null);
   }
 }
 
 function getCurrentlyBoundBuffer(gl: WebGL2RenderingContext): WebGLBuffer | null {
-  // NOTE: gl.getParameter inherently returns any-typed variable
-  return gl.getParameter(gl.ARRAY_BUFFER_BINDING) as WebGLBuffer | null;
+  const parameter: unknown = gl.getParameter(gl.ARRAY_BUFFER_BINDING);
+  if (parameter instanceof WebGLBuffer) {
+    return parameter;
+  }
+  if (parameter === null) {
+    return null;
+  }
+  throw new TypeError();
 }

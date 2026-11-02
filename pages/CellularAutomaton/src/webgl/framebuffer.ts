@@ -1,21 +1,21 @@
 export const FRAMEBUFFER_TARGET: GLenum = WebGL2RenderingContext.FRAMEBUFFER;
 
 export class Framebuffer {
-  private _gl: WebGL2RenderingContext;
-  private _webGLFramebuffer: WebGLFramebuffer;
+  private gl: WebGL2RenderingContext;
+  private webGLFramebuffer: WebGLFramebuffer;
 
-  constructor({ gl }: { gl: WebGL2RenderingContext }) {
-    this._webGLFramebuffer = gl.createFramebuffer();
-    this._gl = gl;
+  public constructor({ gl }: { gl: WebGL2RenderingContext }) {
+    this.webGLFramebuffer = gl.createFramebuffer();
+    this.gl = gl;
   }
 
-  public bindAndExecute(callback: (boundFramebuffer: Framebuffer) => void) {
-    this._gl.bindFramebuffer(FRAMEBUFFER_TARGET, this._webGLFramebuffer);
+  public bindAndExecute(callback: (boundFramebuffer: Framebuffer) => void): void {
+    this.gl.bindFramebuffer(FRAMEBUFFER_TARGET, this.webGLFramebuffer);
     callback(this);
-    this._gl.bindFramebuffer(FRAMEBUFFER_TARGET, null);
+    this.gl.bindFramebuffer(FRAMEBUFFER_TARGET, null);
   }
 
-  public get target(): GLenum {
+  public getTarget(): GLenum {
     return FRAMEBUFFER_TARGET;
   }
 }

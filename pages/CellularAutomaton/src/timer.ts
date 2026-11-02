@@ -1,23 +1,23 @@
 export class Timer {
-  _increment: number;
-  _startAt: number;
-  _onTimerReset: () => void;
+  increment: number;
+  startAt: number;
+  onTimerReset: () => void;
 
-  constructor(increment: number, onTimerReset: () => void) {
-    this._increment = increment;
-    this._startAt = 0;
-    this._onTimerReset = onTimerReset;
+  public constructor(increment: number, onTimerReset: () => void) {
+    this.increment = increment;
+    this.startAt = 0;
+    this.onTimerReset = onTimerReset;
   }
 
-  public start() {
-    this._startAt = performance.now();
+  public start(): void {
+    this.startAt = performance.now();
   }
 
-  public update() {
+  public update(): void {
     const now = performance.now();
-    if (this._increment < now - this._startAt) {
-      this._onTimerReset();
-      this._startAt = now;
+    if (this.increment < now - this.startAt) {
+      this.onTimerReset();
+      this.startAt = now;
     }
   }
 }

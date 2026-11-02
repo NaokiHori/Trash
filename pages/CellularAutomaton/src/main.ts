@@ -9,11 +9,14 @@ function handleResizeEvent(canvas: HTMLCanvasElement) {
 
 function getCanvas(): HTMLCanvasElement {
   const id = "field";
-  const canvas = document.getElementById(id);
+  const canvas = document.querySelector(`#${id}`);
   if (null === canvas) {
     throw new Error(`failed to get element ${id}`);
   }
-  return canvas as HTMLCanvasElement;
+  if (!(canvas instanceof HTMLCanvasElement)) {
+    throw new TypeError();
+  }
+  return canvas;
 }
 
 function draw(timer: Timer) {

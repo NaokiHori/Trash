@@ -1,5 +1,5 @@
 export class VertexAttribute {
-  private _attributeIndex: GLuint;
+  private attributeIndex: GLuint;
 
   public constructor({
     gl,
@@ -16,10 +16,10 @@ export class VertexAttribute {
     }
     // NOTE: enable on creating it
     gl.enableVertexAttribArray(attributeIndex);
-    this._attributeIndex = attributeIndex;
+    this.attributeIndex = attributeIndex;
   }
 
-  public get attributeIndex(): GLuint {
-    return this._attributeIndex;
+  public getAttributeIndex(): GLuint {
+    return this.attributeIndex;
   }
 }

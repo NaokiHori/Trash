@@ -1,10 +1,10 @@
 const BUFFER_TARGET: GLenum = WebGL2RenderingContext.ELEMENT_ARRAY_BUFFER;
 
 export class IndexBufferObject {
-  private _gl: WebGL2RenderingContext;
-  private _buffer: WebGLBuffer;
-  private _size: GLsizeiptr;
-  private _usage: GLenum;
+  private gl: WebGL2RenderingContext;
+  private buffer: WebGLBuffer;
+  private size: GLsizeiptr;
+  private usage: GLenum;
 
   public constructor({
     gl,
@@ -16,20 +16,20 @@ export class IndexBufferObject {
     usage: GLenum;
   }) {
     const buffer: WebGLBuffer = gl.createBuffer();
-    this._gl = gl;
-    this._buffer = buffer;
+    this.gl = gl;
+    this.buffer = buffer;
     this.bindAndExecute(() => {
       gl.bufferData(BUFFER_TARGET, size, usage);
     });
-    this._size = size;
-    this._usage = usage;
+    this.size = size;
+    this.usage = usage;
   }
 
-  public bindAndUpdateData(data: Int16Array) {
-    const gl = this._gl;
+  public bindAndUpdateData(data: Int16Array): void {
+    const gl = this.gl;
     this.bindAndExecute(() => {
-      const size: GLsizeiptr = this._size;
-      const usage: GLenum = this._usage;
+      const size: GLsizeiptr = this.size;
+      const usage: GLenum = this.usage;
       if (size !== data.length) {
         throw new Error(
           `Allocated size (${size.toString()}) does not match with the source data size: ${data.length.toString()}`,
@@ -39,17 +39,17 @@ export class IndexBufferObject {
     });
   }
 
-  public bindAndDraw(mode: GLenum) {
-    const gl = this._gl;
+  public bindAndDraw(mode: GLenum): void {
+    const gl = this.gl;
     this.bindAndExecute(() => {
-      const size: GLsizeiptr = this._size;
+      const size: GLsizeiptr = this.size;
       gl.drawElements(mode, size, gl.UNSIGNED_SHORT, 0);
     });
   }
 
-  private bindAndExecute(callback: () => void) {
-    const gl = this._gl;
-    gl.bindBuffer(BUFFER_TARGET, this._buffer);
+  private bindAndExecute(callback: () => void): void {
+    const gl = this.gl;
+    gl.bindBuffer(BUFFER_TARGET, this.buffer);
     callback();
     gl.bindBuffer(BUFFER_TARGET, null);
   }

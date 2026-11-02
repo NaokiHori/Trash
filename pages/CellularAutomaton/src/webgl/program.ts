@@ -15,7 +15,7 @@ function initShader(
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
   // check if shader being successfully compiled
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+  if (gl.getShaderParameter(shader, gl.COMPILE_STATUS) !== true) {
     const info: string = gl.getShaderInfoLog(shader) ?? "unknown message";
     gl.deleteShader(shader);
     throw new Error(`gl.compileShader failed: ${info}`);
@@ -24,8 +24,8 @@ function initShader(
 }
 
 export class Program {
-  private _gl: WebGL2RenderingContext;
-  private _webGLProgram: WebGLProgram;
+  private gl: WebGL2RenderingContext;
+  private webGLProgram: WebGLProgram;
 
   public constructor({
     gl,
@@ -42,19 +42,19 @@ export class Program {
     gl.attachShader(webGLProgram, vertexShader);
     gl.attachShader(webGLProgram, fragmentShader);
     gl.linkProgram(webGLProgram);
-    if (!gl.getProgramParameter(webGLProgram, gl.LINK_STATUS)) {
+    if (gl.getProgramParameter(webGLProgram, gl.LINK_STATUS) !== true) {
       const info: string = gl.getProgramInfoLog(webGLProgram) ?? "unknown message";
       gl.deleteProgram(webGLProgram);
       throw new Error(`Failed to link program: ${info}`);
     }
-    this._gl = gl;
-    this._webGLProgram = webGLProgram;
+    this.gl = gl;
+    this.webGLProgram = webGLProgram;
   }
 
   public use<T>(callback: (webGLProgram: WebGLProgram) => T): T {
-    this._gl.useProgram(this._webGLProgram);
-    const resultOfCallback: T = callback(this._webGLProgram);
-    this._gl.useProgram(null);
+    this.gl.useProgram(this.webGLProgram);
+    const resultOfCallback: T = callback(this.webGLProgram);
+    this.gl.useProgram(null);
     return resultOfCallback;
   }
 
@@ -68,7 +68,7 @@ export class Program {
     data: Array<number>;
   }) {
     this.use((webGLProgram: WebGLProgram) => {
-      const location: WebGLUniformLocation | null = this._gl.getUniformLocation(
+      const location: WebGLUniformLocation | null = this.gl.getUniformLocation(
         webGLProgram,
         uniformName,
       );
@@ -79,26 +79,26 @@ export class Program {
       if (dataType === "FLOAT32") {
         const typedData = new Float32Array(data);
         if (nitems === 1) {
-          this._gl.uniform1fv(location, typedData);
+          this.gl.uniform1fv(location, typedData);
         } else if (nitems === 2) {
-          this._gl.uniform2fv(location, typedData);
+          this.gl.uniform2fv(location, typedData);
         } else if (nitems === 3) {
-          this._gl.uniform3fv(location, typedData);
+          this.gl.uniform3fv(location, typedData);
         } else if (nitems === 4) {
-          this._gl.uniform4fv(location, typedData);
+          this.gl.uniform4fv(location, typedData);
         } else {
           throwInvalidNumberOfItemsException(nitems);
         }
       } else if (dataType === "INT32") {
         const typedData = new Int32Array(data);
         if (nitems === 1) {
-          this._gl.uniform1iv(location, typedData);
+          this.gl.uniform1iv(location, typedData);
         } else if (nitems === 2) {
-          this._gl.uniform2iv(location, typedData);
+          this.gl.uniform2iv(location, typedData);
         } else if (nitems === 3) {
-          this._gl.uniform3iv(location, typedData);
+          this.gl.uniform3iv(location, typedData);
         } else if (nitems === 4) {
-          this._gl.uniform4iv(location, typedData);
+          this.gl.uniform4iv(location, typedData);
         } else {
           throwInvalidNumberOfItemsException(nitems);
         }
@@ -122,11 +122,11 @@ export class Program {
     attributeName: string;
     numberOfVertices: number;
     numberOfItemsForEachVertex: number;
-    // TODO: for now assuming float32 buffer
+    // NOTE: assuming float32 buffer
     data: Float32Array;
   }): VertexBufferObject {
-    const gl = this._gl;
-    const webGLProgram = this._webGLProgram;
+    const gl = this.gl;
+    const webGLProgram = this.webGLProgram;
     const vertexBufferObject = new VertexBufferObject({
       gl,
       numberOfVertices,

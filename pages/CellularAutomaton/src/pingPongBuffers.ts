@@ -1,68 +1,19 @@
-import { Framebuffer } from "./webgl/framebuffer";
 import { Program } from "./webgl/program";
 import { Texture } from "./webgl/texture";
 import { VertexBufferObject } from "./webgl/vertexBufferObject";
+import { PingPongBuffer } from "./pingPongBuffers/pingPongBuffer";
+import { TEXTURE_CONFIG } from "./pingPongBuffers/textureConfig";
 import vertexShaderSource from "../shader/calculate.vs.glsl?raw";
 import fragmentShaderSource from "../shader/calculate.fs.glsl?raw";
 
-const TEXTURE_CONFIG = {
-  internalFormat: WebGL2RenderingContext.RGBA8UI,
-  format: WebGL2RenderingContext.RGBA_INTEGER,
-  type: WebGL2RenderingContext.UNSIGNED_BYTE,
-};
-
-class PingPongBuffer {
-  private _framebuffer: Framebuffer;
-  private _texture: Texture;
-
-  constructor(gl: WebGL2RenderingContext, program: Program, width: number, height: number) {
-    const { framebuffer, texture } = program.use(() => {
-      const framebuffer = new Framebuffer({ gl });
-      const texture = new Texture({ gl });
-      texture.bindAndExecute((boundTexture: Texture) => {
-        const target = boundTexture.target;
-        gl.texStorage2D(target, 1, TEXTURE_CONFIG.internalFormat, width, height);
-        gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-        gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-      });
-      framebuffer.bindAndExecute((boundFramebuffer: Framebuffer) => {
-        const attachment: GLenum = gl.COLOR_ATTACHMENT0;
-        const level: GLint = 0;
-        gl.framebufferTexture2D(
-          boundFramebuffer.target,
-          attachment,
-          texture.target,
-          texture.webGLTexture,
-          level,
-        );
-      });
-      const framebufferStatus: GLenum = gl.checkFramebufferStatus(framebuffer.target);
-      if (gl.FRAMEBUFFER_COMPLETE !== framebufferStatus) {
-        throw new Error(`Failed to create a framebuffer: ${framebufferStatus.toString()}`);
-      }
-      return { framebuffer, texture };
-    });
-    this._framebuffer = framebuffer;
-    this._texture = texture;
-  }
-
-  public get framebuffer(): Framebuffer {
-    return this._framebuffer;
-  }
-
-  public get texture(): Texture {
-    return this._texture;
-  }
-}
-
 export class PingPongBuffers {
-  private _gl: WebGL2RenderingContext;
-  private _program: Program;
-  private _buffers: [PingPongBuffer, PingPongBuffer];
-  private _isFlipped: boolean;
-  private _vertexBufferObject: VertexBufferObject;
-  private _width: number;
-  private _height: number;
+  private gl: WebGL2RenderingContext;
+  private program: Program;
+  private buffers: [PingPongBuffer, PingPongBuffer];
+  private isFlipped: boolean;
+  private vertexBufferObject: VertexBufferObject;
+  private width: number;
+  private height: number;
 
   constructor(gl: WebGL2RenderingContext, width: number, height: number) {
     const program = new Program({
@@ -88,28 +39,28 @@ export class PingPongBuffers {
       numberOfItemsForEachVertex,
       data: new Float32Array(numberOfVertices * numberOfItemsForEachVertex),
     });
-    this._gl = gl;
-    this._program = program;
-    this._buffers = buffers;
-    this._isFlipped = false;
-    this._vertexBufferObject = vertexBufferObject;
-    this._width = width;
-    this._height = height;
+    this.gl = gl;
+    this.program = program;
+    this.buffers = buffers;
+    this.isFlipped = false;
+    this.vertexBufferObject = vertexBufferObject;
+    this.width = width;
+    this.height = height;
   }
 
   public setData(data: Uint8Array) {
-    const gl = this._gl;
-    const framebuffer = this._buffers[0].framebuffer;
-    const texture = this._buffers[0].texture;
+    const gl = this.gl;
+    const framebuffer = this.buffers[0].getFramebuffer();
+    const texture = this.buffers[0].getTexture();
     framebuffer.bindAndExecute(() => {
       texture.bindAndExecute((boundTexture: Texture) => {
         gl.texSubImage2D(
-          boundTexture.target,
+          boundTexture.getTarget(),
           0,
           0,
           0,
-          this._width,
-          this._height,
+          this.width,
+          this.height,
           TEXTURE_CONFIG.format,
           TEXTURE_CONFIG.type,
           data,
@@ -119,24 +70,24 @@ export class PingPongBuffers {
   }
 
   public update() {
-    const gl = this._gl;
-    const buffers = this._buffers;
-    const isFlipped: boolean = this._isFlipped;
+    const gl = this.gl;
+    const buffers = this.buffers;
+    const isFlipped: boolean = this.isFlipped;
     const inputBuffer = buffers[isFlipped ? 1 : 0];
     const outputBuffer = buffers[isFlipped ? 0 : 1];
-    const vertexBufferObject = this._vertexBufferObject;
-    gl.viewport(0, 0, this._width, this._height);
-    this._program.use(() => {
-      outputBuffer.framebuffer.bindAndExecute(() => {
-        inputBuffer.texture.bindAndExecute(() => {
+    const vertexBufferObject = this.vertexBufferObject;
+    gl.viewport(0, 0, this.width, this.height);
+    this.program.use(() => {
+      outputBuffer.getFramebuffer().bindAndExecute(() => {
+        inputBuffer.getTexture().bindAndExecute(() => {
           vertexBufferObject.bindAndDraw(gl.TRIANGLES);
         });
       });
     });
-    this._isFlipped = !isFlipped;
+    this.isFlipped = !isFlipped;
   }
 
   public getCurrentBuffer(): PingPongBuffer {
-    return this._buffers[this._isFlipped ? 0 : 1];
+    return this.buffers[this.isFlipped ? 0 : 1];
   }
 }
