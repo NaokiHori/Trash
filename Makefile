@@ -61,5 +61,5 @@ polish:
     -v "${PWD}/pages":/app/pages:ro \
     -v "${PWD}/src":/app/src:ro \
     $(IMAGE) \
-    npx oxlint --type-aware -D correctness Advection/ CartPole/ CellularAutomaton/ Classifier/ ColorMapChecker/ Delaunay/ HIFU/ JuliaSetViewer/ Logo/ MiniMaze/ Roulette/ src/ SudokuAssistant/ Truss/
+    npx oxlint --type-aware -D correctness src/ pages/
 
