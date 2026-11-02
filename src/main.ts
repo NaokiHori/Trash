@@ -6,7 +6,7 @@ function getElementByIdOrThrow(elementId: string): HTMLElement {
     throw new Error(`failed to get element: ${elementId}`);
   }
   if (!(element instanceof HTMLElement)) {
-    throw new Error(`expected HTMLElement: ${elementId}`);
+    throw new TypeError(`expected HTMLElement: ${elementId}`);
   }
   return element;
 }
@@ -37,7 +37,7 @@ function main(): void {
   updateCarouselPagination(getCurrentPageIndex(ALL_PAGES), ALL_PAGES.length);
   const carouselItems = getElementByIdOrThrow("carousel-items");
   if (!(carouselItems instanceof HTMLDivElement)) {
-    throw new Error("expected HTMLDivElement");
+    throw new TypeError("expected HTMLDivElement");
   }
   for (const page of ALL_PAGES) {
     carouselItems.append(page.getElement());
