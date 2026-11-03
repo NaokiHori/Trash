@@ -1,16 +1,7 @@
+import { Animation } from "../../common/animation";
 import { Canvas } from "./canvas";
 import { WebGL } from "./webgl";
 import { DomainSize } from "./domainSize";
-import { Timer } from "./timer";
-
-function animate(webGL: WebGL, timer: Timer) {
-  webGL.incrementCounter();
-  webGL.draw();
-  timer.update();
-  requestAnimationFrame(() => {
-    animate(webGL, timer);
-  });
-}
 
 function registerKeydownEvent(
   enableImageSaver: boolean,
@@ -84,11 +75,11 @@ function main({ enableImageSaver }: { enableImageSaver: boolean }) {
   webGL.updateResolution(canvas.getWidth(), canvas.getHeight());
   webGL.draw();
   webGL.incrementCounter();
-  const timer = new Timer(1000, () => {
-    /* nothing to do for now */
+  const animation = new Animation(60, () => {
+    webGL.incrementCounter();
+    webGL.draw();
   });
-  timer.start();
-  animate(webGL, timer);
+  animation.start();
 }
 
 window.addEventListener("load", () => {

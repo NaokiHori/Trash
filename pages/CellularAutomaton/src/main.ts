@@ -1,4 +1,4 @@
-import { Timer } from "./timer";
+import { Animation } from "../../common/animation";
 import { CellularAutomaton } from "./cellularAutomaton";
 
 function handleResizeEvent(canvas: HTMLCanvasElement) {
@@ -19,13 +19,6 @@ function getCanvas(): HTMLCanvasElement {
   return canvas;
 }
 
-function draw(timer: Timer) {
-  timer.update();
-  requestAnimationFrame(() => {
-    draw(timer);
-  });
-}
-
 function main() {
   const canvas = getCanvas();
   handleResizeEvent(canvas);
@@ -36,12 +29,11 @@ function main() {
   });
   handleResizeEvent(canvas);
   cellularAutomaton.handleResizeEvent(canvas);
-  const timer = new Timer(10, () => {
+  const animation = new Animation(60, () => {
     cellularAutomaton.update();
     cellularAutomaton.draw(canvas);
   });
-  timer.start();
-  draw(timer);
+  animation.start();
 }
 
 window.addEventListener("load", (): void => {

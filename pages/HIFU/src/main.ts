@@ -1,4 +1,4 @@
-import { Animation } from "./animation";
+import { Animation } from "../../common/animation";
 import { Simulator } from "./simulator";
 
 function getCanvas(): HTMLCanvasElement {

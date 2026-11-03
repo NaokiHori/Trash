@@ -1,4 +1,4 @@
-import { Animation } from "./animation";
+import { Animation } from "../../common/animation";
 import { getNitems } from "./getNitems";
 import { CanvasElement, DivElement, ProceedButton } from "./dom";
 import { Graph } from "./graph";

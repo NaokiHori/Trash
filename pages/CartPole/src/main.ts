@@ -1,4 +1,4 @@
-import { Animation } from "./animation";
+import { Animation } from "../../common/animation";
 import { Camera } from "./camera";
 import { Controller, fromPoles } from "./controller";
 import { GRAVITATIONAL_ACCELERATION } from "./parameter";

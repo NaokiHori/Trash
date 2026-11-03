@@ -1,4 +1,4 @@
-import { Animation } from "./animation";
+import { Animation } from "../../common/animation";
 import { Graph } from "./graph";
 import { Scheme } from "./scheme";
 

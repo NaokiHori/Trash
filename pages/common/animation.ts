@@ -1,12 +1,14 @@
 export class Animation {
   private interFrameMs: number;
   private lastTime: DOMHighResTimeStamp;
-  private callback: () => void;
+  private counter: number;
+  private callback: (counter: number) => void;
   private isRunning: boolean;
 
-  public constructor(maxFps: number, callback: () => void) {
+  public constructor(maxFps: number, callback: (counter: number) => void) {
     this.interFrameMs = 1000 / maxFps;
     this.lastTime = 0;
+    this.counter = 0;
     this.callback = callback;
     this.isRunning = false;
   }
@@ -24,7 +26,8 @@ export class Animation {
       const elapsed = currentTime - this.lastTime;
       if (this.interFrameMs < elapsed) {
         this.lastTime = currentTime;
-        this.callback();
+        this.callback(this.counter);
+        this.counter += 1;
       }
       requestAnimationFrame(proceed);
     };
@@ -35,5 +38,9 @@ export class Animation {
 
   public stop(): void {
     this.isRunning = false;
+  }
+
+  public getIsRunning(): boolean {
+    return this.isRunning;
   }
 }
