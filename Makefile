@@ -15,7 +15,7 @@ build:
     --name $(CONTAINER) \
     -v "${PWD}/index.html":/app/index.html:ro \
     -v "${PWD}/pages":/app/pages:ro \
-    -v "${PWD}/src":/app/src:ro \
+    -v "${PWD}/main.ts":/app/main.ts:ro \
     -v "${PWD}/style.css":/app/style.css:ro \
     $(IMAGE) \
     npx vite build --outDir=/app/dist --base=$(BASE)
@@ -32,7 +32,7 @@ dev:
     --name $(CONTAINER) \
     -v "${PWD}/index.html":/app/index.html:ro \
     -v "${PWD}/pages":/app/pages:ro \
-    -v "${PWD}/src":/app/src:ro \
+    -v "${PWD}/main.ts":/app/main.ts:ro \
     -v "${PWD}/style.css":/app/style.css:ro \
     $(IMAGE) \
     npx vite dev --host
@@ -43,7 +43,7 @@ polish:
     --rm \
     --name $(CONTAINER) \
     -v "${PWD}/pages":/app/pages:ro \
-    -v "${PWD}/src":/app/src:ro \
+    -v "${PWD}/main.ts":/app/main.ts:ro \
     $(IMAGE) \
     npx tsc
 	# formatter, writable access is needed to fix format violation
@@ -53,7 +53,7 @@ polish:
     -v "${PWD}/index.html":/app/index.html \
     -v "${PWD}/style.css":/app/style.css \
     -v "${PWD}/pages":/app/pages \
-    -v "${PWD}/src":/app/src \
+    -v "${PWD}/main.ts":/app/main.ts \
     $(IMAGE) \
     npx oxfmt
 	# linter, all sources are needed to type-check
@@ -61,7 +61,7 @@ polish:
     --rm \
     --name $(CONTAINER) \
     -v "${PWD}/pages":/app/pages:ro \
-    -v "${PWD}/src":/app/src:ro \
+    -v "${PWD}/main.ts":/app/main.ts:ro \
     $(IMAGE) \
-    npx oxlint --type-aware -D correctness -D suspicious -D pedantic -D perf -A typescript/prefer-readonly-parameter-types src/ pages/
+    npx oxlint --type-aware -D correctness -D suspicious -D pedantic -D perf -A typescript/prefer-readonly-parameter-types main.ts pages/
 

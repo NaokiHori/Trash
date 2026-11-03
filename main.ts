@@ -1,20 +1,18 @@
-import sudokuAssistantIcon from "../pages/SudokuAssistant/icon.jpg";
-import miniMazeIcon from "../pages/MiniMaze/icon.jpg";
-import juliaSetViewerIcon from "../pages/JuliaSetViewer/icon.jpg";
-import classifierIcon from "../pages/Classifier/icon.jpg";
-import colorMapCheckerIcon from "../pages/ColorMapChecker/icon.jpg";
-import delaynayIcon from "../pages/Delaunay/icon.jpg";
-import advectionIcon from "../pages/Advection/icon.jpg";
-import rouletteIcon from "../pages/Roulette/icon.jpg";
-import cellularAutomatonIcon from "../pages/CellularAutomaton/icon.jpg";
-import hifuIcon from "../pages/HIFU/icon.jpg";
-import trussIcon from "../pages/Truss/icon.jpg";
-import cartPoleIcon from "../pages/CartPole/icon.jpg";
-import logoIcon from "../pages/Logo/icon.jpg";
+import sudokuAssistantIcon from "./pages/SudokuAssistant/icon.jpg";
+import miniMazeIcon from "./pages/MiniMaze/icon.jpg";
+import juliaSetViewerIcon from "./pages/JuliaSetViewer/icon.jpg";
+import classifierIcon from "./pages/Classifier/icon.jpg";
+import colorMapCheckerIcon from "./pages/ColorMapChecker/icon.jpg";
+import delaynayIcon from "./pages/Delaunay/icon.jpg";
+import advectionIcon from "./pages/Advection/icon.jpg";
+import rouletteIcon from "./pages/Roulette/icon.jpg";
+import cellularAutomatonIcon from "./pages/CellularAutomaton/icon.jpg";
+import hifuIcon from "./pages/HIFU/icon.jpg";
+import trussIcon from "./pages/Truss/icon.jpg";
+import cartPoleIcon from "./pages/CartPole/icon.jpg";
+import logoIcon from "./pages/Logo/icon.jpg";
 
-const ROOT = "pages";
-
-export class Page {
+class Page {
   private element: HTMLDivElement;
   private isActive: boolean;
 
@@ -73,7 +71,9 @@ export class Page {
   }
 }
 
-export const ALL_PAGES: Array<Page> = [
+const ROOT = "pages";
+
+const ALL_PAGES: Array<Page> = [
   new Page({
     isActive: true,
     title: "Sudoku Assistant",
@@ -153,3 +153,61 @@ export const ALL_PAGES: Array<Page> = [
     imageSource: logoIcon,
   }),
 ];
+
+function getElementByIdOrThrow(elementId: string): HTMLElement {
+  const element = document.querySelector(`#${elementId}`);
+  if (null === element) {
+    throw new Error(`failed to get element: ${elementId}`);
+  }
+  if (!(element instanceof HTMLElement)) {
+    throw new TypeError(`expected HTMLElement: ${elementId}`);
+  }
+  return element;
+}
+
+function getCurrentPageIndex(pages: Readonly<Array<Readonly<Page>>>): number {
+  const currentPageIndex: number = pages.findIndex((page: Readonly<Page>) => page.getIsActive());
+  if (currentPageIndex === -1) {
+    throw new Error("No active page exists");
+  }
+  return currentPageIndex;
+}
+
+function switchPage(pages: Readonly<Array<Readonly<Page>>>, direction: number): number {
+  const currentPageIndex: number = getCurrentPageIndex(pages);
+  const newActivePageIndex: number = (currentPageIndex + direction + pages.length) % pages.length;
+  for (const [index, page] of pages.entries()) {
+    page.setIsActive(index === newActivePageIndex);
+  }
+  return newActivePageIndex;
+}
+
+function updateCarouselPagination(currentPageIndex: number, totalPages: number): void {
+  const carouselPagination = getElementByIdOrThrow("carousel-pagination");
+  carouselPagination.textContent = `${(currentPageIndex + 1).toString()} / ${totalPages.toString()}`;
+}
+
+function main(): void {
+  updateCarouselPagination(getCurrentPageIndex(ALL_PAGES), ALL_PAGES.length);
+  const carouselItems = getElementByIdOrThrow("carousel-items");
+  if (!(carouselItems instanceof HTMLDivElement)) {
+    throw new TypeError("expected HTMLDivElement");
+  }
+  for (const page of ALL_PAGES) {
+    carouselItems.append(page.getElement());
+  }
+  const prevButton = getElementByIdOrThrow("carousel-button-to-prev");
+  const nextButton = getElementByIdOrThrow("carousel-button-to-next");
+  prevButton.addEventListener("click", () => {
+    const newActivePageIndex = switchPage(ALL_PAGES, -1);
+    updateCarouselPagination(newActivePageIndex, ALL_PAGES.length);
+  });
+  nextButton.addEventListener("click", () => {
+    const newActivePageIndex = switchPage(ALL_PAGES, 1);
+    updateCarouselPagination(newActivePageIndex, ALL_PAGES.length);
+  });
+}
+
+window.addEventListener("load", () => {
+  main();
+});
