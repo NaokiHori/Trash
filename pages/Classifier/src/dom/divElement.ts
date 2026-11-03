@@ -1,10 +1,10 @@
-import { querySelectorOrThrow } from "../dom";
+import { getElementByIdOrThrow } from "../../../common/dom";
 
 export class DivElement {
   private divElement: HTMLDivElement;
 
-  public constructor(query: string) {
-    this.divElement = querySelectorOrThrow(HTMLDivElement, query);
+  public constructor(id: string) {
+    this.divElement = getElementByIdOrThrow(HTMLDivElement, id);
   }
 
   public setTextContent(textContent: string): void {

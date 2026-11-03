@@ -15,11 +15,11 @@ interface UIComponents {
 }
 
 function setupUI(nitems: number): UIComponents {
-  const button = new ProceedButton("#proceed-button");
-  const logger = new DivElement("#logger");
+  const button = new ProceedButton("proceed-button");
+  const logger = new DivElement("logger");
   logger.setTextContent(LOGGER_DEFAULT_MESSAGE);
-  const graph = new Graph("#graph", nitems);
-  const canvas = new CanvasElement("#contour-canvas");
+  const graph = new Graph("graph", nitems);
+  const canvas = new CanvasElement("contour-canvas");
   canvas.setWidth(128);
   canvas.setHeight(128);
   return { button, logger, graph, canvas };

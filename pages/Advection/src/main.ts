@@ -1,4 +1,5 @@
 import { Animation } from "../../common/animation";
+import { getElementByIdOrThrow } from "../../common/dom";
 import { Graph } from "./graph";
 import { Scheme } from "./scheme";
 
@@ -11,17 +12,11 @@ function main(): void {
   const length = 1;
   const nitems = 128;
   const scheme = new Scheme(getSpecifiedScheme(), length, nitems);
-  const labelElement = document.querySelector("#scheme-label");
-  if (labelElement === null) {
-    throw new Error("label div element not found");
-  }
-  const buttons = [document.querySelector("#to-prev"), document.querySelector("#to-next")];
-  if (buttons[0] === null) {
-    throw new Error("to-prev button not found");
-  }
-  if (buttons[1] === null) {
-    throw new Error("to-next button not found");
-  }
+  const labelElement = getElementByIdOrThrow(HTMLDivElement, "scheme-label");
+  const buttons = [
+    getElementByIdOrThrow(HTMLButtonElement, "to-prev"),
+    getElementByIdOrThrow(HTMLButtonElement, "to-next"),
+  ];
   labelElement.addEventListener("click", () => {
     scheme.flipVelocity();
   });

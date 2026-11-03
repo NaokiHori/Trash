@@ -1,15 +1,10 @@
+import { getElementByIdOrThrow } from "../../common/dom";
+
 export class Canvas {
   private element: HTMLCanvasElement;
 
   public constructor({ elementId }: { elementId: string }) {
-    const element: HTMLElement | null = document.querySelector(`#${elementId}`);
-    if (null === element) {
-      throw new Error(`Failed to get element: ${elementId}`);
-    }
-    if (!(element instanceof HTMLCanvasElement)) {
-      throw new TypeError();
-    }
-    this.element = element;
+    this.element = getElementByIdOrThrow(HTMLCanvasElement, elementId);
   }
 
   public getWebGL2RenderingContext(): WebGL2RenderingContext {

@@ -1,3 +1,4 @@
+import { getElementByIdOrThrow } from "../../../common/dom";
 import * as Utils from "./util";
 
 const DARK_GRAY = "#272625";
@@ -9,17 +10,8 @@ export class RouletteView {
   private readonly nColors: number;
 
   public constructor(members: ReadonlyArray<string>) {
-    const rouletteElement = document.querySelector("#roulette");
-    if (rouletteElement === null) {
-      throw new Error("roulette element not found");
-    }
-    if (!(rouletteElement instanceof HTMLElement)) {
-      throw new TypeError();
-    }
-    const labelsElement = document.querySelector("#labels");
-    if (labelsElement === null) {
-      throw new Error("labels element not found");
-    }
+    const rouletteElement = getElementByIdOrThrow(HTMLDivElement, "roulette");
+    const labelsElement = getElementByIdOrThrow(HTMLDivElement, "labels");
     const labelElements = members.map((member: string) => {
       const labelElement = document.createElement("div");
       labelElement.className = "label";

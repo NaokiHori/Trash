@@ -1,17 +1,17 @@
-import { getElementByIdOrThrow } from "./dom";
+import { getElementByIdOrThrow } from "../../common/dom";
 import { Point, Triangle } from "./types";
 import { Circle } from "./graph/circle";
 import { Polygon } from "./graph/polygon";
 
 export class Graph {
-  private element: HTMLElement;
+  private element: SVGSVGElement;
   private circles: Array<Circle>;
   private numActivePolygons: number;
   private polygons: Array<Polygon>;
   private size: { width: number; height: number };
 
   public constructor(elementId: string) {
-    const element: HTMLElement = getElementByIdOrThrow(elementId);
+    const element = getElementByIdOrThrow(SVGSVGElement, elementId);
     this.element = element;
     this.circles = new Array<Circle>();
     this.numActivePolygons = 0;
@@ -68,7 +68,7 @@ export class Graph {
     this.numActivePolygons = 0;
   }
 
-  private static getCurrentGraphSize(element: HTMLElement): {
+  private static getCurrentGraphSize(element: SVGSVGElement): {
     width: number;
     height: number;
   } {

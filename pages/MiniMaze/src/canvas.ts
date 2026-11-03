@@ -1,14 +1,4 @@
-function getCanvas(): HTMLCanvasElement {
-  const id = "canvas";
-  const element: HTMLElement | null = document.querySelector(`#${id}`);
-  if (element === null) {
-    throw new Error(`Failed to get ${id}`);
-  }
-  if (!(element instanceof HTMLCanvasElement)) {
-    throw new TypeError();
-  }
-  return element;
-}
+import { getElementByIdOrThrow } from "../../common/dom";
 
 function getContext(canvas: HTMLCanvasElement): CanvasRenderingContext2D {
   const ctx: CanvasRenderingContext2D | null = canvas.getContext("2d");
@@ -23,7 +13,7 @@ export class Canvas {
   private ctx: CanvasRenderingContext2D;
 
   public constructor() {
-    const canvas: HTMLCanvasElement = getCanvas();
+    const canvas: HTMLCanvasElement = getElementByIdOrThrow(HTMLCanvasElement, "canvas");
     const ctx: CanvasRenderingContext2D = getContext(canvas);
     this.element = canvas;
     this.ctx = ctx;

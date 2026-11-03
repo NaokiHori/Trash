@@ -1,13 +1,13 @@
 import { CustomButton } from "../components/customButton";
-import { querySelectorOrThrow } from "../dom";
+import { getElementByIdOrThrow } from "../../../common/dom";
 
 export class ProceedButton {
   private clickCounter: number;
   private element: CustomButton;
 
-  public constructor(query: string) {
+  public constructor(id: string) {
     this.clickCounter = 0;
-    this.element = querySelectorOrThrow(CustomButton, query);
+    this.element = getElementByIdOrThrow(CustomButton, id);
   }
 
   public addClickEventListener(handler: () => void): void {

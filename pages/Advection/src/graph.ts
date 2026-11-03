@@ -1,13 +1,13 @@
-import { getElementById } from "./dom";
+import { getElementByIdOrThrow } from "../../common/dom";
 import { Circle } from "./graph/circle";
 
 export class Graph {
-  private element: HTMLElement;
+  private element: SVGSVGElement;
   private circles: Array<Circle>;
   private size: { width: number; height: number };
 
   public constructor(elementId: string, numCircles: number) {
-    const element: HTMLElement = getElementById(elementId);
+    const element = getElementByIdOrThrow(SVGSVGElement, elementId);
     const circles = new Array<Circle>();
     for (let i = 0; i < numCircles; i += 1) {
       const circle = new Circle();
@@ -40,7 +40,7 @@ export class Graph {
     this.size = Graph.getCurrentGraphSize(this.element);
   }
 
-  private static getCurrentGraphSize(element: HTMLElement): {
+  private static getCurrentGraphSize(element: SVGSVGElement): {
     width: number;
     height: number;
   } {

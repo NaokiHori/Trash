@@ -1,4 +1,4 @@
-import { getElementByIdOrThrow } from "./dom";
+import { getElementByIdOrThrow } from "../../common/dom";
 import { ColorMap } from "./colorMap";
 import { Graph } from "./graph";
 import { ColorSelector } from "./colorSelector";

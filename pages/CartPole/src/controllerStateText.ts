@@ -1,4 +1,4 @@
-import { getElementByIdOrThrow } from "./dom";
+import { getElementByIdOrThrow } from "../../common/dom";
 
 export class ControllerStateText {
   private element: SVGTextElement;

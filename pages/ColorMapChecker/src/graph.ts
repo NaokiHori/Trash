@@ -1,4 +1,4 @@
-import { getElementByIdOrThrow } from "./dom";
+import { getElementByIdOrThrow } from "../../common/dom";
 import { Equations } from "./equation";
 import { rgbToHsv } from "./convert";
 

@@ -1,16 +1,12 @@
-import { getElementByIdOrThrow } from "./dom";
+import { getElementByIdOrThrow } from "../../common/dom";
 
 export class Button {
   private clickCounter: number;
   private element: HTMLButtonElement;
 
   public constructor(elementId: string) {
-    const element = getElementByIdOrThrow(elementId);
-    if (!(element instanceof HTMLButtonElement)) {
-      throw new TypeError();
-    }
     this.clickCounter = 0;
-    this.element = element;
+    this.element = getElementByIdOrThrow(HTMLButtonElement, elementId);
   }
 
   public onClick(

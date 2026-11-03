@@ -5,7 +5,7 @@ import { GRAVITATIONAL_ACCELERATION } from "./parameter";
 import { PidParameters, Cart, Pendulum, integrate, checkStabilityCriteria } from "./simulator";
 import { Line } from "./svg";
 import { ControllerStateText } from "./controllerStateText";
-import { getElementByIdOrThrow } from "./dom";
+import { getElementByIdOrThrow } from "../../common/dom";
 
 class Link {
   private svg: Line;

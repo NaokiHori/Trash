@@ -1,3 +1,4 @@
+import { getElementByIdOrThrow } from "../../common/dom";
 import { Path, PathElement, PathElementM, PathElementS, Rect, Text } from "./svg";
 import { downloadJpg, downloadPng, downloadSvg } from "./image";
 
@@ -12,20 +13,6 @@ function getColorUrlParameter(parameter: string): string | null {
     return color;
   }
   return `#${color}`;
-}
-
-function getElementByIdOrThrow<T extends Element>(
-  type: new (...args: unknown[]) => T,
-  id: string,
-): T {
-  const element = document.querySelector(`#${id}`);
-  if (null === element) {
-    throw new Error();
-  }
-  if (!(element instanceof type)) {
-    throw new TypeError();
-  }
-  return element;
 }
 
 type Point = [number, number];

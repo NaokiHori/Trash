@@ -1,20 +1,9 @@
 import { Animation } from "../../common/animation";
+import { getElementByIdOrThrow } from "../../common/dom";
 import { Simulator } from "./simulator";
 
-function getCanvas(): HTMLCanvasElement {
-  const id = "field";
-  const canvas = document.querySelector(`#${id}`);
-  if (null === canvas) {
-    throw new Error(`failed to get element ${id}`);
-  }
-  if (!(canvas instanceof HTMLCanvasElement)) {
-    throw new TypeError(`element ${id} is not HTMLCanvasElement`);
-  }
-  return canvas;
-}
-
-function main() {
-  const canvas = getCanvas();
+function main(): void {
+  const canvas = getElementByIdOrThrow(HTMLCanvasElement, "field");
   const simulator = new Simulator(canvas, false);
   const animation = new Animation(60, () => {
     simulator.update();

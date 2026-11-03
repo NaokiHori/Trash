@@ -1,18 +1,5 @@
+import { getElementByIdOrThrow } from "../../common/dom";
 import { Truss } from "./truss";
-
-function getElementByIdOrThrow<T extends Element>(
-  type: new (...args: unknown[]) => T,
-  id: string,
-): T {
-  const element = document.querySelector(`#${id}`);
-  if (null === element) {
-    throw new Error();
-  }
-  if (!(element instanceof type)) {
-    throw new TypeError();
-  }
-  return element;
-}
 
 function setupSVG(truss: Readonly<Truss>): void {
   const nodesElement = getElementByIdOrThrow(SVGGElement, "truss-nodes");

@@ -1,15 +1,10 @@
+import { getElementByIdOrThrow } from "../../common/dom";
+
 export class Button {
   private element: HTMLButtonElement;
 
   public constructor(elementId: string) {
-    const element: HTMLElement | null = document.querySelector(`#${elementId}`);
-    if (null === element) {
-      throw new Error(`Failed to find an element: ${elementId}`);
-    }
-    if (!(element instanceof HTMLButtonElement)) {
-      throw new TypeError();
-    }
-    this.element = element;
+    this.element = getElementByIdOrThrow(HTMLButtonElement, elementId);
     this.disable();
   }
 
