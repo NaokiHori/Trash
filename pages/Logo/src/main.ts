@@ -23,7 +23,7 @@ function getElementByIdOrThrow<T extends Element>(
     throw new Error();
   }
   if (!(element instanceof type)) {
-    throw new Error();
+    throw new TypeError();
   }
   return element;
 }
@@ -90,10 +90,10 @@ function setupDownload(graph: SVGSVGElement): void {
   const downloadCancelButton = getElementByIdOrThrow(HTMLButtonElement, "download-cancel");
   const downloadForm = getElementByIdOrThrow(HTMLFormElement, "download-form");
   if (!(downloadDialog instanceof HTMLDialogElement)) {
-    throw new Error();
+    throw new TypeError();
   }
   if (!(downloadForm instanceof HTMLFormElement)) {
-    throw new Error();
+    throw new TypeError();
   }
   downloadOpenButton.addEventListener("click", () => {
     downloadDialog.showModal();
@@ -128,7 +128,7 @@ function main(): void {
   const size = 100;
   const graph = getElementByIdOrThrow(SVGSVGElement, "graph");
   if (!(graph instanceof SVGSVGElement)) {
-    throw new Error();
+    throw new TypeError();
   }
   const foregroundColor = getColorUrlParameter("foreground-color");
   const backgroundColor = getColorUrlParameter("background-color");

@@ -1,6 +1,6 @@
-import { Program } from "./webgl/program";
-import { Texture } from "./webgl/texture";
-import { VertexBufferObject } from "./webgl/vertexBufferObject";
+import { Program } from "../..//webgl/program";
+import { Texture } from "../..//webgl/texture";
+import { VertexBufferObject } from "../../webgl/vertexBufferObject";
 import { PingPongBuffer } from "./pingPongBuffers/pingPongBuffer";
 import { TEXTURE_CONFIG } from "./pingPongBuffers/textureConfig";
 import vertexShaderSource from "../shader/calculate.vs.glsl?raw";
@@ -15,7 +15,7 @@ export class PingPongBuffers {
   private width: number;
   private height: number;
 
-  constructor(gl: WebGL2RenderingContext, width: number, height: number) {
+  public constructor(gl: WebGL2RenderingContext, width: number, height: number) {
     const program = new Program({
       gl,
       vertexShaderSource,
@@ -48,7 +48,7 @@ export class PingPongBuffers {
     this.height = height;
   }
 
-  public setData(data: Uint8Array) {
+  public setData(data: Uint8Array): void {
     const gl = this.gl;
     const framebuffer = this.buffers[0].getFramebuffer();
     const texture = this.buffers[0].getTexture();
@@ -69,7 +69,7 @@ export class PingPongBuffers {
     });
   }
 
-  public update() {
+  public update(): void {
     const gl = this.gl;
     const buffers = this.buffers;
     const isFlipped: boolean = this.isFlipped;

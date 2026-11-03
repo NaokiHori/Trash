@@ -1,16 +1,19 @@
 export class Canvas {
-  private _element: HTMLCanvasElement;
+  private element: HTMLCanvasElement;
 
   public constructor({ elementId }: { elementId: string }) {
-    const element: HTMLElement | null = document.getElementById(elementId);
+    const element: HTMLElement | null = document.querySelector(`#${elementId}`);
     if (null === element) {
       throw new Error(`Failed to get element: ${elementId}`);
     }
-    this._element = element as HTMLCanvasElement;
+    if (!(element instanceof HTMLCanvasElement)) {
+      throw new TypeError();
+    }
+    this.element = element;
   }
 
-  public getWebGLRenderingContext(): WebGLRenderingContext {
-    const gl: WebGLRenderingContext | null = this._element.getContext("webgl", {
+  public getWebGL2RenderingContext(): WebGL2RenderingContext {
+    const gl: WebGL2RenderingContext | null = this.element.getContext("webgl2", {
       preserveDrawingBuffer: true,
     });
     if (null === gl) {
@@ -19,26 +22,26 @@ export class Canvas {
     return gl;
   }
 
-  public adjustSize() {
-    const rect: DOMRect = this._element.getBoundingClientRect();
-    this._element.width = rect.width;
-    this._element.height = rect.height;
+  public adjustSize(): void {
+    const rect: DOMRect = this.element.getBoundingClientRect();
+    this.element.width = rect.width;
+    this.element.height = rect.height;
   }
 
-  public get width(): number {
-    return this._element.width;
+  public getWidth(): number {
+    return this.element.width;
   }
 
-  public get height(): number {
-    return this._element.height;
+  public getHeight(): number {
+    return this.element.height;
   }
 
-  public saveImage(fileName: string) {
+  public saveImage(fileName: string): void {
     if (!fileName.endsWith(".jpeg")) {
       console.error("Image file name should ends with '.jpeg'");
       return;
     }
-    this._element.toBlob((blob: Blob | null) => {
+    this.element.toBlob((blob: Blob | null) => {
       if (null === blob) {
         console.error("Failed to create Blob from canvas");
         return;

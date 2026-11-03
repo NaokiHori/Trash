@@ -1,6 +1,6 @@
-import { Framebuffer } from "../webgl/framebuffer";
-import { Program } from "../webgl/program";
-import { Texture } from "../webgl/texture";
+import { Framebuffer } from "../../../webgl/framebuffer";
+import { Program } from "../../../webgl/program";
+import { Texture } from "../../../webgl/texture";
 import { TEXTURE_CONFIG } from "./textureConfig";
 
 export class PingPongBuffer {

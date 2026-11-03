@@ -61,5 +61,5 @@ polish:
     -v "${PWD}/pages":/app/pages:ro \
     -v "${PWD}/src":/app/src:ro \
     $(IMAGE) \
-    npx oxlint --type-aware -D correctness -D perf src/ pages/
+    npx oxlint --type-aware -D correctness -D suspicious -D pedantic -D perf -A typescript/prefer-readonly-parameter-types src/ pages/
 

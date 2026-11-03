@@ -1,6 +1,6 @@
-import { getWebGL2RenderingContext } from "./webgl/context";
-import { Program } from "./webgl/program";
-import { IndexBufferObject } from "./webgl/indexBufferObject";
+import { getWebGL2RenderingContext } from "../../webgl/context";
+import { Program } from "../../webgl/program";
+import { IndexBufferObject } from "../../webgl/indexBufferObject";
 import { PingPongBuffers } from "./pingPongBuffers";
 import vertexShaderSource from "../shader/visualize.vs.glsl?raw";
 import fragmentShaderSource from "../shader/visualize.fs.glsl?raw";

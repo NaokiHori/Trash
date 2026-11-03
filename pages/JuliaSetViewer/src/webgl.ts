@@ -1,194 +1,190 @@
-import { Program } from "./webgl/program";
-import { VertexAttribute } from "./webgl/vertexAttribute";
-import { VertexBufferObject } from "./webgl/vertexBufferObject";
-import { IndexBufferObject } from "./webgl/indexBufferObject";
-import { Uniform } from "./webgl/uniform";
-import vertexShaderSource from "./webgl/vertexShader.glsl?raw";
-import fragmentShaderSource from "./webgl/fragmentShader.glsl?raw";
+import { Program } from "../../webgl/program";
+import { IndexBufferObject } from "../../webgl/indexBufferObject";
+import { Uniform } from "../../webgl/uniform";
+import vertexShaderSource from "../shader/vertexShader.glsl?raw";
+import fragmentShaderSource from "../shader/fragmentShader.glsl?raw";
+
+function setupRectangleDomain(gl: WebGL2RenderingContext, program: Program): IndexBufferObject {
+  const positions = [
+    [-1, -1],
+    [1, -1],
+    [-1, 1],
+    [1, 1],
+  ];
+  const indices = [0, 1, 2, 1, 3, 2];
+  program.setVertexBufferObject({
+    attributeName: "a_position",
+    numberOfVertices: positions.length,
+    numberOfItemsForEachVertex: "xy".length,
+    data: new Float32Array(positions.flat()),
+  });
+  const indexBufferObject = new IndexBufferObject({
+    gl,
+    size: indices.length,
+    usage: gl.STATIC_DRAW,
+  });
+  indexBufferObject.bindAndUpdateData(new Int16Array(indices));
+  return indexBufferObject;
+}
+
+interface Uniforms {
+  domainSize: Uniform;
+  orbitType: Uniform;
+  center: Uniform;
+  resolution: Uniform;
+  orbitTrapCenter: Uniform;
+  recurrenceOffset: Uniform;
+  counter: Uniform;
+}
+
+function setupDomainSizeUniform(gl: WebGL2RenderingContext, program: Program): Uniform {
+  return new Uniform({
+    gl,
+    program,
+    dataType: "FLOAT32",
+    name: "u_domain_size",
+    nitems: 1,
+  });
+}
+
+function setupOrbitTypeUniform(gl: WebGL2RenderingContext, program: Program): Uniform {
+  return new Uniform({
+    gl,
+    program,
+    dataType: "INT32",
+    name: "u_orbit_type",
+    nitems: 1,
+  });
+}
+
+function setupCenterUniform(gl: WebGL2RenderingContext, program: Program): Uniform {
+  return new Uniform({
+    gl,
+    program,
+    dataType: "FLOAT32",
+    name: "u_center",
+    nitems: 2,
+  });
+}
+
+function setupResolutionUniform(gl: WebGL2RenderingContext, program: Program): Uniform {
+  return new Uniform({
+    gl,
+    program,
+    dataType: "FLOAT32",
+    name: "u_resolution",
+    nitems: 2,
+  });
+}
+
+function setupOrbitTrapCenterUniform(gl: WebGL2RenderingContext, program: Program): Uniform {
+  return new Uniform({
+    gl,
+    program,
+    dataType: "FLOAT32",
+    name: "u_orbit_trap_center",
+    nitems: 2,
+  });
+}
+
+function setupRecurrenceOffsetUniform(gl: WebGL2RenderingContext, program: Program): Uniform {
+  return new Uniform({
+    gl,
+    program,
+    dataType: "FLOAT32",
+    name: "u_recurrence_offset",
+    nitems: 2,
+  });
+}
+
+function setupCounterUniform(gl: WebGL2RenderingContext, program: Program): Uniform {
+  return new Uniform({
+    gl,
+    program,
+    dataType: "INT32",
+    name: "u_counter",
+    nitems: 1,
+  });
+}
+
+function setupUniforms(gl: WebGL2RenderingContext, program: Program): Uniforms {
+  return {
+    domainSize: setupDomainSizeUniform(gl, program),
+    orbitType: setupOrbitTypeUniform(gl, program),
+    center: setupCenterUniform(gl, program),
+    resolution: setupResolutionUniform(gl, program),
+    orbitTrapCenter: setupOrbitTrapCenterUniform(gl, program),
+    recurrenceOffset: setupRecurrenceOffsetUniform(gl, program),
+    counter: setupCounterUniform(gl, program),
+  };
+}
 
 export class WebGL {
-  private _gl: WebGLRenderingContext;
-  private _program: Program;
-  private _indexBufferObject: IndexBufferObject;
-  private _counter: number;
-  private _uniforms: {
-    domainSize: Uniform;
-    orbitType: Uniform;
-    center: Uniform;
-    resolution: Uniform;
-    orbitTrapCenter: Uniform;
-    recurrenceOffset: Uniform;
-    counter: Uniform;
-  };
+  private gl: WebGL2RenderingContext;
+  private program: Program;
+  private indexBufferObject: IndexBufferObject;
+  private counter: number;
+  private uniforms: Uniforms;
 
-  public constructor(gl: WebGLRenderingContext) {
+  public constructor(gl: WebGL2RenderingContext) {
     const program = new Program({
       gl,
       vertexShaderSource,
       fragmentShaderSource,
     });
-    const indexBufferObject: IndexBufferObject = program.use({
-      gl,
-      callback: () => {
-        // set-up rectangle domain
-        const positions = [
-          [-1, -1],
-          [1, -1],
-          [-1, 1],
-          [1, 1],
-        ];
-        const indices = [0, 1, 2, 1, 3, 2];
-        // create a vertex buffer object
-        const attribute = new VertexAttribute({
-          gl,
-          program,
-          attributeName: "a_position",
-        });
-        new VertexBufferObject({
-          gl,
-          numberOfVertices: positions.length,
-          numberOfItemsForEachVertex: positions[0].length,
-          usage: gl.STATIC_DRAW,
-        }).bindAndExecute({
-          gl,
-          callback: (boundBuffer: VertexBufferObject) => {
-            attribute.bindWithArrayBuffer({
-              gl,
-              program,
-              size: positions[0].length,
-              vertexBufferObject: boundBuffer,
-            });
-            boundBuffer.updateData({
-              gl,
-              data: new Float32Array(positions.flat()),
-            });
-          },
-        });
-        // create an index buffer object and return it
-        return new IndexBufferObject({
-          gl,
-          size: indices.length,
-          usage: gl.STATIC_DRAW,
-        }).bindAndExecute({
-          gl,
-          callback: (boundBuffer: IndexBufferObject) => {
-            boundBuffer.updateData({ gl, data: new Int16Array(indices) });
-          },
-        });
-      },
-    });
-    this._gl = gl;
-    this._program = program;
-    this._indexBufferObject = indexBufferObject;
-    this._counter = -1;
-    this._uniforms = {
-      domainSize: new Uniform({
-        gl,
-        program,
-        dataType: "FLOAT32",
-        name: "u_domain_size",
-        nitems: 1,
-      }),
-      orbitType: new Uniform({
-        gl,
-        program,
-        dataType: "INT32",
-        name: "u_orbit_type",
-        nitems: 1,
-      }),
-      center: new Uniform({
-        gl,
-        program,
-        dataType: "FLOAT32",
-        name: "u_center",
-        nitems: 2,
-      }),
-      resolution: new Uniform({
-        gl,
-        program,
-        dataType: "FLOAT32",
-        name: "u_resolution",
-        nitems: 2,
-      }),
-      orbitTrapCenter: new Uniform({
-        gl,
-        program,
-        dataType: "FLOAT32",
-        name: "u_orbit_trap_center",
-        nitems: 2,
-      }),
-      recurrenceOffset: new Uniform({
-        gl,
-        program,
-        dataType: "FLOAT32",
-        name: "u_recurrence_offset",
-        nitems: 2,
-      }),
-      counter: new Uniform({
-        gl,
-        program,
-        dataType: "INT32",
-        name: "u_counter",
-        nitems: 1,
-      }),
-    };
+    const indexBufferObject = setupRectangleDomain(gl, program);
+    this.gl = gl;
+    this.program = program;
+    this.indexBufferObject = indexBufferObject;
+    this.counter = -1;
+    this.uniforms = setupUniforms(gl, program);
   }
 
-  public updateResolution(canvasWidth: number, canvasHeight: number) {
-    const gl: WebGLRenderingContext = this._gl;
+  public updateResolution(canvasWidth: number, canvasHeight: number): void {
+    const gl: WebGL2RenderingContext = this.gl;
     gl.viewport(0, 0, canvasWidth, canvasHeight);
-    this._uniforms.resolution.set({ data: [canvasWidth, canvasHeight] });
+    this.uniforms.resolution.set({ data: [canvasWidth, canvasHeight] });
   }
 
-  public set domainSize(value: number) {
-    this._uniforms.domainSize.set({ data: [value] });
+  public setDomainSize(value: number): void {
+    this.uniforms.domainSize.set({ data: [value] });
   }
 
-  public set orbitType(value: number) {
-    this._uniforms.orbitType.set({ data: [value] });
+  public setOrbitType(value: number): void {
+    this.uniforms.orbitType.set({ data: [value] });
   }
 
-  public set center(values: [number, number]) {
-    this._uniforms.center.set({ data: values });
+  public setCenter(values: [number, number]): void {
+    this.uniforms.center.set({ data: values });
   }
 
-  public set orbitTrapCenter(values: [number, number]) {
+  public setOrbitTrapCenter(values: [number, number]): void {
     console.log(`Orbit trap center: ${values.toString()}`);
-    this._uniforms.orbitTrapCenter.set({ data: values });
+    this.uniforms.orbitTrapCenter.set({ data: values });
   }
 
-  public set recurrenceOffset(values: [number, number]) {
+  public setRecurrenceOffset(values: [number, number]): void {
     console.log(`Recurrence offset: ${values.toString()}`);
-    this._uniforms.recurrenceOffset.set({ data: values });
+    this.uniforms.recurrenceOffset.set({ data: values });
   }
 
-  public incrementCounter() {
-    this._counter += 1;
-    this._uniforms.counter.set({ data: [this._counter] });
+  public incrementCounter(): void {
+    this.counter += 1;
+    this.uniforms.counter.set({ data: [this.counter] });
   }
 
-  public draw() {
+  public draw(): void {
     if (
-      !this._uniforms.domainSize.isSet ||
-      !this._uniforms.resolution.isSet ||
-      !this._uniforms.orbitTrapCenter.isSet ||
-      !this._uniforms.recurrenceOffset.isSet
+      !this.uniforms.domainSize.getIsSet() ||
+      !this.uniforms.resolution.getIsSet() ||
+      !this.uniforms.orbitTrapCenter.getIsSet() ||
+      !this.uniforms.recurrenceOffset.getIsSet()
     ) {
-      throw new Error("There is (are) uniform(s) unset");
+      throw new TypeError("There is (are) uniform(s) unset");
     }
-    const gl: WebGLRenderingContext = this._gl;
-    const program: Program = this._program;
-    const indexBufferObject: IndexBufferObject = this._indexBufferObject;
-    program.use({
-      gl,
-      callback: () => {
-        indexBufferObject.bindAndExecute({
-          gl,
-          callback: (boundBuffer: IndexBufferObject) => {
-            boundBuffer.draw({ gl, mode: gl.TRIANGLES });
-          },
-        });
-      },
+    const gl: WebGL2RenderingContext = this.gl;
+    this.program.use(() => {
+      this.indexBufferObject.bindAndDraw(gl.TRIANGLES);
     });
   }
 }

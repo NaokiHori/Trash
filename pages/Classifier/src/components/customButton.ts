@@ -16,7 +16,7 @@ export class CustomButton extends HTMLElement {
       throw new Error();
     }
     if (!(buttonElement instanceof HTMLButtonElement)) {
-      throw new Error();
+      throw new TypeError();
     }
     this.buttonElement = buttonElement;
   }

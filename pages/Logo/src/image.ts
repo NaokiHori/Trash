@@ -1,7 +1,7 @@
 function buildExportSvg(svg: SVGSVGElement, size: number): string {
   const clone = svg.cloneNode(true);
   if (!(clone instanceof SVGSVGElement)) {
-    throw new Error();
+    throw new TypeError();
   }
   clone.setAttribute("xmlns", "http://www.w3.org/2000/svg");
   clone.setAttribute("width", size.toString());

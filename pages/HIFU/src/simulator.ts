@@ -1,10 +1,10 @@
-import { getWebGLRenderingContext } from "./webgl/context";
-import { Program } from "./webgl/program";
-import { IndexBufferObject } from "./webgl/indexBufferObject";
+import { getWebGL2RenderingContext } from "../../webgl/context";
+import { Program } from "../../webgl/program";
+import { IndexBufferObject } from "../../webgl/indexBufferObject";
 import vertexShaderSource from "../shader/vertexShader.glsl?raw";
 import fragmentShaderSource from "../shader/fragmentShader.glsl?raw";
 
-function setupRectangleDomain(gl: WebGLRenderingContext, program: Program): IndexBufferObject {
+function setupRectangleDomain(gl: WebGL2RenderingContext, program: Program): IndexBufferObject {
   const positions = [
     [-1, -1],
     [1, -1],
@@ -28,14 +28,14 @@ function setupRectangleDomain(gl: WebGLRenderingContext, program: Program): Inde
 }
 
 export class Simulator {
-  private _gl: WebGLRenderingContext;
-  private _program: Program;
-  private _indexBufferObject: IndexBufferObject;
-  private _sourceArgument: number;
-  private _isAnimated: boolean;
+  private gl: WebGL2RenderingContext;
+  private program: Program;
+  private indexBufferObject: IndexBufferObject;
+  private sourceArgument: number;
+  private isAnimated: boolean;
 
   public constructor(canvas: HTMLCanvasElement, isAnimated: boolean) {
-    const gl: WebGLRenderingContext = getWebGLRenderingContext({
+    const gl: WebGL2RenderingContext = getWebGL2RenderingContext({
       canvas,
     });
     const program = new Program({
@@ -45,47 +45,54 @@ export class Simulator {
     });
     const sourceArgument = 0;
     const indexBufferObject = setupRectangleDomain(gl, program);
-    this._gl = gl;
-    this._program = program;
-    this._indexBufferObject = indexBufferObject;
-    this._sourceArgument = sourceArgument;
-    this._isAnimated = isAnimated;
+    this.gl = gl;
+    this.program = program;
+    this.indexBufferObject = indexBufferObject;
+    this.sourceArgument = sourceArgument;
+    this.isAnimated = isAnimated;
     Simulator.setSourceArgument(program, sourceArgument);
     Simulator.setIsAnimated(program, isAnimated);
     Simulator.setColorExponents(program);
   }
 
-  public handleResizeEvent(canvas: HTMLCanvasElement) {
-    const gl = this._gl;
+  public handleResizeEvent(canvas: HTMLCanvasElement): void {
+    const gl = this.gl;
     const rect: DOMRect = canvas.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
     canvas.width = width;
     canvas.height = height;
     gl.viewport(0, 0, width, height);
-    this._program.setUniform({
+    this.program.setUniform({
       dataType: "FLOAT32",
       uniformName: "u_resolution",
       data: [width, height],
     });
   }
 
-  public update() {
+  public update(): void {
     const TWO_PI = 2 * Math.PI;
-    this._sourceArgument += 0.1 * TWO_PI;
-    Simulator.setSourceArgument(this._program, this._sourceArgument);
-    if (TWO_PI < this._sourceArgument) {
-      this._sourceArgument -= TWO_PI;
+    this.sourceArgument += 0.1 * TWO_PI;
+    Simulator.setSourceArgument(this.program, this.sourceArgument);
+    if (TWO_PI < this.sourceArgument) {
+      this.sourceArgument -= TWO_PI;
     }
   }
 
-  public flipIsAnimated() {
-    this._isAnimated = !this._isAnimated;
-    Simulator.setIsAnimated(this._program, this._isAnimated);
-    Simulator.setColorExponents(this._program);
+  public flipIsAnimated(): void {
+    this.isAnimated = !this.isAnimated;
+    Simulator.setIsAnimated(this.program, this.isAnimated);
+    Simulator.setColorExponents(this.program);
   }
 
-  private static setSourceArgument(program: Program, sourceArgument: number) {
+  public draw(): void {
+    const gl = this.gl;
+    this.program.use(() => {
+      this.indexBufferObject.bindAndDraw(gl.TRIANGLES);
+    });
+  }
+
+  private static setSourceArgument(program: Program, sourceArgument: number): void {
     program.setUniform({
       dataType: "FLOAT32",
       uniformName: "u_source_argument",
@@ -93,7 +100,7 @@ export class Simulator {
     });
   }
 
-  private static setIsAnimated(program: Program, isAnimated: boolean) {
+  private static setIsAnimated(program: Program, isAnimated: boolean): void {
     program.setUniform({
       dataType: "INT32",
       uniformName: "u_is_animated",
@@ -101,15 +108,8 @@ export class Simulator {
     });
   }
 
-  private static setColorExponents(program: Program) {
-    function shuffle(array: Array<number>) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
-      }
-      return array;
-    }
-    const colorExponents = shuffle([1, 2, 4]);
+  private static setColorExponents(program: Program): void {
+    const colorExponents = Simulator.shuffle([1, 2, 4]);
     program.setUniform({
       dataType: "FLOAT32",
       uniformName: "u_color_exponents",
@@ -117,10 +117,11 @@ export class Simulator {
     });
   }
 
-  public draw() {
-    const gl = this._gl;
-    this._program.use(() => {
-      this._indexBufferObject.bindAndDraw(gl.TRIANGLES);
-    });
+  private static shuffle(array: Array<number>): Array<number> {
+    for (let i = array.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
   }
 }

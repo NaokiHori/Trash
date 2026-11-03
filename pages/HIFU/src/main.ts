@@ -3,12 +3,12 @@ import { Simulator } from "./simulator";
 
 function getCanvas(): HTMLCanvasElement {
   const id = "field";
-  const canvas = document.getElementById(id);
+  const canvas = document.querySelector(`#${id}`);
   if (null === canvas) {
     throw new Error(`failed to get element ${id}`);
   }
   if (!(canvas instanceof HTMLCanvasElement)) {
-    throw new Error(`element ${id} is not HTMLCanvasElement`);
+    throw new TypeError(`element ${id} is not HTMLCanvasElement`);
   }
   return canvas;
 }

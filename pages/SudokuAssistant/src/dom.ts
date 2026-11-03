@@ -11,7 +11,7 @@ function initializeElement<T extends HTMLElement>(
     element.setAttribute(attribute.key, attribute.value);
   }
   if (!(element instanceof type)) {
-    throw new Error();
+    throw new TypeError();
   }
   return element;
 }

@@ -14,7 +14,7 @@ export class RouletteView {
       throw new Error("roulette element not found");
     }
     if (!(rouletteElement instanceof HTMLElement)) {
-      throw new Error();
+      throw new TypeError();
     }
     const labelsElement = document.querySelector("#labels");
     if (labelsElement === null) {

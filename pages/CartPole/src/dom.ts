@@ -7,7 +7,7 @@ export function getElementByIdOrThrow<T extends Element>(
     throw new Error();
   }
   if (!(element instanceof type)) {
-    throw new Error();
+    throw new TypeError();
   }
   return element;
 }
