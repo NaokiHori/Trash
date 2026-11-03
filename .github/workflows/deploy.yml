@@ -1,7 +1,7 @@
 name: Deploy
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 concurrency:
   group: "pages"
@@ -38,8 +38,7 @@ jobs:
     permissions:
       contents: read
     env:
-      ARTIFACT_BASE: "https://naokihori.github.io/Trash/"
-      ARTIFACT_DESTINATION: "./dist"
+      ARTIFACT: "./dist"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6.0.0
@@ -51,12 +50,11 @@ jobs:
         run: |
           make polish
           make build \
-            ARTIFACT_BASE=${{ env.ARTIFACT_BASE }} \
-            ARTIFACT_DESTINATION=${{ env.ARTIFACT_DESTINATION }}
+            ARTIFACT=${{ env.ARTIFACT }}
       - name: Upload artifacts
         uses: actions/upload-pages-artifact@v5.0.0
         with:
-          path: ${{ env.ARTIFACT_DESTINATION }}
+          path: ${{ env.ARTIFACT }}
   deploy:
     name: Deploy
     needs: build
