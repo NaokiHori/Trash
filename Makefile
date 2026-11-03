@@ -50,6 +50,8 @@ polish:
 	docker run \
     --rm \
     --name $(CONTAINER) \
+    -v "${PWD}/index.html":/app/index.html \
+    -v "${PWD}/style.css":/app/style.css \
     -v "${PWD}/pages":/app/pages \
     -v "${PWD}/src":/app/src \
     $(IMAGE) \
